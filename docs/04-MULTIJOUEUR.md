@@ -4,7 +4,7 @@
 
 | Principe | Mise en œuvre |
 |---|---|
-| **Serveur autoritaire** | Seule une Vercel Function calcule le résultat d'un tour avec `shared/engine`. Le client ne fait qu'afficher |
+| **Serveur autoritaire** | Seule une Supabase Edge Function calcule le résultat d'un tour avec `shared/engine`. Le client ne fait qu'afficher |
 | **Choix simultanés et secrets** | Chaque joueur envoie son action ; elle reste invisible pour l'adversaire tant que le tour n'est pas résolu |
 | **Résolution quand les 2 actions sont reçues** | L'API qui reçoit la **deuxième** action résout le tour |
 | **Diffusion par la BDD** | L'API met à jour `matches` ; Supabase Realtime pousse la mise à jour aux 2 clients |
@@ -15,7 +15,7 @@
 
 ```mermaid
 stateDiagram-v2
-  [*] --> draft : POST /api/match/start
+  [*] --> draft : match-start
   draft --> battle : les 2 drafts reçus (ou timeout)
   battle --> battle : tour résolu, personne n'a gagné
   battle --> reward : manche gagnée et BO3 non terminé (Could)
@@ -32,23 +32,23 @@ stateDiagram-v2
 sequenceDiagram
   participant A as Joueur A (hôte)
   participant B as Joueur B
-  participant API as Vercel /api
+  participant API as Edge Functions
   participant DB as Supabase DB
   participant RT as Realtime
 
-  A->>API: POST /api/rooms/create
+  A->>API: rooms-create
   API->>DB: INSERT rooms (code "K7P2QX")
   API-->>A: { roomId, code }
   A->>RT: subscribe rooms id=roomId
   Note over A: affiche le code à partager
 
-  B->>API: POST /api/rooms/join { code }
+  B->>API: rooms-join { code }
   API->>DB: UPDATE rooms SET guest_id WHERE guest_id IS NULL
   API-->>B: { roomId }
   DB-->>RT: UPDATE rooms
   RT-->>A: guest_id renseigné → "B a rejoint"
 
-  A->>API: POST /api/match/start { roomId }
+  A->>API: match-start { roomId }
   API->>DB: INSERT matches + UPDATE rooms (status playing, current_match_id)
   DB-->>RT: UPDATE rooms
   RT-->>A: current_match_id
@@ -64,7 +64,7 @@ sequenceDiagram
 sequenceDiagram
   participant A as Joueur A
   participant B as Joueur B
-  participant API as /api/match/action
+  participant API as match-action
   participant DB as Supabase DB
   participant RT as Realtime
 
@@ -92,11 +92,11 @@ sequenceDiagram
 ## 5. Résolution côté serveur
 
 ```ts
-// api/_lib/turns.ts
-import { supabaseAdmin } from './supabaseAdmin.js';
-import { resolveTurn } from '../../shared/engine/battle.js';
-import { createTurnRng } from '../../shared/engine/rng.js';
-import type { Action, BattleState } from '../../shared/types.js';
+// supabase/functions/_shared/turns.ts
+import { supabaseAdmin } from './supabaseAdmin.ts';
+import { resolveTurn } from '../../../shared/engine/battle.ts';
+import { createTurnRng } from '../../../shared/engine/rng.ts';
+import type { Action, BattleState } from '../../../shared/types.ts';
 
 export const TURN_DURATION_MS = 60_000;
 
@@ -216,10 +216,10 @@ useEffect(() => subscribeToMatch(matchId, (row) => {
 
 ## 7. Timeout de tour (Should)
 
-Un cron Vercel n'est pas adapté (sur le plan Hobby, les crons tournent au plus une fois par jour). Ce sont donc **les clients** qui réclament le timeout :
+Aucun serveur ne tourne en continu : Render sert des fichiers statiques et les Edge Functions ne s'exécutent qu'à la réception d'une requête. Plutôt que d'ajouter une tâche planifiée côté Supabase, ce sont **les clients** qui réclament le timeout :
 
 1. `matches.turn_deadline` est fixé à chaque nouveau tour (maintenant + 60 s).
-2. Le client qui attend affiche le compte à rebours. Une fois la deadline dépassée, il appelle `POST /api/match/timeout`.
+2. Le client qui attend affiche le compte à rebours. Une fois la deadline dépassée, il appelle la fonction `match-timeout`.
 3. L'API vérifie `now() > turn_deadline + 2 s de marge`, insère une **action par défaut** (`is_auto = true`) pour chaque joueur qui n'a pas joué, puis appelle `tryResolveBattleTurn`.
 4. Action par défaut : première compétence qui a encore des PP (`strike` a des PP infinis, donc il y en a toujours une).
 5. *(Could)* Après 3 timeouts consécutifs du même joueur → défaite par abandon.
@@ -241,7 +241,7 @@ setUiState(mine ? 'waiting' : 'choosing');
 
 ## 9. Abandon
 
-`POST /api/match/forfeit` : passe le match en `finished`, fixe `winner_id` sur l'adversaire, ajoute un événement `forfeit` dans `last_events` et incrémente `version`. L'adversaire est notifié par Realtime.
+Fonction `match-forfeit` : passe le match en `finished`, fixe `winner_id` sur l'adversaire, ajoute un événement `forfeit` dans `last_events` et incrémente `version`. L'adversaire est notifié par Realtime.
 
 ## 10. Plan B : polling
 
@@ -258,7 +258,7 @@ Le reste (API, BDD, moteur) ne change pas. **Tester le Realtime sur le réseau d
 
 ## 11. Tester le multijoueur en local
 
-1. `npx vercel dev`
+1. Déployer les fonctions (`npx supabase functions deploy`) puis lancer `npm run dev` ; ou tester directement sur la preview Render de la PR.
 2. Ouvrir **deux profils de navigateur différents** (ou une fenêtre normale + une fenêtre privée), pour avoir deux sessions anonymes distinctes.
 3. Dans la fenêtre A, créer un salon ; dans la fenêtre B, le rejoindre avec le code.
 4. Vérifier dans Supabase (Table Editor → `matches`) que `version` et `turn` augmentent à chaque tour.

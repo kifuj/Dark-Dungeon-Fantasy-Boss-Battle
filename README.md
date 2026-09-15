@@ -12,7 +12,7 @@ Inspiré de *PokeRogue*.
 
 | Quoi | Lien |
 |---|---|
-| Jeu en ligne (Vercel) | `https://<à-compléter>.vercel.app` |
+| Jeu en ligne (Render) | [`https://dark-dungeon-fantasy-boss-battle.onrender.com`](https://dark-dungeon-fantasy-boss-battle.onrender.com) |
 | Dépôt GitHub (public) | `https://github.com/<à-compléter>/dark-dungeon-fantasy-boss-battle` |
 | Projet Supabase | *(privé : ne jamais publier les clés)* |
 
@@ -23,10 +23,10 @@ Inspiré de *PokeRogue*.
 | Front (menus, lobby) | React + TypeScript + Vite |
 | Rendu du jeu | Phaser 4 (canvas/WebGL, `pixelArt: true`) |
 | Moteur de combat | TypeScript pur, partagé entre le client et le serveur (`shared/`) |
-| Serveur autoritaire | Vercel Functions (`api/`) |
+| Serveur autoritaire | Supabase Edge Functions (`supabase/functions/`) |
 | BDD / Auth / Temps réel | Supabase (Postgres + Auth anonyme + Realtime) |
 | Tests | Vitest |
-| Hébergement | Vercel (plan Hobby gratuit) |
+| Hébergement | Render (Static Site, offre gratuite) |
 
 ## 📚 Documentation
 
@@ -37,9 +37,9 @@ Inspiré de *PokeRogue*.
 | 02 | [Architecture](docs/02-ARCHITECTURE.md) | Stack, schémas, arborescence, liaison React ↔ Phaser |
 | 03 | [Base de données](docs/03-BASE-DE-DONNEES.md) | Schéma SQL Supabase, RLS, Realtime |
 | 04 | [Multijoueur](docs/04-MULTIJOUEUR.md) | Tour simultané, résolution serveur, synchro, timeouts, reconnexion |
-| 05 | [API](docs/05-API.md) | Contrats des endpoints `/api/*` |
+| 05 | [API](docs/05-API.md) | Contrats des Edge Functions (`rooms-*`, `match-*`) |
 | 06 | [Moteur de combat](docs/06-MOTEUR-DE-COMBAT.md) | Types, formules, RNG déterministe, IA, tests |
-| 07 | [Installation & déploiement](docs/07-INSTALLATION-DEPLOIEMENT.md) | Installation locale, Supabase, Vercel, dépannage |
+| 07 | [Installation & déploiement](docs/07-INSTALLATION-DEPLOIEMENT.md) | Installation locale, Supabase, Render, dépannage |
 | 08 | [Conventions](docs/08-CONVENTIONS.md) | Git, code, revues, assets et licences |
 | — | [Crédits](docs/CREDITS.md) | Auteurs et licences des assets |
 | 🟦 | [Product Backlog](docs/agile/PRODUCT-BACKLOG.md) | User stories, critères d'acceptation, DoR, DoD, estimations |
@@ -51,9 +51,8 @@ Inspiré de *PokeRogue*.
 git clone https://github.com/<à-compléter>/dark-dungeon-fantasy-boss-battle.git
 cd dark-dungeon-fantasy-boss-battle
 npm install
-npx vercel link              # lier le dossier au projet Vercel
-npx vercel env pull .env.local
-npx vercel dev               # front + API sur http://localhost:3000
+cp .env.example .env.local   # renseigner l'URL et la clé publishable Supabase
+npm run dev                  # front sur http://localhost:5173
 ```
 
 Tests du moteur de combat :
@@ -62,7 +61,7 @@ Tests du moteur de combat :
 npm test
 ```
 
-Le guide complet est dans [07-INSTALLATION-DEPLOIEMENT.md](docs/07-INSTALLATION-DEPLOIEMENT.md).
+Le guide complet (dont le déploiement des Edge Functions) est dans [07-INSTALLATION-DEPLOIEMENT.md](docs/07-INSTALLATION-DEPLOIEMENT.md).
 
 ## 👥 Équipe
 

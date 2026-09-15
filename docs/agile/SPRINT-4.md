@@ -25,7 +25,7 @@
 | | | Écran de choix (3 cartes) + remplacement si équipe pleine | Owen | ☐ |
 | **US-21** Reconnexion | 3 | Chargement initial sans animation + détection « déjà joué » | Paul | ☐ |
 | | | Bouton « Reprendre la partie » dans le menu | Paul | ☐ |
-| **US-20** Timeout | 3 | `api/match/timeout.ts` (action par défaut, `is_auto`) | Donovan | ☐ |
+| **US-20** Timeout | 3 | Edge Function `match-timeout` (action par défaut, `is_auto`) | Donovan | ☐ |
 | | | Compte à rebours côté client + appel automatique | Donovan | ☐ |
 | **US-26** Crédits | 1 | Page Crédits reprenant `CREDITS.md` | Donovan | ☐ |
 | *(hors US)* | — | Enregistrer une **vidéo de secours** de la démo | Mattéo | ☐ |
@@ -132,7 +132,7 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 ## 📦 Checklist de rendu (jeudi 13h30)
 
 - [ ] Lien GitHub public qui fonctionne en navigation privée
-- [ ] URL Vercel de production dans le README
+- [ ] URL Render de production dans le README (fait : https://dark-dungeon-fantasy-boss-battle.onrender.com)
 - [ ] `PRODUCT-BACKLOG.md` : estimations d'équipe remplies, journal du Planning Poker
 - [ ] `SPRINT-1.md` à `SPRINT-4.md` : goal, backlog, dailies, review, rétro remplis + captures
 - [ ] `00-PROJET-GLOBAL.md` : tableau de vélocité rempli

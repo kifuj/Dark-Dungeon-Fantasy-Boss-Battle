@@ -47,8 +47,8 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 
 ### ⚠️ Points d'attention techniques
 - Première version sans animation : Phaser applique directement les PV finaux. Les animations complètes arrivent avec US-09 (objectif bonus du sprint 4).
-- Tester sur l'**URL Vercel**, pas seulement en local (chemins des assets dans `public/`).
-- En parallèle, le pôle Backend peut **préparer** `api/_lib/` pour le sprint 3.
+- Tester sur l'**URL Render**, pas seulement en local (chemins des assets dans `public/`).
+- En parallèle, le pôle Backend peut **préparer** `supabase/functions/_shared/` pour le sprint 3 et vérifier qu'une Edge Function peut importer `shared/engine` (doc 07 §1).
 
 ---
 

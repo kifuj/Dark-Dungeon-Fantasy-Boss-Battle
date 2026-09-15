@@ -3,7 +3,7 @@ import type { BattleState, Seat } from '../types.js';
 
 /**
  * Côté client : griser les boutons impossibles. Côté serveur : bloquer les requêtes trafiquées.
- * L'abandon passe par `/api/match/forfeit`, pas par cette validation.
+ * L'abandon passe par la fonction `match-forfeit`, pas par cette validation.
  */
 export function validateAction(state: BattleState, seat: Seat, action: unknown): { ok: true } | { ok: false; reason: string } {
   if (typeof action !== 'object' || action === null) return { ok: false, reason: 'not_an_object' };

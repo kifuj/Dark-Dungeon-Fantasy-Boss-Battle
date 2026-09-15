@@ -1,10 +1,11 @@
-# 05 — API (Vercel Functions)
+# 05 — API (Supabase Edge Functions)
 
 ## 1. Conventions
 
-- Tous les endpoints sont en **`POST`**, avec un corps et une réponse en **JSON**.
-- Authentification : en-tête `Authorization: Bearer <access_token Supabase>`.
-- Chaque fichier `api/xxx/yyy.ts` correspond à l'URL `/api/xxx/yyy`. Les fichiers et dossiers qui commencent par `_` ne sont pas exposés.
+- Chaque endpoint est une **Edge Function** Supabase (Deno) : `supabase/functions/<nom>/index.ts`, appelable à `https://<ref>.supabase.co/functions/v1/<nom>`.
+- Nommage `<ressource>-<action>` : `rooms-create`, `match-action`… Les dossiers qui commencent par `_` (`_shared/`) ne sont pas déployés.
+- Tous les endpoints sont en **`POST`**, avec un corps et une réponse en **JSON**. Les requêtes `OPTIONS` (preflight CORS) reçoivent une réponse vide : le front est servi par Render, sur un autre domaine que Supabase.
+- Authentification : en-tête `Authorization: Bearer <access_token Supabase>`, ajouté automatiquement par `supabase.functions.invoke`. La passerelle Supabase vérifie le JWT avant d'appeler la fonction.
 - Format d'erreur : `{ "error": "CODE_ERREUR", "message"?: "détail lisible" }`.
 - Les **lectures** ne passent pas par l'API : le client lit directement Supabase (voir [02](02-ARCHITECTURE.md#-la-règle-dor)).
 
@@ -14,7 +15,7 @@
 |---|---|---|
 | 400 | `INVALID_BODY` | Champ manquant ou mal typé |
 | 400 | `INVALID_ACTION` | Action impossible (compétence inconnue, plus de PP, changement vers un monstre KO…) |
-| 401 | `UNAUTHENTICATED` | JWT absent ou invalide |
+| 401 | `UNAUTHENTICATED` | JWT absent ou invalide (peut aussi venir de la passerelle Supabase, avec un autre corps) |
 | 403 | `NOT_A_PLAYER` | L'utilisateur ne participe pas à ce salon ou à ce match |
 | 403 | `NOT_HOST` | Seul l'hôte peut lancer le match |
 | 404 | `ROOM_NOT_FOUND` / `MATCH_NOT_FOUND` | Salon ou match introuvable |
@@ -24,11 +25,11 @@
 | 409 | `STALE_TURN` | `round`/`turn` différents du tour courant |
 | 409 | `ALREADY_PLAYED` | Action déjà envoyée pour ce tour |
 | 409 | `TOO_EARLY` | Timeout réclamé avant la deadline |
-| 500 | `INTERNAL` | Erreur inattendue (voir les logs Vercel) |
+| 500 | `INTERNAL` | Erreur inattendue (voir les logs de la fonction dans Supabase) |
 
 ## 3. Endpoints
 
-### `POST /api/rooms/create`
+### `rooms-create`
 Crée un salon dont l'appelant est l'hôte.
 
 | Requête | Réponse `200` |
@@ -39,7 +40,7 @@ Règles : l'appelant doit avoir un profil. On génère un code de 6 caractères 
 
 ---
 
-### `POST /api/rooms/join`
+### `rooms-join`
 
 | Requête | Réponse `200` |
 |---|---|
@@ -49,7 +50,7 @@ Règles : le salon existe et est en statut `waiting`, l'appelant n'est pas l'hô
 
 ---
 
-### `POST /api/match/start`
+### `match-start`
 
 | Requête | Réponse `200` |
 |---|---|
@@ -59,7 +60,7 @@ Règles : l'appelant est l'hôte et un invité est présent. Le serveur génère
 
 ---
 
-### `POST /api/match/draft` *(Should)*
+### `match-draft` *(Should)*
 
 | Requête | Réponse `200` |
 |---|---|
@@ -69,7 +70,7 @@ Règles : phase `draft`, 3 indices distincts compris dans les offres du joueur. 
 
 ---
 
-### `POST /api/match/action`
+### `match-action`
 
 | Requête | Réponse `200` |
 |---|---|
@@ -87,7 +88,7 @@ Règles : voir l'implémentation ci-dessous. Erreurs : `WRONG_PHASE`, `STALE_TUR
 
 ---
 
-### `POST /api/match/timeout` *(Should)*
+### `match-timeout` *(Should)*
 
 | Requête | Réponse `200` |
 |---|---|
@@ -97,7 +98,7 @@ Règles : l'appelant est un joueur du match et `now > turn_deadline + 2 s`. Ins�
 
 ---
 
-### `POST /api/match/forfeit`
+### `match-forfeit`
 
 | Requête | Réponse `200` |
 |---|---|
@@ -105,7 +106,7 @@ Règles : l'appelant est un joueur du match et `now > turn_deadline + 2 s`. Ins�
 
 ---
 
-### `POST /api/match/reward` *(Could, BO3)*
+### `match-reward` *(Could, BO3)*
 
 | Requête | Réponse `200` |
 |---|---|
@@ -113,144 +114,153 @@ Règles : l'appelant est un joueur du match et `now > turn_deadline + 2 s`. Ins�
 
 ## 4. Code commun
 
-### `api/_lib/supabaseAdmin.ts`
+> Dans `supabase/functions/`, les imports relatifs prennent l'extension **`.ts`** (Deno) et les paquets npm sont importés avec le préfixe `npm:`. Voir [07 §1](07-INSTALLATION-DEPLOIEMENT.md#supabasefunctionsdenojson) pour l'import de `shared/`.
+
+### `supabase/functions/_shared/supabaseAdmin.ts`
 
 ```ts
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 export const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SECRET_KEY!,           // ⚠️ serveur uniquement
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, // ⚠️ injectée par Supabase, serveur uniquement
   { auth: { persistSession: false, autoRefreshToken: false } },
 );
 ```
 
-### `api/_lib/http.ts`
+### `supabase/functions/_shared/http.ts`
 
 ```ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*', // pas de cookie : la sécurité repose sur le JWT
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
-export function fail(res: VercelResponse, status: number, error: string, message?: string) {
-  res.status(status).json({ error, message });
+export function json(status: number, body: unknown) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+export function fail(status: number, error: string, message?: string) {
+  return json(status, { error, message });
+}
+
+/** Réponse à renvoyer tout de suite (preflight CORS ou mauvaise méthode), sinon null. */
+export function preflight(req: Request): Response | null {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST') return fail(405, 'METHOD_NOT_ALLOWED');
   return null;
 }
-
-export function ensurePost(req: VercelRequest, res: VercelResponse): boolean {
-  if (req.method === 'POST') return true;
-  fail(res, 405, 'METHOD_NOT_ALLOWED');
-  return false;
-}
 ```
 
-### `api/_lib/auth.ts`
+### `supabase/functions/_shared/auth.ts`
 
 ```ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabaseAdmin } from './supabaseAdmin.js';
-import { fail } from './http.js';
+import { supabaseAdmin } from './supabaseAdmin.ts';
 
-export async function requireUser(req: VercelRequest, res: VercelResponse) {
-  const token = req.headers.authorization?.replace(/^Bearer\s+/i, '');
-  if (!token) return fail(res, 401, 'UNAUTHENTICATED');
+export async function getUser(req: Request) {
+  const token = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token) return null;
 
   const { data, error } = await supabaseAdmin.auth.getUser(token);
-  if (error || !data.user) return fail(res, 401, 'UNAUTHENTICATED');
-  return data.user;
+  return error ? null : data.user;
 }
 ```
 
-### `api/match/action.ts`
+### `supabase/functions/match-action/index.ts`
 
 ```ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { supabaseAdmin } from '../_lib/supabaseAdmin.js';
-import { requireUser } from '../_lib/auth.js';
-import { ensurePost, fail } from '../_lib/http.js';
-import { tryResolveBattleTurn } from '../_lib/turns.js';
-import { validateAction } from '../../shared/engine/validate.js';
-import type { BattleState } from '../../shared/types.js';
+import { supabaseAdmin } from '../_shared/supabaseAdmin.ts';
+import { getUser } from '../_shared/auth.ts';
+import { fail, json, preflight } from '../_shared/http.ts';
+import { tryResolveBattleTurn } from '../_shared/turns.ts';
+import { validateAction } from '../../../shared/engine/validate.ts';
+import type { BattleState } from '../../../shared/types.ts';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!ensurePost(req, res)) return;
-  const user = await requireUser(req, res);
-  if (!user) return;
+Deno.serve(async (req) => {
+  const early = preflight(req);
+  if (early) return early;
 
-  const { matchId, round, turn, action } = req.body ?? {};
+  const user = await getUser(req);
+  if (!user) return fail(401, 'UNAUTHENTICATED');
+
+  const { matchId, round, turn, action } = (await req.json().catch(() => null)) ?? {};
   if (typeof matchId !== 'string' || !Number.isInteger(round) || !Number.isInteger(turn) || !action) {
-    return fail(res, 400, 'INVALID_BODY');
+    return fail(400, 'INVALID_BODY');
   }
 
   const { data: match } = await supabaseAdmin.from('matches').select('*').eq('id', matchId).single();
-  if (!match) return fail(res, 404, 'MATCH_NOT_FOUND');
+  if (!match) return fail(404, 'MATCH_NOT_FOUND');
 
   const seat = match.player1_id === user.id ? 0 : match.player2_id === user.id ? 1 : null;
-  if (seat === null) return fail(res, 403, 'NOT_A_PLAYER');
-  if (match.phase !== 'battle') return fail(res, 409, 'WRONG_PHASE');
-  if (match.round !== round || match.turn !== turn) return fail(res, 409, 'STALE_TURN');
+  if (seat === null) return fail(403, 'NOT_A_PLAYER');
+  if (match.phase !== 'battle') return fail(409, 'WRONG_PHASE');
+  if (match.round !== round || match.turn !== turn) return fail(409, 'STALE_TURN');
 
   const check = validateAction(match.state as BattleState, seat, action);
-  if (!check.ok) return fail(res, 400, 'INVALID_ACTION', check.reason);
+  if (!check.ok) return fail(400, 'INVALID_ACTION', check.reason);
 
   const { error } = await supabaseAdmin.from('match_actions').insert({
     match_id: matchId, player_id: user.id, phase: 'battle', round, turn, payload: action,
   });
-  if (error?.code === '23505') return fail(res, 409, 'ALREADY_PLAYED');
-  if (error) return fail(res, 500, 'INTERNAL', error.message);
+  if (error?.code === '23505') return fail(409, 'ALREADY_PLAYED');
+  if (error) return fail(500, 'INTERNAL', error.message);
 
   const resolved = await tryResolveBattleTurn(matchId);
-  return res.status(200).json({ status: resolved ? 'resolved' : 'waiting' });
-}
+  return json(200, { status: resolved ? 'resolved' : 'waiting' });
+});
 ```
 
-### `api/rooms/create.ts` (générer le code)
+### `supabase/functions/rooms-create/index.ts` (générer le code)
 
 ```ts
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const makeCode = () =>
   Array.from({ length: 6 }, () => ALPHABET[Math.floor(Math.random() * ALPHABET.length)]).join('');
 
-// dans le handler :
+// dans Deno.serve, après preflight et getUser :
 for (let attempt = 0; attempt < 5; attempt++) {
   const code = makeCode();
   const { data, error } = await supabaseAdmin
     .from('rooms').insert({ code, host_id: user.id }).select('id, code').single();
-  if (!error) return res.status(200).json({ roomId: data.id, code: data.code });
-  if (error.code !== '23505') return fail(res, 500, 'INTERNAL', error.message);
+  if (!error) return json(200, { roomId: data.id, code: data.code });
+  if (error.code !== '23505') return fail(500, 'INTERNAL', error.message);
 }
-return fail(res, 500, 'INTERNAL', 'Impossible de générer un code');
+return fail(500, 'INTERNAL', 'Impossible de générer un code');
 ```
 
 ## 5. Appeler l'API depuis le client
 
 ```ts
 // src/lib/api.ts
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
 export class ApiError extends Error {
   constructor(public code: string, public status: number) { super(code); }
 }
 
-export async function callApi<T>(path: string, body: unknown = {}): Promise<T> {
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(`/api/${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session?.access_token ?? ''}`,
-    },
-    body: JSON.stringify(body),
-  });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new ApiError(json.error ?? 'INTERNAL', res.status);
-  return json as T;
+export async function callApi<T>(name: string, body: unknown = {}): Promise<T> {
+  // invoke ajoute l'en-tête Authorization avec la session courante
+  const { data, error } = await supabase.functions.invoke(name, { body });
+  if (error instanceof FunctionsHttpError) {
+    const status = error.context.status;
+    const json = await error.context.json().catch(() => ({}));
+    throw new ApiError(json.error ?? (status === 401 ? 'UNAUTHENTICATED' : 'INTERNAL'), status);
+  }
+  if (error) throw new ApiError('INTERNAL', 0); // réseau, CORS, fonction introuvable
+  return data as T;
 }
 
 // Exemples
-export const createRoom = () => callApi<{ roomId: string; code: string }>('rooms/create');
-export const joinRoom = (code: string) => callApi<{ roomId: string }>('rooms/join', { code });
-export const startMatch = (roomId: string) => callApi<{ matchId: string }>('match/start', { roomId });
+export const createRoom = () => callApi<{ roomId: string; code: string }>('rooms-create');
+export const joinRoom = (code: string) => callApi<{ roomId: string }>('rooms-join', { code });
+export const startMatch = (roomId: string) => callApi<{ matchId: string }>('match-start', { roomId });
 export const sendAction = (matchId: string, round: number, turn: number, action: unknown) =>
-  callApi<{ status: 'waiting' | 'resolved' }>('match/action', { matchId, round, turn, action });
+  callApi<{ status: 'waiting' | 'resolved' }>('match-action', { matchId, round, turn, action });
 ```
 
 ### Messages d'erreur affichés au joueur

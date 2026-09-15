@@ -7,12 +7,13 @@
 | Menus, formulaires, lobby | **React + TypeScript + Vite** | Stack JS recommandée par le TP ; compatible avec les maquettes exportées depuis Lovable (React + Tailwind) |
 | Rendu du combat | **Phaser 4** | Moteur 2D mature (sprites, tweens, spritesheets, mise à l'échelle pixel-art). La plupart des tutos Phaser 3 restent valables |
 | Règles du jeu | **TypeScript pur** dans `shared/` | Le même code tourne dans le navigateur (solo) et sur le serveur (multi) |
-| Serveur autoritaire | **Vercel Functions** (`api/`) | Hébergées avec le front, gratuites, aucun serveur à gérer |
+| Hébergement du front | **Render** (Static Site) | Gratuit, déploiement automatique depuis GitHub, previews de PR |
+| Serveur autoritaire | **Supabase Edge Functions** (`supabase/functions/`) | Un Static Site n'exécute pas de code serveur ; les Edge Functions sont gratuites, sans mise en veille, et au plus près de la BDD |
 | Données + auth | **Supabase** Postgres + Auth anonyme | Recommandé par le TP, gratuit, sécurité par RLS |
-| Temps réel | **Supabase Realtime** (`postgres_changes`) | Vercel ne convient pas pour garder des WebSockets ouvertes. Vercel recommande un fournisseur tiers, dont Supabase |
+| Temps réel | **Supabase Realtime** (`postgres_changes`) | Ni un Static Site ni une Edge Function ne gardent de WebSocket ouverte : la diffusion est déléguée à Supabase |
 | Tests | **Vitest** | Intégré à Vite, rapide |
 
-> **Pourquoi pas Socket.io ou un serveur Node permanent ?** Les fonctions Vercel sont éphémères : elles traitent une requête puis s'arrêtent. Le support WebSocket natif de Vercel (bêta, 2026) n'offre ni diffusion vers plusieurs clients ni présence. Pour du **tour par tour**, « requête HTTP pour jouer + notification temps réel pour recevoir » est plus simple et plus robuste.
+> **Pourquoi pas Socket.io ou un serveur Node permanent ?** Il faudrait un Web Service Render en plus du Static Site ; sur l'offre gratuite, il se met en veille après 15 min d'inactivité et met près d'une minute à se réveiller, ce qui est risqué en démo. Les Edge Functions sont éphémères : elles traitent une requête puis s'arrêtent. Pour du **tour par tour**, « requête HTTP pour jouer + notification temps réel pour recevoir » est plus simple et plus robuste.
 
 ## 2. Vue d'ensemble
 
@@ -26,14 +27,14 @@ flowchart TB
     R --> SH1
   end
 
-  subgraph Vercel
+  subgraph Render["Render (Static Site)"]
     ST[Fichiers statiques Vite /dist]
-    API[Functions /api/*]
-    SH2[shared/ moteur]
-    API --> SH2
   end
 
   subgraph Supabase
+    API[Edge Functions rooms-* / match-*]
+    SH2[shared/ moteur]
+    API --> SH2
     AUTH[Auth anonyme]
     DB[(Postgres + RLS)]
     RT[Realtime]
@@ -42,7 +43,7 @@ flowchart TB
 
   R -- "chargement" --> ST
   R -- "LECTURES (select)" --> DB
-  R -- "ÉCRITURES (POST + JWT)" --> API
+  R -- "ÉCRITURES (functions.invoke + JWT)" --> API
   API -- "clé secrète" --> DB
   RT -- "UPDATE matches / rooms" --> R
   R -- "signInAnonymously" --> AUTH
@@ -53,28 +54,30 @@ flowchart TB
 | Opération | Passe par | Pourquoi |
 |---|---|---|
 | **Lire** (profil, salon, état du match, classement) | Client → Supabase directement | Simple et rapide, protégé par la RLS |
-| **Écrire une action de jeu** (créer ou rejoindre un salon, jouer un tour) | Client → **`/api/*`** → Supabase | Le serveur **valide** l'action et **calcule** le résultat : impossible de tricher en modifiant le JS |
+| **Écrire une action de jeu** (créer ou rejoindre un salon, jouer un tour) | Client → **Edge Function** → Supabase | Le serveur **valide** l'action et **calcule** le résultat : impossible de tricher en modifiant le JS |
 | **Écrire des données non critiques** (pseudo, score solo) | Client → Supabase directement | Autorisé par une RLS stricte (on ne peut écrire que ses propres lignes) |
 
 ## 3. Arborescence
 
 ```
 .                                 # racine du dépôt
-├─ api/                          # ⚙️ Vercel Functions (Node, serveur autoritaire)
-│  ├─ _lib/                      #   "_" : pas exposé comme endpoint
-│  │  ├─ supabaseAdmin.ts        #   client Supabase avec la clé secrète
-│  │  ├─ auth.ts                 #   requireUser() : vérifie le JWT
-│  │  ├─ http.ts                 #   helpers de réponse / erreurs
-│  │  └─ turns.ts                #   tryResolve() : résolution des tours
-│  ├─ rooms/
-│  │  ├─ create.ts
-│  │  └─ join.ts
-│  └─ match/
-│     ├─ start.ts
-│     ├─ draft.ts
-│     ├─ action.ts
-│     ├─ timeout.ts
-│     └─ forfeit.ts
+├─ supabase/
+│  ├─ config.toml                #   généré par `supabase init`
+│  ├─ migrations/001_init.sql
+│  └─ functions/                 # ⚙️ Supabase Edge Functions (Deno, serveur autoritaire)
+│     ├─ deno.json
+│     ├─ _shared/                #   "_" : pas déployé comme fonction
+│     │  ├─ supabaseAdmin.ts     #   client Supabase avec la clé secrète
+│     │  ├─ auth.ts              #   getUser() : vérifie le JWT
+│     │  ├─ http.ts              #   CORS, helpers de réponse / erreurs
+│     │  └─ turns.ts             #   tryResolve() : résolution des tours
+│     ├─ rooms-create/index.ts
+│     ├─ rooms-join/index.ts
+│     ├─ match-start/index.ts
+│     ├─ match-draft/index.ts
+│     ├─ match-action/index.ts
+│     ├─ match-timeout/index.ts
+│     └─ match-forfeit/index.ts
 ├─ shared/                       # 🧠 Code PUR partagé (ni React, ni Phaser, ni Supabase)
 │  ├─ types.ts
 │  ├─ data/  elements.ts · skills.ts · monsters.ts · rewards.ts
@@ -91,15 +94,13 @@ flowchart TB
 │  ├─ lib/ supabase.ts · api.ts · realtime.ts
 │  └─ components/                #   boutons, barre d'actions, modales (Lovable)
 ├─ public/assets/ sprites/ · ui/ · fonts/ · audio/
-├─ supabase/migrations/001_init.sql
 ├─ docs/
 ├─ .env.example
-├─ vercel.json
 ├─ vite.config.ts
 └─ package.json
 ```
 
-> **Imports dans `api/` et `shared/`** : utiliser des imports **relatifs avec extension `.js`** (`import { resolveTurn } from '../../shared/engine/battle.js'`). Vite et TypeScript comprennent cette syntaxe, et le runtime Node de Vercel l'exige en ESM. Pas d'alias `@/` dans ces dossiers.
+> **Imports** : dans `shared/`, imports **relatifs avec extension `.js`** (`import { computeDamage } from './damage.js'`), compris par Vite et TypeScript. Dans `supabase/functions/`, imports **relatifs avec extension `.ts`** (Deno) et paquets npm avec le préfixe `npm:`. Pas d'alias `@/` dans ces dossiers. L'import de `shared/` depuis une Edge Function est détaillé en [07 §1](07-INSTALLATION-DEPLOIEMENT.md#supabasefunctionsdenojson).
 
 ## 4. Principes du moteur partagé (`shared/`)
 
@@ -206,7 +207,7 @@ private wait(ms: number) {
 
 | Étape | Solo | Multijoueur |
 |---|---|---|
-| Où tourne `resolveTurn` | Dans le **navigateur** | Dans une **Vercel Function** |
+| Où tourne `resolveTurn` | Dans le **navigateur** | Dans une **Supabase Edge Function** |
 | Action de l'adversaire | `chooseAiAction()` en local | Envoyée par l'autre joueur à l'API |
 | Réception du résultat | Retour direct de la fonction | **Supabase Realtime** (UPDATE sur `matches`) |
 | Sauvegarde | Score en fin de run (`solo_runs`) | État à chaque tour (`matches.state`) |
@@ -216,16 +217,16 @@ Le détail du flux multijoueur est dans [04-MULTIJOUEUR](04-MULTIJOUEUR.md).
 
 ## 7. Sécurité
 
-- **Clé secrète Supabase** (`SUPABASE_SECRET_KEY`, anciennement `service_role`) : **uniquement** dans les variables d'environnement Vercel, jamais dans du code préfixé `VITE_`, jamais commitée.
-- **Clé publishable** (anciennement `anon`) : peut être exposée côté client ; la sécurité repose sur la **RLS**.
-- Chaque endpoint `/api` vérifie le **JWT** de l'utilisateur, que le joueur **appartient au match**, la **phase**, le **numéro de tour** et la **validité de l'action**.
+- **Clé secrète Supabase** (`service_role`) : **uniquement** dans les Edge Functions, où Supabase l'injecte automatiquement (`SUPABASE_SERVICE_ROLE_KEY`). Jamais sur Render, jamais dans du code préfixé `VITE_`, jamais commitée.
+- **Clé publishable** (anciennement `anon`) : peut être exposée côté client (variable Render `VITE_SUPABASE_PUBLISHABLE_KEY`) ; la sécurité repose sur la **RLS**.
+- Chaque Edge Function vérifie le **JWT** de l'utilisateur, que le joueur **appartient au match**, la **phase**, le **numéro de tour** et la **validité de l'action**.
 - Aucune policy RLS n'autorise un client à modifier `matches`, `match_actions` ou `rooms` : seule l'API écrit dans ces tables.
 
 ## 8. Limites des offres gratuites
 
 | Service | Limite utile | Impact pour nous |
 |---|---|---|
-| Supabase Free | 500 Mo de BDD, 200 connexions Realtime simultanées, 2 M messages/mois, pause après 7 jours d'inactivité | Aucun pour une démo |
-| Vercel Hobby | Usage non commercial, quotas de fonctions largement suffisants | Aucun |
+| Supabase Free | 500 Mo de BDD, 200 connexions Realtime simultanées, 2 M messages/mois, 500 000 appels d'Edge Functions/mois, pause après 7 jours d'inactivité | Aucun pour une démo |
+| Render Static Site (gratuit) | Bande passante mensuelle limitée ; pas de mise en veille pour un site statique | Aucun |
 
-> Astuce latence : créer le projet Supabase en région **Paris (eu-west-3)** et régler la région des Functions Vercel sur **Paris (cdg1)** dans *Project Settings → Functions*.
+> Astuce latence : créer le projet Supabase en région **Paris (eu-west-3)**, pour que la BDD soit proche des joueurs et des Edge Functions.
