@@ -1,0 +1,77 @@
+export type Element = 'feu' | 'eau' | 'nature' | 'lumiere' | 'ombre' | 'neutre';
+export type Seat = 0 | 1;
+
+export interface BaseStats {
+  hp: number;
+  atk: number;
+  def: number;
+  spd: number;
+}
+
+export interface SkillDef {
+  id: string;
+  name: string;
+  element: Element;
+  power: number; // 0 pour les compétences sans dégâts
+  pp: number | null; // null = illimité
+  priority?: number; // défaut 0
+  effect?: 'heal30' | 'drain50' | 'defUp';
+}
+
+export interface SpeciesDef {
+  id: string;
+  name: string;
+  element: Element;
+  base: BaseStats;
+  skills: string[];
+  rarity: 'starter' | 'common' | 'rare' | 'boss';
+  sprite: string; // clé de texture Phaser
+}
+
+export interface MonsterInstance {
+  uid: string;
+  speciesId: string;
+  name: string;
+  element: Element;
+  level: number;
+  hp: number;
+  maxHp: number;
+  stats: { atk: number; def: number; spd: number };
+  skills: { id: string; ppLeft: number | null }[];
+  modifiers: { defMult: number };
+}
+
+export interface PlayerState {
+  userId: string | null; // null pour l'IA
+  team: MonsterInstance[];
+  activeIndex: number;
+}
+
+export interface BattleState {
+  round: number;
+  turn: number;
+  players: [PlayerState, PlayerState];
+}
+
+export type Action =
+  | { type: 'skill'; skillId: string }
+  | { type: 'switch'; toIndex: number }
+  | { type: 'forfeit' };
+
+export type BattleEvent =
+  | { type: 'switch'; seat: Seat; fromIndex: number; toIndex: number; forced: boolean; name: string }
+  | { type: 'skill_used'; seat: Seat; actorName: string; skillName: string; skillId: string }
+  | { type: 'damage'; targetSeat: Seat; amount: number; hpAfter: number; maxHp: number; effectiveness: number; crit: boolean }
+  | { type: 'heal'; seat: Seat; amount: number; hpAfter: number; maxHp: number }
+  | { type: 'buff'; seat: Seat; stat: 'def'; mult: number }
+  | { type: 'faint'; seat: Seat; index: number; name: string }
+  | { type: 'forfeit'; seat: Seat }
+  | { type: 'battle_end'; winnerSeat: Seat };
+
+export interface TurnResult {
+  state: BattleState;
+  events: BattleEvent[];
+  winnerSeat: Seat | null;
+}
+
+export type Rng = () => number; // renvoie un nombre dans [0, 1[
