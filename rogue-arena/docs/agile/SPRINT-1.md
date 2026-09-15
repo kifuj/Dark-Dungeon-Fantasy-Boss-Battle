@@ -16,20 +16,20 @@
 
 | US | Points | Tâche | Responsable | Statut |
 |---|---|---|---|---|
-| **US-01** Projet en ligne | 3 | Créer le repo GitHub public + protection de `main` | Mattéo | ☐ À faire |
-| | | Scaffold Vite React-TS, installer Phaser, Supabase, Vitest | Mattéo | ☐ |
-| | | `vercel.json` (rewrites) + import sur Vercel + 1er déploiement | Mattéo | ☐ |
-| | | Composant `PhaserGame` avec canvas 480×270 `pixelArt` | Mattéo | ☐ |
-| **US-02** Supabase | 3 | Créer le projet (région Paris) + exécuter `001_init.sql` | Owen | ☐ |
-| | | Activer l'auth anonyme + vérifier la publication Realtime | Owen | ☐ |
-| | | Variables d'environnement sur Vercel + `.env.example` | Owen | ☐ |
-| | | Tester la RLS (select interdit sur le match d'un autre joueur) | Owen | ☐ |
-| **US-03** Compétences | 5 | `shared/types.ts` + `data/` (éléments, compétences, monstres) | Paul | ☐ |
-| | | `rng.ts`, `stats.ts`, `damage.ts` | Paul | ☐ |
-| | | Tests éléments + déterminisme + PP | Paul | ☐ |
-| **US-05** Ordre | 2 | `getActionOrder` + tests | Donovan | ☐ |
-| **US-06** KO / fin | 3 | `resolveTurn` (KO, remplacement auto, victoire) + `validateAction` + tests | Donovan | ☐ |
-| **US-24** Titre / menu | 2 | Maquette Lovable (optionnel) + pages Titre et Menu + routes | Owen | ☐ |
+| **US-01** Projet en ligne | 3 | Créer le repo GitHub public + protection de `main` | Mattéo | 🟡 Repo public créé ; protection de `main` à faire |
+| | | Scaffold Vite React-TS, installer Phaser, Supabase, Vitest | Mattéo | 🔍 En revue ([PR #29](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/29)) |
+| | | `vercel.json` (rewrites) + import sur Vercel + 1er déploiement | Mattéo | 🟡 `vercel.json` en revue (#29) ; import Vercel (Root Directory `rogue-arena`) à faire |
+| | | Composant `PhaserGame` avec canvas 480×270 `pixelArt` | Mattéo | 🔍 En revue (#29) |
+| **US-02** Supabase | 3 | Créer le projet (région Paris) + exécuter `001_init.sql` | Owen | 🟡 `001_init.sql` en revue ([PR #31](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/31)) ; création du projet à faire |
+| | | Activer l'auth anonyme + vérifier la publication Realtime | Owen | ☐ À faire (dashboard) |
+| | | Variables d'environnement sur Vercel + `.env.example` | Owen | 🟡 `.env.example` en revue (#31) ; variables Vercel à faire |
+| | | Tester la RLS (select interdit sur le match d'un autre joueur) | Owen | ☐ À faire |
+| **US-03** Compétences | 5 | `shared/types.ts` + `data/` (éléments, compétences, monstres) | Paul | 🔍 En revue ([PR #30](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/30)) |
+| | | `rng.ts`, `stats.ts`, `damage.ts` | Paul | 🔍 En revue (#30) |
+| | | Tests éléments + déterminisme + PP | Paul | 🔍 En revue (#30), tests verts |
+| **US-05** Ordre | 2 | `getActionOrder` + tests | Donovan | 🔍 En revue (#30), tests verts |
+| **US-06** KO / fin | 3 | `resolveTurn` (KO, remplacement auto, victoire) + `validateAction` + tests | Donovan | 🔍 En revue (#30), tests verts |
+| **US-24** Titre / menu | 2 | Maquette Lovable (optionnel) + pages Titre et Menu + routes | Owen | 🔍 Pages et routes en revue ([PR #32](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/32)) ; maquette Lovable non utilisée |
 | | **18** | | | |
 
 📸 **Capture du board au début du sprint** : `![Sprint backlog sprint 1](./captures/sprint-1-backlog.png)`
