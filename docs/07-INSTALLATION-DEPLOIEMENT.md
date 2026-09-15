@@ -12,7 +12,7 @@
 ## 1. Créer le projet (une seule fois, par une personne)
 
 ```bash
-cd rogue-arena                       # dossier qui contient déjà README.md et docs/
+# à la racine du dépôt (qui contient déjà README.md et docs/)
 npm create vite@latest . -- --template react-ts
 # si Vite signale que le dossier n'est pas vide → choisir "Ignore files and continue"
 
