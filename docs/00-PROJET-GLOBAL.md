@@ -3,7 +3,7 @@
 ## 1. Vision
 
 > **Pour** les joueurs qui aiment les RPG rétro et les parties courtes,
-> **Rogue Arena** est un jeu web roguelike au tour par tour
+> **Dark Dungeon Fantasy Boss Battle** est un jeu web roguelike au tour par tour
 > **qui** permet de constituer une équipe de monstres médiévaux-fantastiques et de survivre à des vagues d'ennemis, ou d'affronter un ami en ligne.
 > **Contrairement à** un RPG classique, chaque partie est différente (tirages aléatoires, récompenses à choisir) et on joue sans rien installer, directement dans le navigateur.
 

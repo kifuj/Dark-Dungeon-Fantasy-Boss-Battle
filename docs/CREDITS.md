@@ -1,6 +1,6 @@
 # Crédits
 
-Rogue Arena est un projet étudiant non commercial. Merci aux artistes qui partagent leur travail.
+Dark Dungeon Fantasy Boss Battle est un projet étudiant non commercial. Merci aux artistes qui partagent leur travail.
 
 > **Règle** : chaque asset présent dans `public/assets/` a une ligne ici, ajoutée dans la même PR. Recopier la licence **exacte** indiquée sur la page de l'auteur. Voir [08-CONVENTIONS §4](08-CONVENTIONS.md#4-assets-et-licences).
 
