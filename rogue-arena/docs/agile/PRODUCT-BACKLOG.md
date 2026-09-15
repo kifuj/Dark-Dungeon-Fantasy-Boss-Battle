@@ -1,429 +1,320 @@
-# 🟦 Product Backlog — Rogue Arena
+# Product Backlog — Rogue Arena
 
-> Tenu par le **Product Owner**. Les user stories (US) viennent du [Projet global](../00-PROJET-GLOBAL.md), du [Game design](../01-GAME-DESIGN.md), de l'[Architecture](../02-ARCHITECTURE.md) et de la [Base de données](../03-BASE-DE-DONNEES.md).
-> Les estimations ci-dessous sont une **proposition de départ**. L'équipe les confirme ou les corrige en Planning Poker, puis reporte le résultat dans la colonne « Pts ».
+> Tenu par le **Product Owner**. Priorités **MoSCoW** (Must / Should / Could / Won't).
+> Les estimations indiquées sont une **proposition de départ** : l'équipe doit les **rejouer en Planning Poker** (§4) et remplacer la colonne par ses propres valeurs.
 
-## 1. Légende
+## 1. Definition of Ready (DoR)
 
-| Champ | Valeurs |
-|---|---|
-| **Priorité** (MoSCoW) | **M** = Must (MVP) · **S** = Should · **C** = Could |
-| **Pts** | Suite de Fibonacci : 1, 2, 3, 5, 8, 13, 21. **Maximum 8 par US** : au-delà, on découpe l'US (un sprint ne dure que 0,5 jour) |
-| **Statut** | À faire · En cours · Terminé (DoD respectée) |
+Une user story peut entrer dans un sprint si :
 
-### Épopées
+- [ ] Elle est rédigée au format **« En tant que… Je veux… Afin de… »**.
+- [ ] Ses **critères d'acceptation** sont écrits et compris par toute l'équipe.
+- [ ] Elle est **estimée** en Planning Poker (Fibonacci).
+- [ ] Elle fait **8 points maximum** ; sinon elle est découpée.
+- [ ] Ses **dépendances** sont terminées ou prévues dans le même sprint.
+- [ ] Les **assets** nécessaires (sprites, sons) sont identifiés, avec une licence vérifiée.
+- [ ] Le PO sait comment la **démontrer** en Sprint Review.
 
-| Code | Épopée | Pôle principal |
-|---|---|---|
-| 🧱 SOC | Socle technique et déploiement | Backend / UI |
-| 🧠 MOT | Moteur de combat (`shared/`) | Moteur |
-| 🎮 COM | Combat dans le navigateur (Phaser) | Jeu |
-| 👤 CPT | Compte joueur | Backend |
-| 🗺️ SOL | Mode solo « La Descente » | Moteur / Jeu |
-| ⚔️ MUL | Multijoueur « Duel Rogue » | Backend |
-| 🖥️ UI | Écrans et menus | UI |
+## 2. Definition of Done (DoD)
 
-## 2. Definition of Ready (DoR)
+Une user story est terminée si :
 
-Une US peut entrer dans un Sprint Backlog seulement si :
+- [ ] Tous ses **critères d'acceptation** sont vérifiés et **validés par le PO**.
+- [ ] Le code est sur `main` via une **PR relue** par au moins 1 autre personne.
+- [ ] `npm run build` passe, sans erreur TypeScript.
+- [ ] `npx vitest run` passe ; toute nouvelle règle de `shared/` a son test.
+- [ ] La fonctionnalité est **testée sur le déploiement Vercel** (preview ou production), pas seulement en local.
+- [ ] Le multijoueur (s'il est concerné) est testé sur **2 navigateurs** distincts.
+- [ ] Aucun secret commité ; `.env.example` est à jour.
+- [ ] `CREDITS.md` est à jour si un asset a été ajouté.
+- [ ] Le fichier `SPRINT-N.md` mentionne l'US comme terminée.
 
-- [ ] Elle suit le format **« En tant que… Je veux… Afin de… »** et apporte une valeur claire.
-- [ ] Ses **critères d'acceptation** sont écrits et testables (format Étant donné / Quand / Alors).
-- [ ] Elle est **estimée** en Planning Poker par toute l'équipe, à **8 points maximum**.
-- [ ] Ses **dépendances** sont terminées ou prévues plus tôt dans le même sprint.
-- [ ] Les **règles et valeurs** nécessaires sont écrites dans la doc (formules, stats, tables SQL…).
-- [ ] Les **assets** nécessaires sont identifiés, avec une licence compatible avec un repo public (CC0 / CC-BY / OFL).
-- [ ] Le **PO** l'a validée et priorisée.
+## 3. Vue d'ensemble
 
-## 3. Definition of Done (DoD)
+| ID | Epic | User story (résumé) | MoSCoW | Estim. proposée | Estim. équipe | Sprint |
+|---|---|---|---|---|---|---|
+| US-01 | Socle | Projet en ligne sur Vercel | Must | 3 | | 1 |
+| US-02 | Socle | Supabase configuré (schéma + RLS) | Must | 3 | | 1 |
+| US-03 | Moteur | Attaquer avec des compétences et des éléments | Must | 5 | | 1 |
+| US-05 | Moteur | Ordre d'action par priorité et vitesse | Must | 2 | | 1 |
+| US-06 | Moteur | KO, remplacement, victoire/défaite | Must | 3 | | 1 |
+| US-24 | Contenu | Écran titre et menu principal | Must | 2 | | 1 |
+| US-07 | Interface combat | Scène de combat avec sprites et barres de PV | Must | 5 | | 2 |
+| US-08 | Interface combat | Menu de choix d'action | Must | 3 | | 2 |
+| US-04 | Moteur | Changer de monstre actif | Should | 3 | | 2 |
+| US-10 | Solo | Choisir un starter | Must | 2 | | 2 |
+| US-11 | Solo | Enchaîner des vagues contre l'IA | Must | 5 | | 2 |
+| US-15 | Comptes | Se connecter avec un pseudo | Must | 3 | | 3 |
+| US-16 | Multijoueur | Créer un salon avec un code | Must | 3 | | 3 |
+| US-17 | Multijoueur | Rejoindre un salon avec un code | Must | 3 | | 3 |
+| US-19 | Multijoueur | Jouer un combat en ligne tour par tour | Must | 8 | | 3 |
+| US-23 | Multijoueur | Abandonner un duel | Should | 1 | | 3 |
+| US-12 | Solo | Choisir une récompense après chaque vague | Must | 5 | | 4 |
+| US-09 | Interface combat | Animations et textes de combat | Should | 5 | | 4 |
+| US-20 | Multijoueur | Timeout de tour | Should | 3 | | 4 |
+| US-21 | Multijoueur | Reprendre une partie après un rafraîchissement | Should | 3 | | 4 |
+| US-26 | Contenu | Écran des crédits | Must | 1 | | 4 |
+| US-14 | Solo | Score et classement | Should | 3 | | *backlog* |
+| US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | | *backlog* |
+| US-13 | Solo | Boss toutes les 5 vagues | Could | 3 | | *backlog* |
+| US-22 | Multijoueur | Duel en 3 manches avec récompenses | Could | 5 | | *backlog* |
+| US-25 | Contenu | Musique, sons et volume | Could | 3 | | *backlog* |
+| US-27 | Contenu | Jouable sur mobile | Could | 3 | | *backlog* |
+| US-28 | Moteur | Statuts (brûlure, poison) | Could | 5 | | *backlog* |
+| — | — | Matchmaking automatique, chat, 3+ joueurs | Won't | — | — | — |
 
-Une US est terminée seulement si :
+**Total proposé** : 98 points, dont 56 en Must. Engagement prévu : environ 18 points par sprint.
 
-- [ ] Tous les **critères d'acceptation** sont vérifiés par une autre personne que l'auteur.
-- [ ] Le code est sur `main` via une **Pull Request relue** par au moins un·e coéquipier·e.
-- [ ] Le build passe (`npm run build`) et **`npm test` est vert**.
-- [ ] Toute règle ajoutée dans `shared/` a **au moins un test Vitest**.
-- [ ] La fonctionnalité marche sur la **version déployée sur Vercel**, pas seulement en local.
-- [ ] Aucune clé secrète dans le code ni dans un fichier commité ; `.env.example` est à jour.
-- [ ] Les nouveaux assets sont listés dans [CREDITS.md](../CREDITS.md) avec leur licence.
-- [ ] La **doc** concernée (`docs/`) et le fichier du sprint sont à jour.
-- [ ] Le **PO a accepté** l'US lors de la Sprint Review.
+## 4. Planning Poker
 
-## 4. Vue d'ensemble
+### Règles
+1. Le PO lit l'US et ses critères ; l'équipe pose ses questions (2 min max).
+2. Chacun choisit une carte **en secret** : `1, 2, 3, 5, 8, 13, 21` (+ `?` et ☕).
+3. Tout le monde révèle en même temps.
+4. Si les écarts sont grands, **la personne la plus basse et la plus haute s'expliquent**, puis on revote (2 tours max).
+5. Pas de consensus au 3ᵉ vote → on retient la valeur la plus fréquente. **13 ou 21 → découper l'US.**
+6. Référence : **US-05 (ordre d'action) = 2 points**.
 
-| ID | User story | Épopée | Prio | Pts | Sprint | Dépend de | Statut |
-|---|---|---|---|---|---|---|---|
-| US-01 | Accéder au jeu en ligne | SOC | M | 3 | 1 | — | À faire |
-| US-02 | Données du jeu (monstres, compétences, éléments) | MOT | M | 2 | 1 | US-01 | À faire |
-| US-03 | Calcul des dégâts | MOT | M | 5 | 1 | US-02 | À faire |
-| US-04 | Résolution d'un tour de combat | MOT | M | 8 | 1 | US-03 | À faire |
-| US-05 | Se connecter avec un pseudo | CPT | M | 3 | 2 | US-01 | À faire |
-| US-06 | Voir le combat en pixel-art | COM | M | 5 | 2 | US-04 | À faire |
-| US-07 | Choisir son action et voir le tour animé | COM | M | 5 | 2 | US-06 | À faire |
-| US-08 | Affronter une IA | MOT | M | 2 | 2 | US-04 | À faire |
-| US-09 | Écran titre et menu principal | UI | M | 3 | 2 | US-05 | À faire |
-| US-10 | Créer un salon | MUL | M | 3 | 3 | US-05 | À faire |
-| US-11 | Rejoindre un salon avec un code | MUL | M | 3 | 3 | US-10 | À faire |
-| US-12 | Lancer le duel | MUL | M | 3 | 3 | US-11 | À faire |
-| US-13 | Jouer un tour en ligne | MUL | M | 8 | 3 | US-12, US-07 | À faire |
-| US-14 | Voir le résultat du duel | MUL | M | 1 | 3 | US-13 | À faire |
-| US-15 | Choisir un starter | SOL | M | 2 | 4 | US-07 | À faire |
-| US-16 | Enchaîner les vagues | SOL | M | 3 | 4 | US-15, US-08 | À faire |
-| US-17 | Choisir une récompense | SOL | M | 5 | 4 | US-16 | À faire |
-| US-18 | Fin de run et score | SOL | M | 3 | 4 | US-16 | À faire |
-| US-19 | Écran des crédits | UI | M | 2 | 4 | US-09 | À faire |
-| US-20 | Abandonner un duel | MUL | S | 2 | 4 | US-13 | À faire |
-| US-21 | Draft de l'équipe en duel | MUL | S | 5 | — | US-12 | À faire |
-| US-22 | Timeout de tour | MUL | S | 5 | — | US-13 | À faire |
-| US-23 | Reconnexion après un rafraîchissement | MUL | S | 3 | — | US-13 | À faire |
-| US-24 | Duel en 3 manches (BO3) | MUL | C | 8 | — | US-14 | À faire |
-| US-25 | Affronter un boss | SOL | C | 3 | — | US-16 | À faire |
-| US-26 | Consulter le classement | SOL | C | 3 | — | US-18 | À faire |
-| US-27 | Choisir le remplaçant après un KO | MOT | C | 3 | — | US-07 | À faire |
-| US-28 | Statuts brûlure et poison | MOT | C | 5 | — | US-04 | À faire |
-| US-29 | Musique et effets sonores | COM | C | 3 | — | US-07 | À faire |
-| US-30 | Jouer sur mobile | UI | C | 5 | — | US-09 | À faire |
+### Journal des votes *(à compléter pendant la séance)*
 
-### Charge par sprint
+| US | Tour 1 (votes) | Tour 2 (votes) | Estimation retenue | Remarque |
+|---|---|---|---|---|
+| US-01 | | | | |
+| US-02 | | | | |
+| US-03 | | | | |
+| … | | | | |
 
-| Sprint | Sprint Goal proposé | US | Points |
-|---|---|---|---|
-| 1 | Le squelette est en ligne sur Vercel et un combat 1v1 se résout correctement dans les tests | US-01 → US-04 | **18** |
-| 2 | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites | US-05 → US-09 | **18** |
-| 3 | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire | US-10 → US-14 | **18** |
-| 4 | La boucle roguelike est complète et le jeu est présentable | US-15 → US-20 | **17** |
-| Réserve | Should / Could, à tirer si un sprint finit en avance | US-21 → US-30 | 43 |
-
-> Si le multijoueur prend du retard (risque n°1), le PO peut repousser US-20 et garder le solo (US-15 à US-18) comme livrable prioritaire du sprint 4.
-
----
+📸 `![Planning Poker](./captures/planning-poker.png)`
 
 ## 5. User stories détaillées
 
-### 🧱 Sprint 1 — Socle et moteur
-
-#### US-01 — Accéder au jeu en ligne · M · 3 pts
-**En tant que** joueur,
-**je veux** ouvrir le jeu depuis une simple URL,
-**afin de** jouer sans rien installer.
-
-**Critères d'acceptation**
-1. **Étant donné** le repo GitHub public, **quand** un commit est poussé sur `main`, **alors** Vercel déploie automatiquement le site.
-2. **Étant donné** l'URL Vercel, **quand** je l'ouvre dans un navigateur, **alors** une page React (Vite + TypeScript) s'affiche sans erreur dans la console.
-3. **Étant donné** le projet cloné, **quand** je lance `npm install` puis `npm test`, **alors** Vitest s'exécute (au moins un test d'exemple vert).
-4. L'arborescence `api/`, `shared/`, `src/` suit [02-ARCHITECTURE §3](../02-ARCHITECTURE.md#3-arborescence) et un `.env.example` liste les variables sans valeur secrète.
-
-#### US-02 — Données du jeu · M · 2 pts
-**En tant que** game designer,
-**je veux** que les éléments, compétences et monstres soient décrits dans des fichiers de données,
-**afin de** pouvoir rééquilibrer le jeu sans toucher au moteur.
-
-**Critères d'acceptation**
-1. `shared/data/elements.ts` contient la table des 6 éléments de [01 §3.4](../01-GAME-DESIGN.md#34-éléments).
-2. `shared/data/skills.ts` contient les 12 compétences de [01 §4](../01-GAME-DESIGN.md#4-compétences) (élément, puissance, PP, priorité, effet).
-3. `shared/data/monsters.ts` contient les 10 monstres de [01 §5](../01-GAME-DESIGN.md#5-bestiaire) avec leur rôle (starter, commun, rare, boss).
-4. Un test vérifie que chaque compétence référencée par un monstre existe.
-5. Chaque monstre possède au moins une compétence à PP infinis (`strike`, ou équivalent).
-
-#### US-03 — Calcul des dégâts · M · 5 pts
-**En tant que** joueur,
-**je veux** que les dégâts dépendent des stats, du niveau et des éléments,
-**afin que** mes choix de compétences aient un vrai impact.
-
-**Critères d'acceptation**
-1. **Étant donné** un monstre de niveau `N`, **alors** chaque stat vaut `floor(base × (1 + (N − 1) × 0,08))`.
-2. Les dégâts suivent la formule de [01 §3.3](../01-GAME-DESIGN.md#33-formule-de-dégâts) : multiplicateur d'élément (×2 / ×1 / ×0,5), bonus même élément ×1,25 (sauf Neutre), aléa entre 0,90 et 1,00, critique ×1,5 avec 1 chance sur 16, minimum 1.
-3. Tout l'aléatoire passe par un générateur `rng` créé depuis une **seed** : **même seed = mêmes dégâts** (test à l'appui).
-4. **Étant donné** Boule de feu sur un monstre Nature, **alors** l'efficacité renvoyée est 2 ; sur un monstre Eau, 0,5.
-5. Les tests couvrent : formule de stat, efficacité, bonus d'élément, critique forcé, dégâts minimum de 1.
-
-#### US-04 — Résolution d'un tour de combat · M · 8 pts
-**En tant que** joueur,
-**je veux** que chaque tour se déroule selon des règles claires et identiques pour tous,
-**afin que** le combat soit juste et prévisible.
-
-**Critères d'acceptation**
-1. `resolveTurn(état, actions, rng)` est une fonction **pure** qui renvoie un nouvel état JSON et une liste `events[]` (`skill_used`, `damage`, `heal`, `faint`, `switch`, `battle_end`…).
-2. Ordre de résolution : abandons, puis changements, puis compétences par **priorité** décroissante, puis **VIT** décroissante, puis au hasard (via `rng`).
-3. Un monstre mis KO avant d'avoir agi **n'agit pas**.
-4. Utiliser une compétence retire 1 PP ; une compétence à 0 PP est refusée par `validate.ts`.
-5. Les effets Régénération (30 % PV max), Drain vital (50 % des dégâts) et Bénédiction (DEF ×1,25) sont appliqués.
-6. En fin de tour, un monstre actif KO est remplacé par le premier monstre en vie ; si toute l'équipe est KO, le joueur **perd** et un événement `battle_end` indique le vainqueur.
-7. Un test simule un combat complet 1v1 jusqu'à la victoire, et rejouer la même seed avec les mêmes actions donne exactement le même résultat.
+Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alors** (résultat).
 
 ---
 
-### 🎮 Sprint 2 — Combat solo dans le navigateur
+### Epic 1 — Socle technique
 
-#### US-05 — Se connecter avec un pseudo · M · 3 pts
-**En tant que** joueur,
-**je veux** entrer un simple pseudo pour jouer,
-**afin de** ne pas avoir à créer de compte avec e-mail et mot de passe.
+#### US-01 — Projet en ligne sur Vercel · Must · 3 pts
+**En tant que** membre de l'équipe, **je veux** un projet React + TypeScript + Phaser déployé automatiquement sur Vercel **afin de** pouvoir tester chaque changement en ligne et le montrer au PO.
 
-**Critères d'acceptation**
-1. La migration `001_init.sql` de [03](../03-BASE-DE-DONNEES.md#2-migration-sql) est exécutée et l'auth anonyme est activée sur Supabase.
-2. **Étant donné** un nouveau visiteur, **quand** il valide un pseudo de 3 à 20 caractères, **alors** une session anonyme est créée (`signInAnonymously`) et une ligne `profiles` est enregistrée.
-3. **Étant donné** un pseudo déjà pris ou hors limites, **alors** un message d'erreur clair s'affiche et rien n'est enregistré.
-4. **Étant donné** un joueur déjà connecté, **quand** il recharge la page, **alors** il retrouve son pseudo sans le ressaisir.
-5. Un joueur ne peut modifier que **sa propre** ligne `profiles` (RLS vérifiée).
+- **CA1** : Étant donné un push sur `main`, quand le build Vercel se termine, alors l'URL de production affiche la page d'accueil.
+- **CA2** : Étant donné une PR ouverte, quand Vercel la construit, alors une URL de preview est commentée sur la PR.
+- **CA3** : Étant donné l'URL `/n-importe-quelle-route`, quand je rafraîchis la page, alors l'application se charge (pas de 404).
+- **CA4** : Un canvas Phaser de 480×270 s'affiche, mis à l'échelle sans flou.
 
-#### US-06 — Voir le combat en pixel-art · M · 5 pts
-**En tant que** joueur,
-**je veux** voir mon monstre et l'ennemi avec leurs barres de PV,
-**afin de** suivre le combat d'un coup d'œil.
+#### US-02 — Supabase configuré · Must · 3 pts
+**En tant que** développeur, **je veux** une base Supabase avec le schéma, la RLS et le Realtime **afin de** stocker les joueurs et les parties de façon sécurisée.
 
-**Critères d'acceptation**
-1. Le composant `PhaserGame` monte le jeu dans React et le détruit proprement en quittant la page (pas de double canvas).
-2. La scène est rendue en 480 × 270, mise à l'échelle `FIT`, sans flou (`pixelArt: true`).
-3. **Quand** React émet `battle-init`, **alors** mon monstre s'affiche en bas à gauche, l'ennemi en haut à droite, face à face (`flipX` si besoin).
-4. Chaque monstre affiche son nom, son niveau et une barre de PV aux couleurs lisibles.
-5. Les sprites viennent d'**un seul pack** en licence redistribuable, crédité dans `CREDITS.md`.
-
-#### US-07 — Choisir son action et voir le tour animé · M · 5 pts
-**En tant que** joueur,
-**je veux** choisir une compétence ou changer de monstre, puis voir le tour se jouer,
-**afin de** comprendre ce qui s'est passé.
-
-**Critères d'acceptation**
-1. Le menu d'actions (React, par-dessus le canvas) affiche les compétences du monstre actif avec leurs PP restants et la couleur de leur élément ; les compétences à 0 PP sont désactivées.
-2. Le bouton **Changer** propose uniquement les monstres encore en vie et différents du monstre actif.
-3. **Quand** je valide une action, **alors** le menu se masque et Phaser rejoue les `events[]` : texte « X utilise Y ! », flash, barre de PV animée, « C'est super efficace ! », « Coup critique ! », animation de KO.
-4. **Quand** Phaser émet `events-played`, **alors** le menu réapparaît.
-5. **Quand** Phaser émet `battle-end`, **alors** un écran de victoire ou de défaite s'affiche.
-
-#### US-08 — Affronter une IA · M · 2 pts
-**En tant que** joueur solo,
-**je veux** que l'ennemi choisisse ses actions tout seul,
-**afin de** pouvoir jouer sans adversaire humain.
-
-**Critères d'acceptation**
-1. `chooseAiAction(état, rng)` renvoie toujours une action **valide** (jamais une compétence à 0 PP).
-2. L'IA privilégie la compétence qui inflige le plus de dégâts estimés (efficacité d'élément comprise).
-3. Le choix est déterministe pour une même seed (test Vitest).
-4. En solo, `resolveTurn` tourne dans le navigateur avec l'action du joueur et celle de l'IA.
-
-#### US-09 — Écran titre et menu principal · M · 3 pts
-**En tant que** joueur,
-**je veux** un écran titre puis un menu clair,
-**afin de** choisir facilement ce que je veux faire.
-
-**Critères d'acceptation**
-1. L'écran titre affiche le nom du jeu et un bouton « Jouer » qui mène au choix du pseudo (ou au menu si déjà connecté).
-2. Le menu principal propose **Solo**, **Multijoueur** et **Crédits**, et affiche le pseudo du joueur.
-3. Les routes suivent le parcours de [01 §7](../01-GAME-DESIGN.md#7-écrans-et-parcours) ; le bouton retour du navigateur ne casse pas l'application.
-4. L'interface utilise la police pixel et la palette de [01 §8](../01-GAME-DESIGN.md#8-direction-artistique-et-interface).
+- **CA1** : La migration `001_init.sql` s'exécute sans erreur sur un projet vide.
+- **CA2** : Étant donné un utilisateur A, quand il fait `select` sur `matches`, alors il ne voit que les matchs dont il est joueur.
+- **CA3** : Étant donné un client connecté, quand il tente un `insert` dans `matches`, alors la requête est refusée.
+- **CA4** : Les variables d'environnement sont configurées sur Vercel et documentées dans `.env.example`.
 
 ---
 
-### ⚔️ Sprint 3 — Duel en ligne
+### Epic 2 — Moteur de combat
 
-#### US-10 — Créer un salon · M · 3 pts
-**En tant que** joueur,
-**je veux** créer un salon et obtenir un code,
-**afin de** le transmettre à un ami pour qu'il me rejoigne.
+#### US-03 — Attaquer avec des compétences · Must · 5 pts
+**En tant que** joueur, **je veux** que mon monstre utilise une compétence qui inflige des dégâts selon les stats et les éléments **afin que** mes choix tactiques aient un impact.
 
-**Critères d'acceptation**
-1. **Quand** je clique sur « Créer un salon », **alors** `POST /api/rooms/create` (JWT obligatoire) crée une ligne `rooms` au statut `waiting` avec un **code unique de 6 caractères** `[A-Z0-9]`.
-2. La page du salon affiche le code en grand, avec un bouton pour le copier.
-3. Sans JWT valide, l'API répond **401** et ne crée rien.
-4. Le client ne peut pas écrire directement dans `rooms` (aucune policy d'écriture).
+- **CA1** : Étant donné une Salamandre (feu) contre un Champignon (nature), quand elle utilise Boule de feu, alors l'événement `damage` indique `effectiveness = 2`.
+- **CA2** : Les dégâts suivent la formule de [06 §5](../06-MOTEUR-DE-COMBAT.md#5-dégâts) et valent au minimum 1.
+- **CA3** : Étant donné une compétence avec des PP limités, quand elle est utilisée, alors ses PP baissent de 1 ; à 0 PP elle est refusée par `validateAction`.
+- **CA4** : Étant donné la même seed et les mêmes actions, quand on résout deux fois le tour, alors le résultat est identique (test Vitest).
 
-#### US-11 — Rejoindre un salon avec un code · M · 3 pts
-**En tant que** joueur,
-**je veux** saisir le code d'un ami,
-**afin de** rejoindre son salon.
+#### US-05 — Ordre d'action · Must · 2 pts
+**En tant que** joueur, **je veux** que le monstre le plus rapide agisse en premier **afin que** la vitesse soit une vraie statistique stratégique.
 
-**Critères d'acceptation**
-1. **Étant donné** un code valide d'un salon `waiting` sans invité, **quand** je le saisis, **alors** `POST /api/rooms/join` m'enregistre comme `guest_id`.
-2. **Étant donné** un code inexistant, un salon plein ou mon propre salon, **alors** un message d'erreur explicite s'affiche.
-3. La saisie accepte les minuscules (converties en majuscules).
-4. **Quand** l'invité rejoint, **alors** l'hôte voit son pseudo apparaître **sans recharger** (Supabase Realtime sur `rooms`).
+- **CA1** : Changement de monstre > compétence prioritaire > compétence normale.
+- **CA2** : À priorité égale, la VIT la plus haute agit en premier.
+- **CA3** : À VIT égale, l'ordre est tiré au hasard avec le RNG du tour.
+- **CA4** : Un monstre mis KO avant son action n'agit pas.
 
-#### US-12 — Lancer le duel · M · 3 pts
-**En tant qu'**hôte du salon,
-**je veux** lancer la partie quand mon adversaire est là,
-**afin que** le combat commence pour nous deux en même temps.
+#### US-06 — KO et fin de combat · Must · 3 pts
+**En tant que** joueur, **je veux** que mes monstres KO soient remplacés et que le combat se termine quand une équipe est vaincue **afin que** chaque combat ait une issue claire.
 
-**Critères d'acceptation**
-1. Le bouton « Lancer » n'est actif **que pour l'hôte** et **que si** un invité est présent.
-2. `POST /api/match/start` crée un `matches` avec une seed, deux **équipes de 3 monstres tirées au hasard** et `phase = 'battle'`, puis passe le salon en `playing`.
-3. **Quand** le match est créé, **alors** les deux navigateurs basculent automatiquement sur l'écran de combat en ligne (Realtime).
-4. Chaque joueur voit **sa** propre équipe en bas à gauche.
+- **CA1** : Étant donné un monstre à 0 PV, alors un événement `faint` est émis.
+- **CA2** : En fin de tour, le monstre actif KO est remplacé par le premier monstre en vie (`switch` avec `forced: true`).
+- **CA3** : Quand tous les monstres d'une équipe sont KO, alors `winnerSeat` désigne l'autre joueur et un événement `battle_end` termine la liste.
 
-#### US-13 — Jouer un tour en ligne · M · 8 pts
-**En tant que** joueur en duel,
-**je veux** choisir mon action en secret en même temps que mon adversaire,
-**afin que** personne ne puisse réagir au choix de l'autre ni tricher.
+#### US-04 — Changer de monstre · Should · 3 pts
+**En tant que** joueur, **je veux** remplacer mon monstre actif pendant mon tour **afin d'**éviter un désavantage d'élément.
 
-**Critères d'acceptation**
-1. **Quand** je valide une action, **alors** `POST /api/match/action` vérifie le JWT, que je joue ce match, la phase, le numéro de tour et la validité de l'action, puis l'enregistre dans `match_actions`.
-2. Une deuxième action pour le même tour est refusée ; une action invalide renvoie **400** sans rien enregistrer.
-3. Après mon choix, j'affiche « En attente de l'adversaire… » ; je **ne peux pas** lire l'action de l'adversaire (RLS + `match_actions` hors Realtime).
-4. **Quand** les deux actions sont reçues, **alors** le serveur exécute `resolveTurn`, met à jour `matches.state`, `last_events`, `turn`, `version`, et archive le tour dans `match_turns`.
-5. **Quand** `matches` est mis à jour, **alors** les deux clients reçoivent l'événement Realtime et rejouent les **mêmes** animations.
-6. Deux envois simultanés ne résolvent jamais le même tour deux fois (contrôle par `version` ou `turn`).
+- **CA1** : Le bouton « Changer » liste les monstres en vie autres que le monstre actif.
+- **CA2** : Le changement a lieu avant les compétences de l'adversaire, qui touchent donc le nouveau monstre.
+- **CA3** : Un changement vers un monstre KO ou déjà actif est refusé.
 
-#### US-14 — Voir le résultat du duel · M · 1 pt
-**En tant que** joueur en duel,
-**je veux** savoir clairement qui a gagné,
-**afin de** terminer la partie proprement.
+#### US-28 — Statuts · Could · 5 pts
+**En tant que** joueur, **je veux** des effets de statut (brûlure, poison) **afin d'**avoir plus de profondeur tactique.
 
-**Critères d'acceptation**
-1. **Quand** une équipe est entièrement KO, **alors** le serveur passe le match en `finished`, renseigne `winner_id` et passe le salon en `finished`.
-2. Chaque joueur voit « Victoire » ou « Défaite » avec le pseudo de l'adversaire.
-3. Un bouton ramène au menu principal.
+- **CA1** : Un monstre brûlé perd 1/16 de ses PV max en fin de tour et son ATQ est réduite de moitié.
+- **CA2** : Un monstre empoisonné perd 1/8 de ses PV max en fin de tour.
+- **CA3** : Le statut est affiché à côté de la barre de PV.
 
 ---
 
-### 🗺️ Sprint 4 — Boucle roguelike et finitions
+### Epic 3 — Interface de combat
 
-#### US-15 — Choisir un starter · M · 2 pts
-**En tant que** joueur solo,
-**je veux** choisir mon premier monstre parmi 3,
-**afin de** commencer la run avec le style de jeu qui me plaît.
+#### US-07 — Scène de combat · Must · 5 pts
+**En tant que** joueur, **je veux** voir mon monstre et celui de l'ennemi avec leurs barres de PV **afin de** comprendre la situation du combat.
 
-**Critères d'acceptation**
-1. L'écran propose Salamandre, Ondine et Champignon avec sprite, élément et stats.
-2. **Quand** je valide un starter, **alors** une run démarre avec une nouvelle seed et ce monstre comme seul membre de l'équipe.
-3. Je ne peux pas lancer la run sans avoir choisi.
+- **CA1** : Le monstre ennemi est affiché en haut à droite et le mien en bas à gauche, face à face.
+- **CA2** : Chaque monstre a un encadré : nom, niveau, icône d'élément, barre de PV (verte > 50 %, jaune > 20 %, rouge sinon).
+- **CA3** : Les sprites sont nets (`pixelArt: true`) sur un écran 1080p.
+- **CA4** : Un fond de décor est affiché.
 
-#### US-16 — Enchaîner les vagues · M · 3 pts
-**En tant que** joueur solo,
-**je veux** affronter des vagues d'ennemis de plus en plus fortes,
-**afin de** voir jusqu'où je peux descendre.
+#### US-08 — Menu d'actions · Must · 3 pts
+**En tant que** joueur, **je veux** choisir une compétence ou un changement dans un menu **afin de** jouer mon tour.
 
-**Critères d'acceptation**
-1. Les vagues suivent [01 §6.1](../01-GAME-DESIGN.md#61-vagues) : 1 commun (niveau `3 + vague`) jusqu'à la vague 4, puis 2 monstres à partir de la vague 6 ; sans boss, la vague 5 (et 10, 15…) oppose 2 communs de niveau `4 + vague`.
-2. Le tirage des ennemis utilise la seed de la run (même seed = mêmes ennemis).
-3. Entre deux vagues, toute l'équipe récupère **20 % de ses PV max** (sans dépasser le max).
-4. Le numéro de vague est affiché pendant le combat.
+- **CA1** : Le menu affiche les compétences du monstre actif avec leur élément (couleur) et leurs PP.
+- **CA2** : Les actions impossibles (0 PP) sont grisées.
+- **CA3** : Le menu est masqué pendant la résolution et réapparaît après l'animation.
+- **CA4** : Le menu est utilisable à la souris et au clavier (flèches + Entrée).
 
-#### US-17 — Choisir une récompense · M · 5 pts
-**En tant que** joueur solo,
-**je veux** choisir une récompense parmi 3 après chaque vague gagnée,
-**afin de** renforcer mon équipe à ma façon.
+#### US-09 — Animations et textes · Should · 5 pts
+**En tant que** joueur, **je veux** voir les attaques animées et lire ce qui se passe **afin que** le combat soit vivant et compréhensible.
 
-**Critères d'acceptation**
-1. Après une victoire, 3 récompenses **différentes** sont tirées selon les poids de [01 §6.2](../01-GAME-DESIGN.md#62-récompenses-1-au-choix-parmi-3), avec la seed de la run.
-2. Potion (+50 % PV max à toute l'équipe) et Élixir (recharge tous les PP) s'appliquent immédiatement.
-3. Entraînement et Parchemin demandent de choisir le monstre concerné (et, pour le Parchemin, la compétence remplacée).
-4. Recrutement ajoute un monstre de l'espèce vaincue ; si l'équipe compte déjà **4** monstres, je choisis celui qu'il remplace.
-5. Chaque effet est couvert par un test Vitest dans `shared/engine/run.ts`.
-
-#### US-18 — Fin de run et score · M · 3 pts
-**En tant que** joueur solo,
-**je veux** voir mon score quand mon équipe est vaincue,
-**afin de** mesurer ma progression et essayer de faire mieux.
-
-**Critères d'acceptation**
-1. **Quand** toute l'équipe est KO, **alors** l'écran de fin affiche la vague atteinte et le score `vague × 100 + PV restants`.
-2. Le score est enregistré dans `solo_runs` avec `user_id`, `wave_reached`, `score` et `team`.
-3. Les boutons « Rejouer » et « Menu » fonctionnent.
-4. Un joueur ne peut pas insérer une run au nom d'un autre (RLS).
-
-#### US-19 — Écran des crédits · M · 2 pts
-**En tant que** joueur ou enseignant,
-**je veux** voir qui a fait le jeu et d'où viennent les assets,
-**afin de** respecter les auteurs et les licences.
-
-**Critères d'acceptation**
-1. L'écran liste les membres de l'équipe et leur rôle Scrum.
-2. Chaque pack d'assets et la police sont cités avec auteur, lien et licence, comme dans `CREDITS.md`.
-3. L'écran est accessible depuis le menu principal et propose un retour.
-
-#### US-20 — Abandonner un duel · S · 2 pts
-**En tant que** joueur en duel,
-**je veux** pouvoir abandonner,
-**afin de** quitter une partie perdue sans bloquer mon adversaire.
-
-**Critères d'acceptation**
-1. Le bouton « Abandonner » demande une confirmation.
-2. `POST /api/match/forfeit` termine le match et désigne l'adversaire comme vainqueur.
-3. L'adversaire voit « Victoire par abandon » via Realtime.
+- **CA1** : Chaque événement est rejoué dans l'ordre : texte « X utilise Y ! », flash du monstre touché, barre de PV qui descend progressivement.
+- **CA2** : « C'est super efficace ! », « Ce n'est pas très efficace… » et « Coup critique ! » s'affichent quand c'est le cas.
+- **CA3** : Un monstre KO disparaît avec une animation (fondu + descente).
+- **CA4** : L'animation complète d'un tour dure moins de 4 secondes.
 
 ---
 
-### 📦 Réserve (Should / Could, non planifiées)
+### Epic 4 — Mode solo roguelike
 
-#### US-21 — Draft de l'équipe en duel · S · 5 pts
-**En tant que** joueur en duel, **je veux** choisir 3 monstres parmi 6 tirés au hasard, **afin de** composer une équipe qui me ressemble.
-1. Chaque joueur reçoit 6 propositions (`draftOffers`) et en garde exactement 3.
-2. Les deux joueurs choisissent en même temps ; ils ne voient pas le choix de l'autre avant la fin du draft.
-3. **Quand** les deux drafts sont reçus, **alors** `POST /api/match/draft` crée les équipes et passe en `battle`.
+#### US-10 — Choisir un starter · Must · 2 pts
+**En tant que** joueur solo, **je veux** choisir mon premier monstre parmi 3 **afin de** commencer ma run avec une stratégie.
 
-#### US-22 — Timeout de tour · S · 5 pts
-**En tant que** joueur en duel, **je veux** qu'un tour ne puisse pas durer indéfiniment, **afin de** ne pas être bloqué par un adversaire absent.
-1. Un compte à rebours visible (basé sur `turn_deadline`) s'affiche pendant le choix.
-2. À l'expiration, `POST /api/match/timeout` joue une action automatique (`is_auto = true`) pour le joueur absent.
-3. Après plusieurs timeouts consécutifs (nombre à fixer), le joueur absent perd par forfait.
+- **CA1** : Salamandre, Ondine et Champignon sont proposés avec sprite, élément et stats.
+- **CA2** : Quand je valide, une run démarre avec ce monstre au niveau 5.
 
-#### US-23 — Reconnexion après un rafraîchissement · S · 3 pts
-**En tant que** joueur en duel, **je veux** retrouver mon match si je recharge la page, **afin de** ne pas perdre la partie à cause d'une fausse manipulation.
-1. Au chargement, le client cherche un match non terminé dont je suis joueur et me propose de le reprendre.
-2. L'état affiché est celui de `matches.state`, sans rejouer les anciennes animations.
-3. Si j'avais déjà choisi mon action pour le tour en cours, l'écran d'attente s'affiche.
+#### US-11 — Vagues contre l'IA · Must · 5 pts
+**En tant que** joueur solo, **je veux** affronter des vagues d'ennemis de plus en plus forts **afin de** progresser dans la run.
 
-#### US-24 — Duel en 3 manches (BO3) · C · 8 pts
-**En tant que** joueur en duel, **je veux** jouer en 2 manches gagnantes avec des récompenses entre les manches, **afin de** pouvoir renverser la partie.
-1. `roundWins` est affiché ; le premier à 2 manches gagne le match.
-2. Entre les manches, les équipes sont soignées et chaque joueur choisit une récompense (le perdant de la manche choisit parmi 4 au lieu de 3).
+- **CA1** : La vague N oppose un ennemi de niveau `3 + N`, tiré avec la seed de la run.
+- **CA2** : L'IA choisit ses actions avec `chooseAiAction` ; elle ne joue jamais une action invalide.
+- **CA3** : Quand je gagne, le numéro de vague augmente et mon équipe récupère 20 % de ses PV max.
+- **CA4** : Quand toute mon équipe est KO, l'écran « Fin de run » affiche la vague atteinte.
 
-#### US-25 — Affronter un boss · C · 3 pts
-**En tant que** joueur solo, **je veux** affronter un boss toutes les 5 vagues, **afin de** vivre des moments forts dans la run.
-1. Les vagues 5, 10, 15… opposent un boss (Démon mineur ou Liche) de niveau `4 + vague`.
-2. Le boss est signalé à l'écran avant le combat.
+#### US-12 — Récompenses · Must · 5 pts
+**En tant que** joueur solo, **je veux** choisir une récompense parmi 3 après chaque vague **afin de** renforcer mon équipe à ma façon.
 
-#### US-26 — Consulter le classement · C · 3 pts
-**En tant que** joueur, **je veux** voir les meilleurs scores, **afin de** me comparer aux autres.
-1. La page Classement lit la vue `leaderboard` (top 20 : pseudo, meilleur score, meilleure vague).
-2. Ma ligne est mise en évidence si j'y figure.
+- **CA1** : 3 récompenses différentes sont tirées selon les poids de [01 §6.2](../01-GAME-DESIGN.md#62-récompenses-1-au-choix-parmi-3).
+- **CA2** : L'effet de la récompense choisie est appliqué et visible (PV, niveau, nouveau monstre…).
+- **CA3** : « Recrutement » avec une équipe de 4 demande quel monstre remplacer.
+- **CA4** : Une même seed de run donne les mêmes propositions.
 
-#### US-27 — Choisir le remplaçant après un KO · C · 3 pts
-**En tant que** joueur, **je veux** choisir quel monstre remplace celui qui est KO, **afin de** profiter des avantages d'élément.
-1. Après un KO, une sélection des monstres en vie s'affiche au lieu du remplacement automatique.
-2. En duel, le choix passe par l'API, en secret comme une action normale.
+#### US-13 — Boss · Could · 3 pts
+**En tant que** joueur solo, **je veux** affronter un boss toutes les 5 vagues **afin d'**avoir des moments forts dans la run.
 
-#### US-28 — Statuts brûlure et poison · C · 5 pts
-**En tant que** joueur, **je veux** des effets de statut, **afin que** les combats soient plus tactiques.
-1. La brûlure et le poison infligent des dégâts en fin de tour (valeurs à définir dans `shared/data/`).
-2. Le statut est visible à côté de la barre de PV et testé dans Vitest.
+- **CA1** : Aux vagues 5, 10, 15…, l'ennemi est un Démon mineur ou une Liche, au niveau `4 + N`.
+- **CA2** : Une bannière « BOSS » s'affiche avant le combat.
 
-#### US-29 — Musique et effets sonores · C · 3 pts
-**En tant que** joueur, **je veux** entendre une musique et des sons d'attaque, **afin d'**être plus immergé.
-1. Musique de menu et de combat, sons de coup et de KO, en licence redistribuable créditée.
-2. Un bouton coupe le son et le réglage est mémorisé.
+#### US-14 — Score et classement · Should · 3 pts
+**En tant que** joueur, **je veux** voir mon score et le top 20 **afin de** me comparer aux autres.
 
-#### US-30 — Jouer sur mobile · C · 5 pts
-**En tant que** joueur sur téléphone, **je veux** une interface utilisable au doigt, **afin de** jouer n'importe où.
-1. Les menus et le menu d'actions sont lisibles et cliquables à partir de 360 px de large.
-2. Le canvas s'adapte à l'écran en mode paysage.
+- **CA1** : En fin de run, le score est calculé et enregistré dans `solo_runs`.
+- **CA2** : La page Classement affiche le meilleur score et la meilleure vague de chaque pseudo, triés par score.
 
 ---
 
-## 6. Planning Poker *(à compléter par l'équipe)*
+### Epic 5 — Comptes
 
-| ID | Proposition | Votes du 1er tour | Votes du 2e tour | Estimation retenue | Remarque |
-|---|---|---|---|---|---|
-| US-01 | 3 | | | | |
-| US-02 | 2 | | | | |
-| US-03 | 5 | | | | |
-| US-04 | 8 | | | | |
-| US-05 | 3 | | | | |
-| US-06 | 5 | | | | |
-| US-07 | 5 | | | | |
-| US-08 | 2 | | | | |
-| US-09 | 3 | | | | |
-| US-10 | 3 | | | | |
-| US-11 | 3 | | | | |
-| US-12 | 3 | | | | |
-| US-13 | 8 | | | | |
-| US-14 | 1 | | | | |
-| US-15 | 2 | | | | |
-| US-16 | 3 | | | | |
-| US-17 | 5 | | | | |
-| US-18 | 3 | | | | |
-| US-19 | 2 | | | | |
-| US-20 | 2 | | | | |
-| US-21 → US-30 | voir tableau §4 | | | | |
+#### US-15 — Pseudo · Must · 3 pts
+**En tant que** joueur, **je veux** entrer seulement un pseudo pour jouer **afin de** commencer sans créer de compte.
 
-> Règle : chacun révèle sa carte en même temps. En cas d'écart, le vote le plus bas et le plus haut s'expliquent, puis on revote. Si une US dépasse 8 points, on la découpe.
+- **CA1** : Quand je saisis un pseudo de 3 à 20 caractères et valide, une session anonyme Supabase est créée et mon profil enregistré.
+- **CA2** : Un pseudo déjà pris affiche « Ce pseudo est déjà utilisé ».
+- **CA3** : Quand je rafraîchis la page, je suis toujours connecté avec le même pseudo.
+
+---
+
+### Epic 6 — Multijoueur
+
+#### US-16 — Créer un salon · Must · 3 pts
+**En tant que** joueur, **je veux** créer un salon et obtenir un code **afin d'**inviter un ami.
+
+- **CA1** : Quand je clique sur « Créer un salon », un code de 6 caractères s'affiche avec un bouton « Copier ».
+- **CA2** : Quand un joueur rejoint, son pseudo apparaît en moins de 2 secondes, sans rafraîchir.
+- **CA3** : Le bouton « Lancer le duel » n'est actif que pour l'hôte, quand 2 joueurs sont présents.
+
+#### US-17 — Rejoindre un salon · Must · 3 pts
+**En tant que** joueur, **je veux** rejoindre un salon avec un code **afin de** jouer contre mon ami.
+
+- **CA1** : Un code valide me fait entrer dans le salon, où je vois le pseudo de l'hôte.
+- **CA2** : Un code inconnu affiche « Aucun salon avec ce code ».
+- **CA3** : Un salon complet affiche « Ce salon est déjà complet ».
+- **CA4** : La saisie ignore la casse et les espaces.
+
+#### US-19 — Combat en ligne · Must · 8 pts
+**En tant que** joueur, **je veux** affronter un autre joueur au tour par tour en temps réel **afin de** jouer à deux à distance.
+
+- **CA1** : Étant donné un duel lancé, alors les 2 joueurs voient les 2 équipes (3 monstres de niveau 10 tirés au hasard) et le même état.
+- **CA2** : Quand je choisis une action, elle est envoyée à `/api/match/action`, et « En attente de l'adversaire… » s'affiche.
+- **CA3** : Quand les 2 actions sont reçues, le serveur résout le tour et les 2 écrans rejouent **les mêmes événements** en moins de 2 secondes.
+- **CA4** : Une action invalide, pour un tour dépassé, ou envoyée par un non-joueur est refusée avec le bon code d'erreur ([doc 05](../05-API.md#2-codes-derreur)).
+- **CA5** : Un double-clic n'enregistre qu'une seule action.
+- **CA6** : À la fin, un écran Victoire ou Défaite s'affiche pour chaque joueur, avec un bouton « Retour au menu ».
+
+#### US-23 — Abandonner · Should · 1 pt
+**En tant que** joueur, **je veux** abandonner un duel **afin de** quitter proprement une partie perdue.
+
+- **CA1** : Le bouton « Abandonner » demande une confirmation.
+- **CA2** : Après confirmation, l'adversaire voit « Victoire par abandon ».
+
+#### US-20 — Timeout de tour · Should · 3 pts
+**En tant que** joueur, **je veux** que le tour se joue automatiquement si mon adversaire ne répond pas **afin de** ne pas rester bloqué.
+
+- **CA1** : Un compte à rebours de 60 s est visible pendant le choix.
+- **CA2** : À 0, l'action par défaut est jouée pour le joueur absent et le tour est résolu.
+- **CA3** : Un appel à `/api/match/timeout` avant la deadline renvoie `409 TOO_EARLY`.
+
+#### US-21 — Reconnexion · Should · 3 pts
+**En tant que** joueur, **je veux** retrouver ma partie après un rafraîchissement **afin de** ne pas perdre un duel à cause d'une erreur de manipulation.
+
+- **CA1** : Quand je rafraîchis la page du match, l'état actuel s'affiche (bons PV, bon tour), sans rejouer d'animation.
+- **CA2** : Si j'avais déjà joué ce tour, je vois « En attente de l'adversaire… ».
+- **CA3** : Depuis le menu, un bouton « Reprendre la partie » apparaît si j'ai un match non terminé.
+
+#### US-18 — Draft · Should · 5 pts
+**En tant que** joueur, **je veux** choisir 3 monstres parmi 6 avant le duel **afin de** construire mon équipe.
+
+- **CA1** : Chaque joueur voit 6 propositions (tirées avec la seed du match) et en sélectionne exactement 3.
+- **CA2** : Le choix de l'adversaire n'est révélé qu'au début du combat.
+- **CA3** : Quand les 2 drafts sont validés, le combat démarre automatiquement.
+
+#### US-22 — Duel en 3 manches · Could · 5 pts
+**En tant que** joueur, **je veux** un duel en 2 manches gagnantes avec des récompenses entre les manches **afin de** retrouver la progression roguelike en multijoueur.
+
+- **CA1** : Le score de manches (ex. 1–0) est affiché.
+- **CA2** : Entre deux manches, chacun choisit une récompense (4 choix pour le perdant, 3 pour le gagnant) et les équipes sont soignées.
+- **CA3** : Le premier à 2 manches gagne le duel.
+
+---
+
+### Epic 7 — Contenu et finitions
+
+#### US-24 — Écran titre et menu · Must · 2 pts
+**En tant que** joueur, **je veux** un écran titre et un menu clair **afin d'**accéder facilement aux modes de jeu.
+
+- **CA1** : L'écran titre affiche le logo et « Appuyer pour commencer ».
+- **CA2** : Le menu propose Solo, Multijoueur, Classement et Crédits ; chaque bouton mène à sa page (même vide).
+
+#### US-26 — Crédits · Must · 1 pt
+**En tant qu'**artiste dont les assets sont utilisés, **je veux** être crédité dans le jeu **afin que** mon travail soit reconnu et ma licence respectée.
+
+- **CA1** : La page Crédits reprend tout le contenu de `docs/CREDITS.md` (auteur, lien, licence).
+
+#### US-25 — Audio · Could · 3 pts
+**En tant que** joueur, **je veux** de la musique et des effets sonores réglables **afin d'**être plus immergé.
+
+- **CA1** : Une musique de menu et une musique de combat tournent en boucle.
+- **CA2** : Un son est joué à chaque coup reçu et à chaque KO.
+- **CA3** : Un réglage de volume (0–100 %) est mémorisé dans le `localStorage`.
+
+#### US-27 — Mobile · Could · 3 pts
+**En tant que** joueur sur téléphone, **je veux** jouer en mode paysage **afin de** jouer n'importe où.
+
+- **CA1** : Le canvas et le menu d'actions tiennent sur un écran de 390×844 en paysage.
+- **CA2** : Les boutons font au moins 44 px de haut.
