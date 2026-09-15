@@ -50,7 +50,7 @@ Une user story est terminée si :
 | US-19 | Multijoueur | Jouer un combat en ligne tour par tour | Must | 8 | | 3 |
 | US-23 | Multijoueur | Abandonner un duel | Should | 1 | | 3 |
 | US-12 | Solo | Choisir une récompense après chaque vague | Must | 5 | | 4 |
-| US-09 | Interface combat | Animations et textes de combat | Should | 5 | | 4 |
+| US-09 | Interface combat | Animations et textes de combat | Should | 5 | | *backlog* (bonus S4) |
 | US-20 | Multijoueur | Timeout de tour | Should | 3 | | 4 |
 | US-21 | Multijoueur | Reprendre une partie après un rafraîchissement | Should | 3 | | 4 |
 | US-26 | Contenu | Écran des crédits | Must | 1 | | 4 |
@@ -63,7 +63,7 @@ Une user story est terminée si :
 | US-28 | Moteur | Statuts (brûlure, poison) | Could | 5 | | *backlog* |
 | — | — | Matchmaking automatique, chat, 3+ joueurs | Won't | — | — | — |
 
-**Total proposé** : 98 points, dont 56 en Must. Engagement prévu : environ 18 points par sprint.
+**Total proposé** : 98 points, dont 56 en Must. Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
 
 ## 4. Planning Poker
 

@@ -46,6 +46,7 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 | Donovan | `donovanmessager0-tech` | US-05, US-06 | 5 |
 
 ### ⚠️ Points d'attention techniques
+- **20 premières minutes** : Paul et Donovan écrivent `shared/types.ts` ensemble (pair programming) avant de se séparer sur US-03 et US-05/US-06. Sans ces types, Donovan est bloqué.
 - Choisir **dès maintenant** le pack de sprites principal et la taille de cadre (voir 08 §3), puis vérifier sa licence.
 - Faire valider `shared/types.ts` par toute l'équipe tôt : tout le monde en dépend.
 - Pas de `Math.random` dans `shared/`.

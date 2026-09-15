@@ -70,7 +70,7 @@
 | 1 | Mar. 15/09 après-midi | Le squelette est en ligne sur Vercel et un combat 1v1 se résout correctement dans les tests | [SPRINT-1](agile/SPRINT-1.md) |
 | 2 | Mer. 16/09 matin | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites | [SPRINT-2](agile/SPRINT-2.md) |
 | 3 | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire | [SPRINT-3](agile/SPRINT-3.md) |
-| 4 | Jeu. 17/09 matin | La boucle roguelike est complète et le jeu est présentable | [SPRINT-4](agile/SPRINT-4.md) |
+| 4 | Jeu. 17/09 matin, **gel du code à 13h** | La boucle roguelike est complète et le jeu est présentable (US-09 en bonus) | [SPRINT-4](agile/SPRINT-4.md) |
 | — | Jeu. 17/09 13h30 | 📧 Rendu : lien GitHub + fichiers `.md` | |
 | — | Jeu. 17/09 après-midi | 🎤 Présentation | |
 
@@ -86,12 +86,14 @@
 
 ## 7. Suivi de la vélocité *(à compléter)*
 
+> À la fin de chaque sprint, calculer la vélocité réelle (points terminés, DoD respectée) et réajuster l'engagement des sprints suivants sur la moyenne des sprints terminés. Répercuter le changement dans les `SPRINT-N.md`, les milestones et le GitHub Project.
+
 | Sprint | Points engagés | Points terminés (DoD respectée) | Commentaire |
 |---|---|---|---|
 | 1 | 18 | | |
 | 2 | 18 | | |
 | 3 | 18 | | |
-| 4 | 17 | | |
+| 4 | 12 | | Engagement réduit : sprint court (gel du code + rendu), US-09 en bonus |
 
 ## 8. Risques
 
@@ -102,6 +104,7 @@
 | Assets de styles ou de tailles hétérogènes | Moyenne | Moyen | Choisir **un** pack de base au sprint 1 et fixer une taille de sprite |
 | Variables d'environnement oubliées sur Vercel | Moyenne | Haut | Checklist de déploiement (doc 07), `.env.example` à jour |
 | Projet Supabase en pause le jour J | Faible | Haut | Ouvrir le dashboard la veille et le matin |
+| Sprint 4 trop court pour tout finir | Haute | Haut | Engagement réduit à 12 pts, US-09 en objectif bonus, gel du code à 13h |
 | Démo qui plante en direct | Moyenne | Haut | Vidéo de secours enregistrée au sprint 4, deux navigateurs préparés |
 
 ## 9. Plan de la présentation (≈ 30 min)

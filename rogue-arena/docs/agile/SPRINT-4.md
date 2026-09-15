@@ -16,7 +16,7 @@
 
 ## 📋 Sprint Backlog
 
-> Ajuster selon la vélocité réelle des sprints 1 à 3. Si elle est plus faible, retirer d'abord US-09 puis US-20.
+> Engagement réduit à **12 points** : le sprint 4 est plus court (préparation du rendu + gel du code 30 min avant 13h30). US-09 passe en **objectif bonus**. Si la vélocité réelle des sprints 1 à 3 est encore plus faible, retirer US-20.
 
 | US | Points | Tâche | Responsable | Statut |
 |---|---|---|---|---|
@@ -27,13 +27,20 @@
 | | | Bouton « Reprendre la partie » dans le menu | Paul | ☐ |
 | **US-20** Timeout | 3 | `api/match/timeout.ts` (action par défaut, `is_auto`) | Donovan | ☐ |
 | | | Compte à rebours côté client + appel automatique | Donovan | ☐ |
+| **US-26** Crédits | 1 | Page Crédits reprenant `CREDITS.md` | Donovan | ☐ |
+| *(hors US)* | — | Enregistrer une **vidéo de secours** de la démo | Mattéo | ☐ |
+| *(hors US)* | — | Mettre à jour README (URL prod, équipe) + vérifier que tous les `.md` sont remplis | Donovan | ☐ |
+| *(hors US)* | — | Slides de présentation (plan dans 00-PROJET-GLOBAL §9) | Mattéo | ☐ |
+| | **12** | | | |
+
+#### 🎁 Objectif bonus (hors engagement)
+
+À commencer **seulement** si US-12, US-20, US-21 et US-26 sont terminées et qu'il reste au moins 1h avant le gel du code. Sinon, US-09 reste dans la réserve.
+
+| US | Points | Tâche | Responsable | Statut |
+|---|---|---|---|---|
 | **US-09** Animations | 5 | File d'événements avec attente (`wait`, tweens de PV, flash, KO) | Mattéo | ☐ |
 | | | Textes d'efficacité et de critique | Mattéo | ☐ |
-| **US-26** Crédits | 1 | Page Crédits reprenant `CREDITS.md` | Donovan | ☐ |
-| *(hors US)* | — | Enregistrer une **vidéo de secours** de la démo | Paul | ☐ |
-| *(hors US)* | — | Mettre à jour README (URL prod, équipe) + vérifier que tous les `.md` sont remplis | Donovan | ☐ |
-| *(hors US)* | — | Slides de présentation (plan dans 00-PROJET-GLOBAL §9) | Paul | ☐ |
-| | **17** | | | |
 
 📸 **Capture du board** : `![Sprint backlog sprint 4](./captures/sprint-4-backlog.png)`
 
@@ -43,9 +50,9 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 
 | Membre | Compte GitHub | US / tâches | Points |
 |---|---|---|---|
-| Mattéo | `kifuj` | US-09 | 5 |
+| Mattéo | `kifuj` | Vidéo de secours + slides (+ US-09 en bonus) | hors US (+ 5 bonus) |
 | Owen | `Owen-Cazaux` | US-12 | 5 |
-| Paul | `Paul-B-O` | US-21 + vidéo de secours + slides | 3 + hors US |
+| Paul | `Paul-B-O` | US-21 + relecture des PR et test sur la production | 3 + hors US |
 | Donovan | `donovanmessager0-tech` | US-20, US-26 + README | 4 + hors US |
 
 ### ⚠️ Points d'attention techniques
@@ -103,10 +110,10 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 | US-12 | ☐ | ☐ | |
 | US-21 | ☐ | ☐ | |
 | US-20 | ☐ | ☐ | |
-| US-09 | ☐ | ☐ | |
+| US-09 *(bonus)* | ☐ | ☐ | |
 | US-26 | ☐ | ☐ | |
 
-- **Points engagés** : 17 — **Points terminés** : __
+- **Points engagés** : 12 (+ 5 bonus) — **Points terminés** : __
 - **Sprint Goal atteint ?** ☐ Oui ☐ Partiellement ☐ Non
 - **Reste dans le Product Backlog (pistes pour la suite) :**
 
@@ -139,7 +146,7 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 | 1 | 18 | | |
 | 2 | 18 | | |
 | 3 | 18 | | |
-| 4 | 17 | | |
+| 4 | 12 | | |
 | **Total** | **71** | | |
 
 **Ce que l'équipe retient du projet :**
