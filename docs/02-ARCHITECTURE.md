@@ -59,7 +59,7 @@ flowchart TB
 ## 3. Arborescence
 
 ```
-rogue-arena/
+.                                 # racine du dépôt
 ├─ api/                          # ⚙️ Vercel Functions (Node, serveur autoritaire)
 │  ├─ _lib/                      #   "_" : pas exposé comme endpoint
 │  │  ├─ supabaseAdmin.ts        #   client Supabase avec la clé secrète

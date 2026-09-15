@@ -1,4 +1,4 @@
-# Product Backlog — Rogue Arena
+# Product Backlog — Dark Dungeon Fantasy Boss Battle
 
 > Tenu par le **Product Owner**. Priorités **MoSCoW** (Must / Should / Could / Won't).
 > Les estimations indiquées sont une **proposition de départ** : l'équipe doit les **rejouer en Planning Poker** (§4) et remplacer la colonne par ses propres valeurs.

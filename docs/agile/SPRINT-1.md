@@ -18,7 +18,7 @@
 |---|---|---|---|---|
 | **US-01** Projet en ligne | 3 | Créer le repo GitHub public + protection de `main` | Mattéo | 🟡 Repo public créé ; protection de `main` à faire |
 | | | Scaffold Vite React-TS, installer Phaser, Supabase, Vitest | Mattéo | 🔍 En revue ([PR #29](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/29)) |
-| | | `vercel.json` (rewrites) + import sur Vercel + 1er déploiement | Mattéo | 🟡 `vercel.json` en revue (#29) ; import Vercel (Root Directory `rogue-arena`) à faire |
+| | | `vercel.json` (rewrites) + import sur Vercel + 1er déploiement | Mattéo | 🟡 `vercel.json` en revue (#29) ; import Vercel (Root Directory = racine du dépôt) à faire |
 | | | Composant `PhaserGame` avec canvas 480×270 `pixelArt` | Mattéo | 🔍 En revue (#29) |
 | **US-02** Supabase | 3 | Créer le projet (région Paris) + exécuter `001_init.sql` | Owen | 🟡 `001_init.sql` en revue ([PR #31](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/31)) ; création du projet à faire |
 | | | Activer l'auth anonyme + vérifier la publication Realtime | Owen | ☐ À faire (dashboard) |

@@ -1,4 +1,4 @@
-# 🗡️ Rogue Arena *(nom provisoire)*
+# 🗡️ Dark Dungeon Fantasy Boss Battle
 
 Jeu **roguelike pixel-art médiéval-fantasy au tour par tour**, jouable dans le navigateur.
 On peut jouer **en solo** contre des vagues de monstres contrôlés par l'IA, ou **en duel multijoueur en ligne** contre un ami.
