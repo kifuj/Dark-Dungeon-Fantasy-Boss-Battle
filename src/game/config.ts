@@ -11,7 +11,7 @@ export const gameConfig: Types.Core.GameConfig = {
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   pixelArt: true, // pas de lissage des pixels
-  backgroundColor: '#1a1423',
+  backgroundColor: '#0D0D0F',
   scale: { mode: Scale.FIT, autoCenter: Scale.CENTER_BOTH },
   scene: [BootScene, PreloadScene, BattleScene],
 };
