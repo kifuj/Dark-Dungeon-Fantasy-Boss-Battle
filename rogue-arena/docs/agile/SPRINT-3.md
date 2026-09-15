@@ -18,21 +18,32 @@
 
 | US | Points | Tâche | Responsable | Statut |
 |---|---|---|---|---|
-| **US-15** Pseudo | 3 | Page Login : `signInAnonymously` + `upsert` du profil | | ☐ À faire |
-| | | Garde de route (redirection si pas de profil) + gestion du pseudo déjà pris | | ☐ |
-| **US-16** Créer un salon | 3 | `api/_lib/` (supabaseAdmin, auth, http) | | ☐ |
-| | | `api/rooms/create.ts` + page Salon (code, copier) | | ☐ |
-| | | Abonnement Realtime `rooms` (arrivée de l'invité) | | ☐ |
-| **US-17** Rejoindre | 3 | `api/rooms/join.ts` (course sur `guest_id`) + formulaire de code | | ☐ |
-| **US-19** Combat en ligne | 8 | `api/match/start.ts` (seed, équipes aléatoires, `current_match_id`) | | ☐ |
-| | | `api/_lib/turns.ts` : `tryResolveBattleTurn` (verrou `version`) | | ☐ |
-| | | `api/match/action.ts` (validations + codes d'erreur) | | ☐ |
-| | | `src/lib/realtime.ts` + page `OnlineMatch` (états choosing / waiting / animating / finished) | | ☐ |
-| | | Tests manuels M1, M2, M5, M6, M7 (doc 04 §11) sur 2 navigateurs **en preview Vercel** | | ☐ |
-| **US-23** Abandon | 1 | `api/match/forfeit.ts` + bouton avec confirmation | | ☐ |
+| **US-15** Pseudo | 3 | Page Login : `signInAnonymously` + `upsert` du profil | Owen | ☐ À faire |
+| | | Garde de route (redirection si pas de profil) + gestion du pseudo déjà pris | Owen | ☐ |
+| **US-16** Créer un salon | 3 | `api/_lib/` (supabaseAdmin, auth, http) | Mattéo | ☐ |
+| | | `api/rooms/create.ts` + page Salon (code, copier) | Mattéo | ☐ |
+| | | Abonnement Realtime `rooms` (arrivée de l'invité) | Mattéo | ☐ |
+| **US-17** Rejoindre | 3 | `api/rooms/join.ts` (course sur `guest_id`) + formulaire de code | Donovan | ☐ |
+| **US-19** Combat en ligne | 8 | `api/match/start.ts` (seed, équipes aléatoires, `current_match_id`) | Paul | ☐ |
+| | | `api/_lib/turns.ts` : `tryResolveBattleTurn` (verrou `version`) | Paul | ☐ |
+| | | `api/match/action.ts` (validations + codes d'erreur) | Paul | ☐ |
+| | | `src/lib/realtime.ts` + page `OnlineMatch` (états choosing / waiting / animating / finished) | Mattéo | ☐ |
+| | | Tests manuels M1, M2, M5, M6, M7 (doc 04 §11) sur 2 navigateurs **en preview Vercel** | Donovan | ☐ |
+| **US-23** Abandon | 1 | `api/match/forfeit.ts` + bouton avec confirmation | Donovan | ☐ |
 | | **18** | | | |
 
 📸 **Capture du board** : `![Sprint backlog sprint 3](./captures/sprint-3-backlog.png)`
+
+### 👥 Répartition des tâches
+
+Tâches réparties entre les 4 membres du repo, équilibrées en points. Le responsable de chaque US est assigné sur l'issue GitHub (milestone `Sprint 3`).
+
+| Membre | Compte GitHub | US / tâches | Points |
+|---|---|---|---|
+| Mattéo | `kifuj` | US-16 + front de US-19 (`realtime.ts`, `OnlineMatch`) | 3 + ~2 |
+| Owen | `Owen-Cazaux` | US-15 | 3 |
+| Paul | `Paul-B-O` | back de US-19 (`start`, `turns`, `action`) | ~5 |
+| Donovan | `donovanmessager0-tech` | US-17, US-23 + tests multi de US-19 | 3 + 1 + ~1 |
 
 ### ⚠️ Points d'attention techniques
 - **Premier daily** : vérifier que le Realtime passe sur le réseau de l'école. Sinon, activer tout de suite le plan B polling (doc 04 §10).

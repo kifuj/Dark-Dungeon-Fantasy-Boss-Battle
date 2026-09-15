@@ -18,21 +18,32 @@
 
 | US | Points | Tâche | Responsable | Statut |
 |---|---|---|---|---|
-| **US-07** Scène de combat | 5 | `PreloadScene` : chargement des spritesheets + animations idle | | ☐ À faire |
-| | | `BattleScene` : placement face à face (`flipX` si besoin) + fond | | ☐ |
-| | | Encadrés nom / niveau / élément + barre de PV colorée | | ☐ |
-| | | `EventBus` : `scene-ready`, `battle-init` | | ☐ |
-| **US-08** Menu d'actions | 3 | Composant React `ActionMenu` (compétences, PP, couleurs) | | ☐ |
-| | | Griser via `validateAction` + navigation clavier | | ☐ |
-| | | Masquer pendant la résolution (`play-events` / `events-played`) | | ☐ |
-| **US-04** Changer | 3 | Sous-menu « Changer » + événement `switch` dans Phaser | | ☐ |
-| **US-10** Starter | 2 | Page de choix du starter (3 cartes) + création de la run (seed) | | ☐ |
-| **US-11** Vagues IA | 5 | `chooseAiAction` + tests | | ☐ |
-| | | Génération d'ennemi par vague (`shared/engine/run.ts`) + tests | | ☐ |
-| | | Page `SoloRun` : boucle tour → vague suivante → fin de run | | ☐ |
+| **US-07** Scène de combat | 5 | `PreloadScene` : chargement des spritesheets + animations idle | Mattéo | ☐ À faire |
+| | | `BattleScene` : placement face à face (`flipX` si besoin) + fond | Mattéo | ☐ |
+| | | Encadrés nom / niveau / élément + barre de PV colorée | Mattéo | ☐ |
+| | | `EventBus` : `scene-ready`, `battle-init` | Mattéo | ☐ |
+| **US-08** Menu d'actions | 3 | Composant React `ActionMenu` (compétences, PP, couleurs) | Owen | ☐ |
+| | | Griser via `validateAction` + navigation clavier | Owen | ☐ |
+| | | Masquer pendant la résolution (`play-events` / `events-played`) | Owen | ☐ |
+| **US-04** Changer | 3 | Sous-menu « Changer » + événement `switch` dans Phaser | Donovan | ☐ |
+| **US-10** Starter | 2 | Page de choix du starter (3 cartes) + création de la run (seed) | Owen | ☐ |
+| **US-11** Vagues IA | 5 | `chooseAiAction` + tests | Paul | ☐ |
+| | | Génération d'ennemi par vague (`shared/engine/run.ts`) + tests | Paul | ☐ |
+| | | Page `SoloRun` : boucle tour → vague suivante → fin de run | Paul | ☐ |
 | | **18** | | | |
 
 📸 **Capture du board** : `![Sprint backlog sprint 2](./captures/sprint-2-backlog.png)`
+
+### 👥 Répartition des tâches
+
+Tâches réparties entre les 4 membres du repo, équilibrées en points. Le responsable de chaque US est assigné sur l'issue GitHub (milestone `Sprint 2`).
+
+| Membre | Compte GitHub | US / tâches | Points |
+|---|---|---|---|
+| Mattéo | `kifuj` | US-07 | 5 |
+| Owen | `Owen-Cazaux` | US-08, US-10 | 5 |
+| Paul | `Paul-B-O` | US-11 | 5 |
+| Donovan | `donovanmessager0-tech` | US-04 | 3 |
 
 ### ⚠️ Points d'attention techniques
 - Première version sans animation : Phaser applique directement les PV finaux. Les animations complètes arrivent avec US-09 au sprint 4.

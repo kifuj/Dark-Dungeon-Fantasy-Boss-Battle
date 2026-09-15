@@ -115,7 +115,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 ### Epic 2 — Moteur de combat
 
 #### US-03 — Attaquer avec des compétences · Must · 5 pts
-**En tant que** joueur, **je veux** que mon monstre utilise une compétence qui inflige des dégâts selon les stats et les éléments **afin que** mes choix tactiques aient un impact.
+**En tant que** joueur, **je veux** que mon monstre utilise une compétence qui inflige des dégâts selon les stats et les éléments **afin de** rendre mes choix tactiques décisifs.
 
 - **CA1** : Étant donné une Salamandre (feu) contre un Champignon (nature), quand elle utilise Boule de feu, alors l'événement `damage` indique `effectiveness = 2`.
 - **CA2** : Les dégâts suivent la formule de [06 §5](../06-MOTEUR-DE-COMBAT.md#5-dégâts) et valent au minimum 1.
@@ -123,7 +123,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA4** : Étant donné la même seed et les mêmes actions, quand on résout deux fois le tour, alors le résultat est identique (test Vitest).
 
 #### US-05 — Ordre d'action · Must · 2 pts
-**En tant que** joueur, **je veux** que le monstre le plus rapide agisse en premier **afin que** la vitesse soit une vraie statistique stratégique.
+**En tant que** joueur, **je veux** que le monstre le plus rapide agisse en premier **afin de** faire de la vitesse une vraie statistique stratégique.
 
 - **CA1** : Changement de monstre > compétence prioritaire > compétence normale.
 - **CA2** : À priorité égale, la VIT la plus haute agit en premier.
@@ -131,7 +131,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA4** : Un monstre mis KO avant son action n'agit pas.
 
 #### US-06 — KO et fin de combat · Must · 3 pts
-**En tant que** joueur, **je veux** que mes monstres KO soient remplacés et que le combat se termine quand une équipe est vaincue **afin que** chaque combat ait une issue claire.
+**En tant que** joueur, **je veux** que mes monstres KO soient remplacés et que le combat se termine quand une équipe est vaincue **afin de** savoir clairement qui a gagné chaque combat.
 
 - **CA1** : Étant donné un monstre à 0 PV, alors un événement `faint` est émis.
 - **CA2** : En fin de tour, le monstre actif KO est remplacé par le premier monstre en vie (`switch` avec `forced: true`).
@@ -172,7 +172,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA4** : Le menu est utilisable à la souris et au clavier (flèches + Entrée).
 
 #### US-09 — Animations et textes · Should · 5 pts
-**En tant que** joueur, **je veux** voir les attaques animées et lire ce qui se passe **afin que** le combat soit vivant et compréhensible.
+**En tant que** joueur, **je veux** voir les attaques animées et lire ce qui se passe **afin de** suivre un combat vivant et compréhensible.
 
 - **CA1** : Chaque événement est rejoué dans l'ordre : texte « X utilise Y ! », flash du monstre touché, barre de PV qui descend progressivement.
 - **CA2** : « C'est super efficace ! », « Ce n'est pas très efficace… » et « Coup critique ! » s'affichent quand c'est le cas.
@@ -302,7 +302,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA2** : Le menu propose Solo, Multijoueur, Classement et Crédits ; chaque bouton mène à sa page (même vide).
 
 #### US-26 — Crédits · Must · 1 pt
-**En tant qu'**artiste dont les assets sont utilisés, **je veux** être crédité dans le jeu **afin que** mon travail soit reconnu et ma licence respectée.
+**En tant qu'**artiste dont les assets sont utilisés, **je veux** être crédité dans le jeu **afin de** voir mon travail reconnu et ma licence respectée.
 
 - **CA1** : La page Crédits reprend tout le contenu de `docs/CREDITS.md` (auteur, lien, licence).
 

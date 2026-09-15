@@ -20,22 +20,33 @@
 
 | US | Points | Tâche | Responsable | Statut |
 |---|---|---|---|---|
-| **US-12** Récompenses | 5 | `shared/data/rewards.ts` + tirage pondéré avec la seed + tests | | ☐ À faire |
-| | | Application des effets (potion, élixir, entraînement, recrutement, parchemin) + tests | | ☐ |
-| | | Écran de choix (3 cartes) + remplacement si équipe pleine | | ☐ |
-| **US-21** Reconnexion | 3 | Chargement initial sans animation + détection « déjà joué » | | ☐ |
-| | | Bouton « Reprendre la partie » dans le menu | | ☐ |
-| **US-20** Timeout | 3 | `api/match/timeout.ts` (action par défaut, `is_auto`) | | ☐ |
-| | | Compte à rebours côté client + appel automatique | | ☐ |
-| **US-09** Animations | 5 | File d'événements avec attente (`wait`, tweens de PV, flash, KO) | | ☐ |
-| | | Textes d'efficacité et de critique | | ☐ |
-| **US-26** Crédits | 1 | Page Crédits reprenant `CREDITS.md` | | ☐ |
-| *(hors US)* | — | Enregistrer une **vidéo de secours** de la démo | | ☐ |
-| *(hors US)* | — | Mettre à jour README (URL prod, équipe) + vérifier que tous les `.md` sont remplis | | ☐ |
-| *(hors US)* | — | Slides de présentation (plan dans 00-PROJET-GLOBAL §9) | | ☐ |
+| **US-12** Récompenses | 5 | `shared/data/rewards.ts` + tirage pondéré avec la seed + tests | Owen | ☐ À faire |
+| | | Application des effets (potion, élixir, entraînement, recrutement, parchemin) + tests | Owen | ☐ |
+| | | Écran de choix (3 cartes) + remplacement si équipe pleine | Owen | ☐ |
+| **US-21** Reconnexion | 3 | Chargement initial sans animation + détection « déjà joué » | Paul | ☐ |
+| | | Bouton « Reprendre la partie » dans le menu | Paul | ☐ |
+| **US-20** Timeout | 3 | `api/match/timeout.ts` (action par défaut, `is_auto`) | Donovan | ☐ |
+| | | Compte à rebours côté client + appel automatique | Donovan | ☐ |
+| **US-09** Animations | 5 | File d'événements avec attente (`wait`, tweens de PV, flash, KO) | Mattéo | ☐ |
+| | | Textes d'efficacité et de critique | Mattéo | ☐ |
+| **US-26** Crédits | 1 | Page Crédits reprenant `CREDITS.md` | Donovan | ☐ |
+| *(hors US)* | — | Enregistrer une **vidéo de secours** de la démo | Paul | ☐ |
+| *(hors US)* | — | Mettre à jour README (URL prod, équipe) + vérifier que tous les `.md` sont remplis | Donovan | ☐ |
+| *(hors US)* | — | Slides de présentation (plan dans 00-PROJET-GLOBAL §9) | Paul | ☐ |
 | | **17** | | | |
 
 📸 **Capture du board** : `![Sprint backlog sprint 4](./captures/sprint-4-backlog.png)`
+
+### 👥 Répartition des tâches
+
+Tâches réparties entre les 4 membres du repo, équilibrées en points. Le responsable de chaque US est assigné sur l'issue GitHub (milestone `Sprint 4`).
+
+| Membre | Compte GitHub | US / tâches | Points |
+|---|---|---|---|
+| Mattéo | `kifuj` | US-09 | 5 |
+| Owen | `Owen-Cazaux` | US-12 | 5 |
+| Paul | `Paul-B-O` | US-21 + vidéo de secours + slides | 3 + hors US |
+| Donovan | `donovanmessager0-tech` | US-20, US-26 + README | 4 + hors US |
 
 ### ⚠️ Points d'attention techniques
 - **Gel du code 30 min avant le rendu** : plus de nouvelle fonctionnalité, seulement des corrections.
