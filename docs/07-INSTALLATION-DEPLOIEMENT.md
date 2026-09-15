@@ -126,7 +126,7 @@ export const supabase = createClient(
 
 ## 2. Supabase
 
-1. **New project** : nom `rogue-arena`, région **Europe West (Paris)**, noter le mot de passe de la BDD.
+1. **New project** : nom `dark-dungeon-fantasy-boss-battle`, région **Europe West (Paris)**, noter le mot de passe de la BDD.
 2. **SQL Editor → New query** : coller `supabase/migrations/001_init.sql` ([doc 03](03-BASE-DE-DONNEES.md#2-migration-sql)) puis **Run**.
 3. **Authentication → Sign In / Providers** : activer **Allow anonymous sign-ins**.
 4. **Database → Publications** : vérifier que `rooms` et `matches` sont dans `supabase_realtime`.
@@ -146,7 +146,7 @@ git init
 git add .
 git commit -m "chore: initialisation du projet"
 git branch -M main
-git remote add origin https://github.com/<organisation-ou-pseudo>/rogue-arena.git
+git remote add origin https://github.com/<organisation-ou-pseudo>/dark-dungeon-fantasy-boss-battle.git
 git push -u origin main
 ```
 
@@ -157,7 +157,7 @@ git push -u origin main
 ## 4. Vercel
 
 ### 4.1 Premier déploiement
-1. [vercel.com/new](https://vercel.com/new) → **Import Git Repository** → choisir `rogue-arena`.
+1. [vercel.com/new](https://vercel.com/new) → **Import Git Repository** → choisir `dark-dungeon-fantasy-boss-battle`.
 2. Framework Preset : **Vite** (détecté automatiquement). Build : `npm run build`. Output : `dist`.
 3. **Environment Variables** : ajouter les **4 variables** de `.env.example` pour *Production*, *Preview* **et** *Development*.
 4. **Deploy**.

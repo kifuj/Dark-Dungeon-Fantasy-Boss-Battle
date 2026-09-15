@@ -34,7 +34,7 @@ erDiagram
 
 ```sql
 -- =========================================================
--- 001_init.sql — Dark Dungeon Fantasy Boss Battle
+-- 001_init.sql — Dark Dungeon Fantasy Boss battle
 -- =========================================================
 
 -- ---------- PROFILES ----------

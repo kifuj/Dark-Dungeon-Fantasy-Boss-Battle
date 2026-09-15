@@ -1,4 +1,4 @@
-# 🗡️ Dark Dungeon Fantasy Boss Battle
+# 🗡️ Dark Dungeon Fantasy Boss battle
 
 Jeu **roguelike pixel-art médiéval-fantasy au tour par tour**, jouable dans le navigateur.
 On peut jouer **en solo** contre des vagues de monstres contrôlés par l'IA, ou **en duel multijoueur en ligne** contre un ami.
@@ -13,7 +13,7 @@ Inspiré de *PokeRogue*.
 | Quoi | Lien |
 |---|---|
 | Jeu en ligne (Vercel) | `https://<à-compléter>.vercel.app` |
-| Dépôt GitHub (public) | `https://github.com/<à-compléter>/rogue-arena` |
+| Dépôt GitHub (public) | `https://github.com/<à-compléter>/dark-dungeon-fantasy-boss-battle` |
 | Projet Supabase | *(privé : ne jamais publier les clés)* |
 
 ## 🧱 Stack
@@ -48,8 +48,8 @@ Inspiré de *PokeRogue*.
 ## 🚀 Démarrage rapide
 
 ```bash
-git clone https://github.com/<à-compléter>/rogue-arena.git
-cd rogue-arena
+git clone https://github.com/<à-compléter>/dark-dungeon-fantasy-boss-battle.git
+cd dark-dungeon-fantasy-boss-battle
 npm install
 npx vercel link              # lier le dossier au projet Vercel
 npx vercel env pull .env.local

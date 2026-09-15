@@ -12,7 +12,7 @@ export function Menu() {
   return (
     <main className="page">
       <h1 className="logo logo-small">
-        Rogue <span>Arena</span>
+        Dark Dungeon Fantasy <span>Boss battle</span>
       </h1>
       <nav className="menu">
         {ENTRIES.map((entry, i) => (

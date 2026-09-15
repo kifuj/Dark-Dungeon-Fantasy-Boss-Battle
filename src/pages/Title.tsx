@@ -14,7 +14,7 @@ export function Title() {
   return (
     <main className="page title-screen" onClick={() => navigate('/menu')}>
       <h1 className="logo">
-        Rogue <span>Arena</span>
+        Dark Dungeon Fantasy <span>Boss battle</span>
       </h1>
       <p className="blink">Appuyer pour commencer</p>
     </main>
