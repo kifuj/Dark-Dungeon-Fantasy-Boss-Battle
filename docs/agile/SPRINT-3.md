@@ -209,6 +209,10 @@ Sprint Goal écrit, Planning Poker rejoué (tableau ci-dessus), US découpées e
 - **Sprint Goal atteint ?** ☑ Oui
 - **Écart de DoD assumé** : la fonctionnalité n'a pas été vérifiée sur **l'URL de production Render**, seulement sur la build de production en local ; et les PR ont un relecteur désigné mais sont fusionnées par le même compte.
 - **US non terminées → retour au Product Backlog :** US-01 (CA3 + protection de `main`) passe en tête du sprint 4, avec les variables d'environnement Render.
+📸 **Jalon `Sprint 3` en fin de sprint : 6 issues fermées, 100 %** (US-01 a été déplacée vers le jalon `Sprint 4`) :
+
+![Review sprint 3](./captures/sprint-3-review.png)
+
 - **Retours / nouvelles idées :**
   - US-21 (reconnexion) est **déjà à moitié faite** : la page du duel repart de l'état courant et sait dire « En attente de l'adversaire… ». Il reste le bouton « Reprendre la partie » du menu.
   - Le duel dure longtemps avec 3 monstres niveau 10 : prévoir de montrer un duel déjà avancé pendant la présentation de jeudi.
