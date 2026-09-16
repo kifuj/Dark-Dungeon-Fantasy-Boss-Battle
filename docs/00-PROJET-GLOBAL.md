@@ -69,7 +69,7 @@
 |---|---|---|---|
 | 1 ⚠️ | Mar. 15/09 après-midi | Le squelette est en ligne sur Render et un combat 1v1 se résout correctement dans les tests — **partiellement atteint** (Supabase non configuré) | [SPRINT-1](agile/SPRINT-1.md) |
 | 2 ✅ | Mer. 16/09 matin | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites — **atteint** | [SPRINT-2](agile/SPRINT-2.md) |
-| 3 ✅ | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire — **atteint** (Supabase en ligne, 5 Edge Functions déployées) | [SPRINT-3](agile/SPRINT-3.md) |
+| 3 ✅ | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire — **atteint**, vérifié sur la production (Supabase en ligne, 5 Edge Functions déployées) | [SPRINT-3](agile/SPRINT-3.md) |
 | 4 | Jeu. 17/09 matin, **gel du code à 13h** | La boucle roguelike est complète et le jeu est présentable (US-09 en bonus) | [SPRINT-4](agile/SPRINT-4.md) |
 | — | Jeu. 17/09 13h30 | 📧 Rendu : lien GitHub + fichiers `.md` | |
 | — | Jeu. 17/09 après-midi | 🎤 Présentation | |
@@ -104,7 +104,7 @@
 | ~~Le multijoueur prend plus de temps que prévu~~ | — | — | **Levé au sprint 3** : duel complet livré et testé sur deux navigateurs. Le plan B polling est resté actif en permanence |
 | Conflits Git dans une petite équipe | Moyenne | Moyen | Branches courtes, PR petites, un pôle par dossier |
 | Assets de styles ou de tailles hétérogènes | Moyenne | Moyen | Choisir **un** pack de base au sprint 1 et fixer une taille de sprite |
-| Variables d'environnement oubliées sur Render, ou Edge Functions non redéployées | **Avérée** | Haut | **Réalisée au sprint 3** : les clés Supabase ne sont pas sur Render, le multijoueur ne marche donc pas encore sur la production. Première tâche du sprint 4 (checklist doc 07 §6) |
+| Variables d'environnement oubliées sur Render, ou Edge Functions non redéployées | Moyenne | Haut | Checklist de déploiement (doc 07 §6). Au sprint 3, les clés Supabase de Render étaient bien en place et le duel a été vérifié sur la production ; ce qui manque encore, c'est la règle de réécriture du dashboard (US-01) |
 | Projet Supabase en pause le jour J | Faible | Haut | Ouvrir le dashboard la veille et le matin |
 | Sprint 4 trop court pour tout finir | Haute | Haut | Engagement réduit à 12 pts, US-09 en objectif bonus, gel du code à 13h |
 | Démo qui plante en direct | Moyenne | Haut | Vidéo de secours enregistrée au sprint 4, deux navigateurs préparés |

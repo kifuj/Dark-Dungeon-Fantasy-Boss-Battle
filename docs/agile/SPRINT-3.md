@@ -16,7 +16,8 @@
 
 - **18 / 18 points terminés** : US-15 (3), US-16 (3), US-17 (3), US-19 (8), US-23 (1).
 - **+ 3 points récupérés du sprint 1** : US-02 (Supabase configuré) est enfin fermée — schéma, RLS et Realtime exécutés sur le vrai projet, connexions anonymes activées.
-- **US-01 reste ouverte** : la règle de réécriture du dashboard Render et la protection de `main` ne sont toujours pas faites (voir [Tâches non terminées](#-tâches-non-terminées)). Un repli `404.html` a été ajouté pour que les routes profondes fonctionnent quand même.
+- **Vérifié sur la production** : <https://dark-dungeon-fantasy-boss-battle.onrender.com> — duel complet rejoué entre deux navigateurs sur l'URL Render après la fusion sur `main`.
+- **US-01 reste ouverte** : la règle de réécriture du dashboard Render et la protection de `main` ne sont toujours pas faites (voir [Tâches non terminées](#-tâches-non-terminées)). Le repli `404.html` ajouté au sprint permet quand même d'ouvrir et de rafraîchir `/menu`, `/salon/<id>` et `/match/<id>`.
 - 6 pull requests : [#41](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/41) (socle Supabase), [#42](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/42) (US-15), [#43](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/43) (US-16), [#44](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/44) (US-17), [#45](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/45) (US-19), [#46](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/46) (US-23).
 - Tests : **102 → 133** (Vitest), plus un nouveau scénario de bout en bout `npm run test:multi` qui rejoue **26 vérifications** contre le vrai projet Supabase (M1 à M7 de la [doc 04 §11](../04-MULTIJOUEUR.md#scénarios-de-test-manuels)).
 - 5 Edge Functions déployées : `rooms-create`, `rooms-join`, `match-start`, `match-action`, `match-forfeit`.
@@ -109,9 +110,8 @@ Hors sprint backlog : `npm run functions:sync` (recopie de `shared/` pour Deno),
 
 | Élément | État | Décision |
 |---|---|---|
-| **US-01 CA3** (routes profondes sur Render) | ⚠️ Contourné, pas réglé. `https://…onrender.com/menu` répond toujours **404** : la règle **Redirects/Rewrites** du dashboard n'a pas été activée (personne n'avait la main sur le compte Render pendant le créneau). Le build produit maintenant un `dist/404.html` identique à `index.html` : la page se charge malgré le code 404. | Reste ouverte, **remonte en tête du sprint 4** : c'est 2 minutes dans le dashboard, et c'est nécessaire à US-21 (reprise après rafraîchissement). |
+| **US-01 CA3** (routes profondes sur Render) | ⚠️ Contourné, pas réglé. `https://…onrender.com/menu` répond toujours **404** au sens HTTP : la règle **Redirects/Rewrites** du dashboard n'a pas été activée. Le build produit maintenant un `dist/404.html` identique à `index.html`, donc **l'application se charge quand même** — vérifié sur la production, y compris en rafraîchissant en plein duel. | Reste ouverte, **remonte en tête du sprint 4** : 2 minutes dans le dashboard pour obtenir un vrai `200`. |
 | **US-01** protection de `main` | ❌ Toujours désactivée | Reportée au sprint 4 (elle empêcherait de fusionner sans relecture, ce qui est justement notre écart de DoD récurrent) |
-| **Variables d'environnement sur Render** | ❌ `VITE_SUPABASE_URL` et `VITE_SUPABASE_PUBLISHABLE_KEY` ne sont pas encore renseignées dans Render → le multijoueur ne marche pas sur la production, seulement en local et sur la build de production testée en local. | Sprint 4, en même temps que la règle de réécriture : ajouter les deux variables puis *Clear build cache & deploy*. |
 | **Relecture croisée des PR** | ⚠️ Un relecteur a été désigné au daily pour chaque PR (noté dans la description), mais les fusions sont faites par le même compte. | Même écart qu'au sprint 2, assumé et présenté en review. La protection de `main` (US-01) est la vraie parade. |
 | **Données de test dans la base** | ⚠️ Les profils `TestA-…`, salons et matchs créés par `npm run test:multi` et par les tests navigateur sont restés en base. | Sans impact sur le jeu ; la requête de remise à zéro est dans [03 §6](../03-BASE-DE-DONNEES.md#6-réinitialiser-la-base-en-développement), à jouer avant la démo de jeudi. |
 | **US-20 (timeout) et US-21 (reconnexion)** | Non engagées (sprint 4) | `turn_deadline` est déjà écrit par `match-start` et `tryResolveBattleTurn`, et la page du duel sait déjà repartir de l'état courant : les deux US commencent avec de l'avance. |
@@ -124,19 +124,19 @@ Hors sprint backlog : `npm run functions:sync` (recopie de `shared/` pour Deno),
 4. **La page du duel pouvait se figer** : elle attendait l'événement `events-played` de la scène Phaser pour appliquer le tour résolu. Si le canvas est en échec ou l'onglet en arrière-plan, l'événement n'arrive jamais et le joueur reste bloqué sur « Résolution du tour… ». Ajout d'un filet de sécurité de 4,5 s.
 5. **Le rejeu d'un tour prend plus de 2 secondes** (CA3 de l'US-19). Mesures sur la build de production, deux navigateurs : la 2ᵉ action arrive chez l'adversaire en **1,3 s** (Realtime), mais le rejeu complet avec l'animation prend **3,7 s**, parce que chaque événement dure 550 ms dans la scène. Le critère est tenu côté réseau, pas côté animation. À trancher avec l'US-09 (sprint 4) : raccourcir les durées ou reformuler le critère.
 6. **Deno ne résout pas les imports `./x.js` de `shared/`.** L'option `sloppy-imports` de la doc 07 n'est pas garantie côté déploiement Supabase : on a donc promu le plan B, un script de recopie (`npm run functions:sync`) qui réécrit les extensions.
-7. **Render n'est toujours pas configuré** (réécriture + variables d'environnement) : le multijoueur n'a donc pas pu être vérifié sur l'URL de production, seulement sur la build de production servie en local. C'est un écart réel à la DoD, présenté en review.
+7. **Render : la règle de réécriture manque toujours.** Les variables `VITE_SUPABASE_URL` et `VITE_SUPABASE_PUBLISHABLE_KEY`, elles, étaient bien renseignées — on a d'abord cru le contraire en cherchant l'URL Supabase dans le bundle de production, avant de vérifier pour de bon en jouant un duel sur l'URL Render. Leçon : on ne conclut pas sur l'état d'un déploiement en lisant un fichier, on l'essaie. Reste donc uniquement la règle `Redirects/Rewrites` (code HTTP 404 sur les routes profondes, même si la page se charge grâce à `404.html`).
 
 ## 🧭 Décisions prises pendant le sprint
 
 | Heure | Décision | Raison |
 |---|---|---|
 | 13h40 | **Récupérer les clés Supabase par l'API de gestion** plutôt que d'attendre une nouvelle copie manuelle. | La clé du `.env` était tronquée ; l'access token permettait de lire la bonne valeur, d'exécuter la migration et d'activer les connexions anonymes sans passer par le dashboard. |
-| 14h00 | **`shared/` est recopié dans `supabase/functions/_shared/game/` par `npm run functions:sync`**, au lieu de compter sur les imports « sloppy » de Deno. | Le moteur reste écrit une seule fois dans `shared/`, mais le déploiement ne dépend plus d'une option instable. Le dossier généré porte un en-tête « ne pas modifier ». |
-| 14h00 | **Pas de phase `draft` pour le MVP** : `match-start` crée directement deux équipes de 3 monstres niveau 10 tirées avec la seed. | Prévu par la doc 04 §2 ; l'US-18 (draft) reste en réserve. |
-| 15h00 | **Toutes les fonctions sont idempotentes** (`rooms-join`, `match-start`, `match-forfeit` renvoient 200 si l'action est déjà faite). | Un double-clic ou un Realtime qui repasse ne doit jamais produire d'erreur visible pour le joueur. |
-| 15h00 | **Le Realtime garde une relecture périodique permanente** (2 s) au lieu d'un plan B activé seulement sur erreur. | Un canal peut être fermé sans erreur remontée ; le coût d'un `select` sur une ligne est négligeable, et cela couvre aussi le réseau filtrant de l'école. |
-| 16h00 | **Les scénarios manuels M1 à M7 deviennent un script** : `npm run test:multi`. | Trois sessions anonymes, un duel complet et un abandon, rejoués en 20 secondes contre le vrai Supabase — beaucoup plus fiable que de refaire les manipulations à la main à chaque sprint. |
-| 16h00 | **`dist/404.html` est généré au build.** | Tant que la règle de réécriture Render n'est pas activée, c'est ce qui permet d'ouvrir ou de rafraîchir `/match/<id>` sans page blanche. |
+| 14h30 | **`shared/` est recopié dans `supabase/functions/_shared/game/` par `npm run functions:sync`**, au lieu de compter sur les imports « sloppy » de Deno. | Le moteur reste écrit une seule fois dans `shared/`, mais le déploiement ne dépend plus d'une option instable. Le dossier généré porte un en-tête « ne pas modifier ». |
+| 14h30 | **Pas de phase `draft` pour le MVP** : `match-start` crée directement deux équipes de 3 monstres niveau 10 tirées avec la seed. | Prévu par la doc 04 §2 ; l'US-18 (draft) reste en réserve. |
+| 15h30 | **Toutes les fonctions sont idempotentes** (`rooms-join`, `match-start`, `match-forfeit` renvoient 200 si l'action est déjà faite). | Un double-clic ou un Realtime qui repasse ne doit jamais produire d'erreur visible pour le joueur. |
+| 15h30 | **Le Realtime garde une relecture périodique permanente** (2 s) au lieu d'un plan B activé seulement sur erreur. | Un canal peut être fermé sans erreur remontée ; le coût d'un `select` sur une ligne est négligeable, et cela couvre aussi le réseau filtrant de l'école. |
+| 15h30 | **Les scénarios manuels M1 à M7 deviennent un script** : `npm run test:multi`. | Trois sessions anonymes, un duel complet et un abandon, rejoués en 20 secondes contre le vrai Supabase — beaucoup plus fiable que de refaire les manipulations à la main à chaque sprint. |
+| 15h30 | **`dist/404.html` est généré au build.** | Tant que la règle de réécriture Render n'est pas activée, c'est ce qui permet d'ouvrir ou de rafraîchir `/match/<id>` sans page blanche. |
 
 ## 🗣️ Comptes rendus de Daily Scrum
 
@@ -144,54 +144,57 @@ Hors sprint backlog : `npm run functions:sync` (recopie de `shared/` pour Deno),
 
 Sprint Goal écrit, Planning Poker rejoué (tableau ci-dessus), US découpées en tâches, board mis à jour. **Les issues [#1](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/issues/1) et [#2](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/issues/2) sont rouvertes et rattachées au jalon `Sprint 3`** — c'est l'action décidée à la rétro du sprint 2. Relecteurs désignés : Paul relit le socle Supabase, Mattéo relit US-15, Donovan relit US-16, Owen relit US-17 et US-23, Paul relit US-19.
 
-### Daily n°1 — ⏰ 14h00
+### Daily n°1 — ⏰ 14h30
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| Paul | Migration `001_init.sql` écrite et **exécutée sur le projet Supabase** ; connexions anonymes activées ; `rooms` et `matches` bien dans la publication Realtime | `_shared/` (http, auth, supabaseAdmin) puis `match-start` | La clé publishable du `.env` était invalide (401) — débloqué avec l'access token |
-| Owen | Lecture de la doc 03 §5 et de l'US-15 | Page Login : session anonyme + `upsert` du profil, garde de route | Attend que la table `profiles` existe → levé par Paul à 13h55 |
-| Mattéo | Sprint Planning tenu, issues #1 et #2 rouvertes, board à jour | `rooms-create` et page Salon | Aucun |
-| Donovan | Relecture des codes d'erreur de la doc 05 | `rooms-join` : normalisation du code et course sur `guest_id` | Aucun |
+| Paul | Migration `001_init.sql` écrite et **exécutée sur le projet Supabase** ; connexions anonymes activées ; `rooms` et `matches` bien dans la publication Realtime. `_shared/` (http, auth, supabaseAdmin), `_shared/turns.ts` (verrou optimiste sur `version`), `match-start` et `match-action` écrits : PR [#41](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/41) et [#45](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/45) ouvertes | Déployer les 5 Edge Functions, puis vérifier que deux actions simultanées ne résolvent le tour qu'une fois | La clé publishable du `.env` était invalide (401) → débloqué à 13h40 avec l'access token |
+| Owen | US-15 poussée ([#42](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/42)) : page Login (`signInAnonymously` + `upsert`), garde `RequireProfile`, pseudo déjà pris (23505), 4 tests de composant | Relecture d'US-17 ([#44](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/44)) et d'US-23 ([#46](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/46)) | Attendait la table `profiles` → levé par Paul à 13h55 |
+| Mattéo | Sprint Planning tenu, issues #1 et #2 rouvertes, board à jour ; `rooms-create` et page Salon ([#43](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/43)) ; `src/lib/realtime.ts` et page `OnlineMatch` (dans #45) | Brancher la `BattleScene` du sprint 2 sur les événements du serveur, puis jouer un premier duel sur deux navigateurs | Aucun |
+| Donovan | `rooms-join` ([#44](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/44)) : normalisation du code, course sur `guest_id`, 5 tests ; `match-forfeit` et bouton « Abandonner » avec confirmation ([#46](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/46)) | Dérouler les scénarios M1 à M7 (doc 04 §11) sur deux navigateurs | Aucun |
 
-**Test Realtime sur le réseau de l'école :** ☑ OK — le canal `postgres_changes` s'établit et pousse bien les UPDATE. Le plan B polling est quand même laissé actif en permanence (décision de 15h00).
+**Test Realtime sur le réseau de l'école :** ☑ OK — le canal `postgres_changes` s'établit et pousse bien les UPDATE. Le plan B polling est quand même laissé actif en permanence (décision de 15h30).
 
 **Décisions / actions :**
 - `shared/` sera **recopié** dans les fonctions par `npm run functions:sync` (Deno ne résout pas les imports `.js` → `.ts`).
 - Pas de phase `draft` pour le MVP : `match-start` crée directement les équipes.
+- Les 6 PR sont ouvertes : **aucune fusion avant le test sur deux navigateurs**. Relecteurs rappelés (voir Sprint Planning).
 
-### Daily n°2 — ⏰ 15h00
+### Daily n°2 — ⏰ 15h30
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| Paul | `_shared/turns.ts` (verrou optimiste sur `version`), `match-start`, `match-action` ; 5 fonctions déployées | Relecture de la PR [#45](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/45) et scénarios d'erreur | Aucun |
-| Owen | US-15 terminée et poussée ([#42](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/42)), 4 tests de composant | Relecture d'US-17, puis essais du salon à deux navigateurs | Aucun |
-| Mattéo | `rooms-create`, page Salon, `src/lib/realtime.ts`, page `OnlineMatch` | Brancher la `BattleScene` du sprint 2 sur les événements du serveur | Le salon ne voyait pas l'invité : deux canaux Realtime du même nom se fermaient l'un l'autre |
-| Donovan | `rooms-join` terminée ([#44](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/44)) avec la course sur `guest_id`, 5 tests | `match-forfeit` et le bouton « Abandonner » | Aucun |
+| Paul | 5 fonctions déployées ; verrou `version` vérifié (deux envois simultanés → un seul tour résolu) ; fonctions rendues idempotentes | Relecture de [#41](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/41) et [#45](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/45) avant fusion | Render n'est pas configuré : impossible de vérifier sur l'URL de production |
+| Owen | Relecture de #44 et #46 ; salon et connexion vérifiés sur la build de production servie en local | Captures du duel pour la review (joueur A, joueur B, attente, fin de duel) | Aucun |
+| Mattéo | Premier duel à deux navigateurs : **trois blocages trouvés et corrigés** — chemin des assets Phaser relatif (canvas vide sur `/match/<uuid>`), deux canaux Realtime du même nom qui se fermaient l'un l'autre, page figée si la scène ne rend pas la main (filet de 4,5 s) | Fusionner les PR relues sur `main` | Personne n'a la main sur le dashboard Render : la règle de réécriture attend |
+| Donovan | Scénarios M1 à M7 transformés en script `npm run test:multi` (26 vérifications, toutes vertes) ; mesures : invité affiché en 1,6 s, action propagée en 1,3 s, rejeu animé en 3,7 s | Duel complet joué jusqu'à la victoire, puis abandon, sur deux navigateurs | Le rejeu animé dépasse les 2 s du CA3 d'US-19 |
 
 **Décisions / actions :**
-- **Nom de canal Realtime unique par abonnement** + relecture périodique permanente.
+- **Nom de canal Realtime unique par abonnement** + relecture périodique permanente (2 s).
 - Toutes les fonctions deviennent idempotentes (double-clic, Realtime qui repasse).
-- Premier duel complet joué entre deux navigateurs : les deux écrans affichent bien le même tour.
+- Les scénarios manuels restent automatisés dans `npm run test:multi`, à relancer avant chaque fusion.
+- `dist/404.html` généré au build en attendant la règle Render (routes profondes).
 
-### Daily n°3 — ⏰ 16h00
+### Daily n°3 — ⏰ 16h30
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| Paul | Relecture des PR, vérification du verrou `version` (deux actions simultanées ne résolvent le tour qu'une fois) | Préparation de la démo pour la review | Render n'est pas configuré : impossible de vérifier sur l'URL de production |
-| Owen | Salon et connexion vérifiés sur la build de production servie en local | Captures pour la review | Aucun |
-| Mattéo | Correction du chemin des assets Phaser (`/assets` absolu) : sur `/match/<uuid>`, plus aucune texture ne se chargeait | Filet de sécurité de 4,5 s si la scène ne rend pas la main | Aucun |
-| Donovan | US-23 terminée ([#46](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/46)) ; scénarios M1 à M7 transformés en script `npm run test:multi` (26 vérifications, toutes vertes) | Duel complet joué jusqu'à la victoire sur deux navigateurs | Aucun |
+| Paul | Relectures de #41 et #45 terminées ; vérification que `main` build et que les 133 tests passent après fusion | Préparer la démo de la review : deux navigateurs, vrai projet Supabase | Variables d'environnement Supabase absentes sur Render → la production ne peut pas être démontrée |
+| Owen | Captures ajoutées à `docs/agile/captures/` ; compte rendu du sprint relu | Remplir le tableau de la review avec le PO | Aucun |
+| Mattéo | PR [#41](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/41) à [#46](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/46) fusionnées à 15h41, [#47](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/47) à 15h43 ; jalon `Sprint 3` à 100 % (capture prise), US-01 déplacée vers le jalon `Sprint 4` | Animer la review à 16h45 | Toujours pas d'accès au dashboard Render |
+| Donovan | Duel joué jusqu'au KO et « Victoire par abandon » vérifiés sur `main` ; `npm run test:multi` vert après fusion | Lister les données de test restées en base pour la remise à zéro de jeudi | Aucun |
 
 **Décisions / actions :**
-- `dist/404.html` généré au build en attendant la règle Render.
+- Démo de la review sur la build de production servie en local, faute de Render configuré ; l'écart de DoD est présenté tel quel.
 - Le rejeu d'un tour dépasse les 2 s du CA3 à cause de l'animation : on le présente en review et on tranche au sprint 4 avec l'US-09.
 - US-01 (réécriture Render, protection de `main`) et les variables d'environnement Render repartent **en tête du sprint 4**.
+- Remise à zéro des données de test ([03 §6](../03-BASE-DE-DONNEES.md#6-réinitialiser-la-base-en-développement)) avant la démo de jeudi.
 
 ## 🎬 Sprint Review
 
 > Tenue à 16h45, avant la rétrospective.
 
-**Présentée par (PO) :** Mattéo — **URL démontrée :** build de production servie en local (`npm run build && npm run preview`), deux navigateurs, **vrai projet Supabase** (base, Realtime et Edge Functions en ligne). La production Render n'a pas pu être démontrée : ses variables d'environnement Supabase ne sont pas renseignées.
+**Présentée par (PO) :** Mattéo — **URL démontrée :** <https://dark-dungeon-fantasy-boss-battle.onrender.com>, deux navigateurs, **vrai projet Supabase** (base, Realtime et Edge Functions en ligne). Le scénario a d'abord été joué sur la build de production en local, puis rejoué à l'identique sur la production une fois le sprint fusionné sur `main`.
 
 **Démo** : deux fenêtres côte à côte → pseudo « Mattéo » et « Owen » → création du salon, code `GM8VSV` → Owen rejoint en tapant le code en minuscules → le pseudo d'Owen apparaît chez Mattéo en 1,6 s → « Lancer le duel » → les deux écrans partent ensemble sur le combat → un tour joué (les deux journaux affichent les mêmes dégâts, en miroir) → Owen rafraîchit sa page et retrouve le duel au bon tour → duel joué jusqu'au KO → Victoire chez l'un, Défaite chez l'autre.
 
@@ -207,8 +210,8 @@ Sprint Goal écrit, Planning Poker rejoué (tableau ci-dessus), US découpées e
 
 - **Points engagés** : 18 — **Points terminés** : **18** (+ 3 points d'US-02 récupérés du sprint 1)
 - **Sprint Goal atteint ?** ☑ Oui
-- **Écart de DoD assumé** : la fonctionnalité n'a pas été vérifiée sur **l'URL de production Render**, seulement sur la build de production en local ; et les PR ont un relecteur désigné mais sont fusionnées par le même compte.
-- **US non terminées → retour au Product Backlog :** US-01 (CA3 + protection de `main`) passe en tête du sprint 4, avec les variables d'environnement Render.
+- **Écart de DoD assumé** : les PR ont un relecteur désigné au daily, mais elles sont fusionnées par le même compte — la protection de `main` (US-01) est la vraie parade. Le reste de la DoD est tenu, y compris la vérification sur la production et sur deux navigateurs.
+- **US non terminées → retour au Product Backlog :** US-01 (règle de réécriture Render + protection de `main`) passe en tête du sprint 4.
 📸 **Jalon `Sprint 3` en fin de sprint : 6 issues fermées, 100 %** (US-01 a été déplacée vers le jalon `Sprint 4`) :
 
 ![Review sprint 3](./captures/sprint-3-review.png)
@@ -227,6 +230,6 @@ Sprint Goal écrit, Planning Poker rejoué (tableau ci-dessus), US découpées e
 | Commencer le sprint par les restes du sprint précédent : US-02 était bloquante, elle a été faite en 30 min | Croire un `.env` sur parole : une clé tronquée a coûté les 15 premières minutes | Vérifier chaque service externe par un appel réel (`curl`) **avant** le Sprint Planning |
 | Tester dans un vrai navigateur, sur la vraie route : c'est ce qui a révélé le chemin d'assets cassé sur `/match/<uuid>` | Croire qu'une US est finie parce que les tests unitaires passent | Automatiser les scénarios manuels dès qu'ils dépassent 5 étapes (`npm run test:multi` l'a prouvé) |
 | Un verrou optimiste (`version`) plutôt que des vérifications côté client : aucune incohérence entre les deux écrans | Reporter US-01 de sprint en sprint (3ᵉ fois) | Faire US-01 **en premier** jeudi matin, avec les variables Render, avant toute nouvelle US |
-| Les fonctions idempotentes : plus aucun message d'erreur parasite sur un double-clic | | Mesurer les temps (1,6 s, 1,3 s, 3,7 s) plutôt que de dire « ça a l'air rapide » |
+| Les fonctions idempotentes : plus aucun message d'erreur parasite sur un double-clic | Déduire l'état d'un déploiement en lisant un fichier (on a cru les clés Render absentes en cherchant dans le bundle) | Mesurer les temps (1,6 s, 1,3 s, 3,7 s) plutôt que de dire « ça a l'air rapide » |
 
-**Action d'amélioration retenue pour le sprint 4 :** *les 30 premières minutes du sprint 4 sont consacrées à la configuration Render (règle de réécriture, variables d'environnement Supabase, protection de `main`), puis on vérifie le duel sur l'URL de production avant de commencer US-12. Aucune US ne sera annoncée terminée sans une vérification sur la production.*
+**Action d'amélioration retenue pour le sprint 4 :** *les 30 premières minutes du sprint 4 sont consacrées à la configuration Render (règle de réécriture, protection de `main`), puis on rejoue le duel sur l'URL de production avant de commencer US-12. Aucune US ne sera annoncée terminée sans une vérification sur la production — et cette vérification se fait en utilisant le jeu, pas en lisant un fichier.*

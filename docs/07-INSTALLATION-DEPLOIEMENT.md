@@ -97,7 +97,7 @@ routes:
     destination: /index.html
 ```
 
-3. **Repli livré au sprint 3** : `npm run build` recopie `index.html` en `dist/404.html`
+3. **Repli livré au sprint 3** (celui qui fait tourner la production aujourd'hui) : `npm run build` recopie `index.html` en `dist/404.html`
    (`tools/spa-fallback.mjs`). Tant que la règle du dashboard n'est pas activée, ouvrir ou rafraîchir
    `/menu`, `/salon/<id>` ou `/match/<id>` charge quand même l'application — le serveur répond 404 mais
    sert la page. Ce n'est pas un remplacement de la règle : il faut la faire.
