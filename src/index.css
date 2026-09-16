@@ -730,3 +730,155 @@ h2,
 .starter-sprite {
   overflow: hidden;
 }
+
+/* ---------- Connexion et multijoueur (US-15 à US-23) ---------- */
+
+.centered-page { justify-content: center; }
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 540px);
+  padding: clamp(1.5rem, 4vw, 2.6rem);
+  border: 3px solid var(--stone);
+  background: var(--anthracite);
+  text-align: center;
+  animation: panel-enter 700ms ease-out both;
+}
+
+.panel h1 {
+  margin: 0 0 1rem;
+  color: var(--bone);
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: min(100%, 320px);
+  margin-top: 1.4rem;
+  text-align: left;
+}
+
+.login-form label {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(194, 181, 154, 0.72);
+}
+
+.login-form input {
+  padding: 0.7rem 0.8rem;
+  border: 2px solid var(--stone);
+  background: var(--charcoal);
+  color: var(--bone);
+  font: inherit;
+}
+
+.login-form input:focus-visible { outline: 2px solid var(--ember); }
+
+.login-form .button {
+  justify-content: center;
+  font: inherit;
+  cursor: pointer;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--ember);
+  font-size: 0.9rem;
+}
+
+.loading-line {
+  font-family: ui-monospace, 'Courier New', monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(194, 181, 154, 0.72);
+}
+
+.code-input {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.room-panel .button { margin-top: 0.8rem; font: inherit; cursor: pointer; }
+
+.room-code {
+  margin: 0.4rem 0 0;
+  padding: 0.5rem 1.4rem;
+  border: 3px solid var(--ember);
+  background: var(--charcoal);
+  color: var(--bone);
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: clamp(1.8rem, 7vw, 2.8rem);
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+}
+
+.player-list {
+  width: min(100%, 340px);
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.player-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.7rem;
+  border: 2px solid var(--stone);
+  background: var(--charcoal);
+}
+
+.player-list li + li { margin-top: 0.4rem; }
+.player-list .player-empty { opacity: 0.55; }
+
+.player-slot {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(194, 181, 154, 0.72);
+}
+
+.player-name { color: var(--bone); }
+
+.match-status {
+  margin: 0;
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.forfeit-button,
+.forfeit-confirm .button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.forfeit-button {
+  width: min(100%, 260px);
+  border-color: var(--blood);
+  color: rgba(194, 181, 154, 0.8);
+}
+
+.forfeit-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
+  border: 3px solid var(--blood);
+  background: var(--anthracite);
+  text-align: center;
+}
+
+.forfeit-confirm p { margin: 0; }

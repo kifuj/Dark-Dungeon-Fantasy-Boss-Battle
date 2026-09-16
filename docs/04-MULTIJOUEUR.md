@@ -91,12 +91,16 @@ sequenceDiagram
 
 ## 5. Résolution côté serveur
 
+> Les fonctions n'importent pas `shared/` directement : `npm run functions:sync` en recopie une version
+> aux extensions réécrites dans `supabase/functions/_shared/game/` (Deno ne résout pas les imports
+> `./x.js` d'un fichier `.ts`). Voir [07 §1](07-INSTALLATION-DEPLOIEMENT.md#supabasefunctionsdenojson).
+
 ```ts
 // supabase/functions/_shared/turns.ts
 import { supabaseAdmin } from './supabaseAdmin.ts';
-import { resolveTurn } from '../../../shared/engine/battle.ts';
-import { createTurnRng } from '../../../shared/engine/rng.ts';
-import type { Action, BattleState } from '../../../shared/types.ts';
+import { resolveTurn } from './game/engine/battle.ts';
+import { createTurnRng } from './game/engine/rng.ts';
+import type { Action, BattleState } from './game/types.ts';
 
 export const TURN_DURATION_MS = 60_000;
 
@@ -243,7 +247,13 @@ setUiState(mine ? 'waiting' : 'choosing');
 
 Fonction `match-forfeit` : passe le match en `finished`, fixe `winner_id` sur l'adversaire, ajoute un événement `forfeit` dans `last_events` et incrémente `version`. L'adversaire est notifié par Realtime.
 
-## 10. Plan B : polling
+## 10. Relecture périodique (ex-plan B)
+
+> **Sprint 3 : le plan B est devenu permanent.** Le Realtime fonctionne (mesuré à ~1,3 s entre l'action du
+> 2ᵉ joueur et l'affichage chez l'adversaire), mais un canal peut être fermé sans erreur remontée — c'est
+> arrivé en développement, deux canaux du même nom se fermant l'un l'autre. `src/lib/realtime.ts` relit donc
+> la ligne toutes les 2 secondes **en plus** du Realtime, et chaque abonnement utilise un nom de canal unique.
+> Le coût est négligeable (un `select` sur une ligne) et cela couvre aussi un réseau qui filtrerait les WebSockets.
 
 Si Realtime pose problème (réseau d'école filtrant les WebSockets, quota atteint…) :
 
@@ -264,6 +274,11 @@ Le reste (API, BDD, moteur) ne change pas. **Tester le Realtime sur le réseau d
 4. Vérifier dans Supabase (Table Editor → `matches`) que `version` et `turn` augmentent à chaque tour.
 
 ### Scénarios de test manuels
+
+> **Automatisés depuis le sprint 3** : `npm run test:multi` ouvre trois sessions anonymes et rejoue
+> M1, M2, M5, M6, M7 (plus la RLS, l'historique `match_turns` et l'abandon) contre le vrai projet
+> Supabase — 26 vérifications en une vingtaine de secondes. M3 (timeout) et M4 (rafraîchissement)
+> restent manuels tant que l'US-20 et l'US-21 ne sont pas faites.
 
 | # | Scénario | Résultat attendu |
 |---|---|---|
