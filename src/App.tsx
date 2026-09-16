@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { PhaserGame } from './game/PhaserGame.tsx';
 import { Menu } from './pages/Menu.tsx';
 import { Placeholder } from './pages/Placeholder.tsx';
+import { SoloStarter } from './pages/SoloStarter.tsx';
 import { Title } from './pages/Title.tsx';
 
 export default function App() {
@@ -9,14 +9,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Title />} />
       <Route path="/menu" element={<Menu />} />
-      <Route
-        path="/solo"
-        element={
-          <Placeholder title="Solo">
-            <PhaserGame />
-          </Placeholder>
-        }
-      />
+      <Route path="/solo" element={<SoloStarter />} />
       <Route path="/multi" element={<Placeholder title="Multijoueur" />} />
       <Route path="/classement" element={<Placeholder title="Classement" />} />
       <Route path="/credits" element={<Placeholder title="Crédits" />} />
