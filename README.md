@@ -13,7 +13,7 @@ Inspiré de *PokeRogue*.
 | Quoi | Lien |
 |---|---|
 | Jeu en ligne (Render) | [`https://dark-dungeon-fantasy-boss-battle.onrender.com`](https://dark-dungeon-fantasy-boss-battle.onrender.com) |
-| Dépôt GitHub (public) | `https://github.com/<à-compléter>/dark-dungeon-fantasy-boss-battle` |
+| Dépôt GitHub (public) | [`kifuj/Dark-Dungeon-Fantasy-Boss-Battle`](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle) |
 | Projet Supabase | *(privé : ne jamais publier les clés)* |
 
 ## 🧱 Stack
@@ -48,8 +48,8 @@ Inspiré de *PokeRogue*.
 ## 🚀 Démarrage rapide
 
 ```bash
-git clone https://github.com/<à-compléter>/dark-dungeon-fantasy-boss-battle.git
-cd dark-dungeon-fantasy-boss-battle
+git clone https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle.git
+cd Dark-Dungeon-Fantasy-Boss-Battle
 npm install
 cp .env.example .env.local   # renseigner l'URL et la clé publishable Supabase
 npm run dev                  # front sur http://localhost:5173

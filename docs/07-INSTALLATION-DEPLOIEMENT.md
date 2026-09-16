@@ -75,7 +75,14 @@ Dans `tsconfig.app.json`, ajouter `shared` à `include` :
 
 ### Réécriture SPA
 
-Render sert des fichiers statiques : sans règle de réécriture, un rafraîchissement sur `/menu` ou `/match/123` donne une **404**. La règle se configure dans le dashboard Render (§4.1, étape 5), il n'y a pas de fichier de config dans le dépôt.
+Render sert des fichiers statiques : sans règle de réécriture, un rafraîchissement sur `/menu` ou `/match/123` donne une **404**.
+Depuis le sprint 2, la règle est **dans le dépôt** : le fichier [`public/_redirects`](../public/_redirects) (copié tel quel dans `dist/` par Vite) contient
+
+```
+/*  /index.html  200
+```
+
+Render lit ce fichier au déploiement ; il n'y a donc plus rien à configurer dans le dashboard. La règle **Redirects/Rewrites** du dashboard (§4.1, étape 5) reste une alternative équivalente.
 
 ### `.env.example` (à commiter)
 
@@ -209,7 +216,7 @@ npm run dev                  # front sur http://localhost:5173
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
-| 404 en rafraîchissant une page du jeu | Réécriture SPA absente | Render → **Redirects/Rewrites** : `/*` → `/index.html` (Rewrite) |
+| 404 en rafraîchissant une page du jeu | `public/_redirects` absent du build | Vérifier que `dist/_redirects` existe après `npm run build`, sinon Render → **Redirects/Rewrites** : `/*` → `/index.html` (Rewrite) |
 | Le front ne voit pas une variable modifiée sur Render | Les `VITE_…` sont figées au build | **Manual Deploy → Clear build cache & deploy** |
 | Une Edge Function renvoie 500 « supabaseUrl is required » | Code qui lit un autre nom de variable | Utiliser `Deno.env.get('SUPABASE_URL')` et `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` |
 | `Module not found` au déploiement d'une fonction | Import sans extension, ou `.js` vers un `.ts` sans `sloppy-imports` | Vérifier `supabase/functions/deno.json` ; imports `.ts` dans `supabase/functions/` |
