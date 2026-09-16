@@ -2,7 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { ProfileProvider, RequireProfile } from './lib/profile.tsx';
 import { Login } from './pages/Login.tsx';
 import { Menu } from './pages/Menu.tsx';
+import { Multiplayer } from './pages/Multiplayer.tsx';
 import { Placeholder } from './pages/Placeholder.tsx';
+import { Room } from './pages/Room.tsx';
 import { SoloRun } from './pages/SoloRun.tsx';
 import { Title } from './pages/Title.tsx';
 
@@ -18,7 +20,15 @@ export default function App() {
           path="/multi"
           element={
             <RequireProfile>
-              <Placeholder title="Multijoueur" />
+              <Multiplayer />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/salon/:roomId"
+          element={
+            <RequireProfile>
+              <Room />
             </RequireProfile>
           }
         />
