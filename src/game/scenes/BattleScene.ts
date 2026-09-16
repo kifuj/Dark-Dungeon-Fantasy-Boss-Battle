@@ -54,11 +54,15 @@ export class BattleScene extends Scene {
     EventBus.on('battle-init', this.onInit, this);
     EventBus.on('battle-update', this.onUpdate, this);
     EventBus.on('battle-banner', this.onBanner, this);
-    this.events.once('shutdown', () => {
+    // `game.destroy()` (démontage de <PhaserGame>, ex. « Nouvelle run ») émet `destroy` sans `shutdown` :
+    // sans ce double abonnement, la scène détruite resterait branchée sur l'EventBus et planterait la suivante.
+    const unsubscribe = () => {
       EventBus.off('battle-init', this.onInit, this);
       EventBus.off('battle-update', this.onUpdate, this);
       EventBus.off('battle-banner', this.onBanner, this);
-    });
+    };
+    this.events.once('shutdown', unsubscribe);
+    this.events.once('destroy', unsubscribe);
 
     EventBus.emit('scene-ready', this);
   }
