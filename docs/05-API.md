@@ -29,6 +29,11 @@
 
 ## 3. Endpoints
 
+> ✅ **Déployées au sprint 3** : `rooms-create`, `rooms-join`, `match-start`, `match-action`, `match-forfeit`
+> (`npm run functions:deploy`). `match-draft`, `match-timeout` et `match-reward` restent à faire.
+> Toutes les fonctions livrées sont **idempotentes** : rejoindre deux fois, lancer deux fois ou abandonner
+> deux fois renvoie `200` avec le même résultat, pour qu'un double-clic ne produise jamais d'erreur visible.
+
 ### `rooms-create`
 Crée un salon dont l'appelant est l'hôte.
 

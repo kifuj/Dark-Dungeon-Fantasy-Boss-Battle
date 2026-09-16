@@ -44,11 +44,11 @@ Une user story est terminée si :
 | US-04 | Moteur | Changer de monstre actif | Should | 3 | **3** | 2 |
 | US-10 | Solo | Choisir un starter | Must | 2 | **2** | 2 |
 | US-11 | Solo | Enchaîner des vagues contre l'IA | Must | 5 | **5** | 2 |
-| US-15 | Comptes | Se connecter avec un pseudo | Must | 3 | | 3 |
-| US-16 | Multijoueur | Créer un salon avec un code | Must | 3 | | 3 |
-| US-17 | Multijoueur | Rejoindre un salon avec un code | Must | 3 | | 3 |
-| US-19 | Multijoueur | Jouer un combat en ligne tour par tour | Must | 8 | | 3 |
-| US-23 | Multijoueur | Abandonner un duel | Should | 1 | | 3 |
+| US-15 | Comptes | Se connecter avec un pseudo | Must | 3 | **3** | 3 |
+| US-16 | Multijoueur | Créer un salon avec un code | Must | 3 | **3** | 3 |
+| US-17 | Multijoueur | Rejoindre un salon avec un code | Must | 3 | **3** | 3 |
+| US-19 | Multijoueur | Jouer un combat en ligne tour par tour | Must | 8 | **8** | 3 |
+| US-23 | Multijoueur | Abandonner un duel | Should | 1 | **1** | 3 |
 | US-12 | Solo | Choisir une récompense après chaque vague | Must | 5 | | 4 |
 | US-09 | Interface combat | Animations et textes de combat | Should | 5 | | *backlog* (bonus S4) |
 | US-20 | Multijoueur | Timeout de tour | Should | 3 | | 4 |
@@ -81,13 +81,20 @@ Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, 
 
 | US | Tour 1 (Mattéo / Owen / Paul / Donovan) | Tour 2 | Estimation retenue | Remarque |
 |---|---|---|---|---|
+| **Sprint 2** | | | | |
 | US-07 Scène de combat | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | Owen comptait les animations : elles sont dans l'US-09 |
 | US-08 Menu d'actions | 3 / 3 / 5 / 2 | — | **3** | `validateAction` existe déjà, il ne reste que l'affichage |
 | US-04 Changer de monstre | 3 / 2 / 3 / 3 | — | **3** | Le moteur gère déjà le changement depuis le sprint 1 |
 | US-10 Choisir un starter | 2 / 2 / 1 / 2 | — | **2** | Trois cartes et une création de run |
 | US-11 Vagues contre l'IA | 5 / 8 / 5 / 5 | 5 / 5 / 5 / 5 | **5** | Owen comptait les récompenses : elles sont dans l'US-12 |
+| **Sprint 3** | | | | |
+| US-15 Pseudo | 3 / 2 / 3 / 5 | — | **3** | Donovan comptait la garde de route et la reprise de session, Owen ne voyait qu'un formulaire |
+| US-16 Créer un salon | 3 / 3 / 2 / 3 | — | **3** | Paul n'estimait que la fonction ; le Realtime et la page de salon font le reste |
+| US-17 Rejoindre un salon | 2 / 3 / 3 / 3 | — | **3** | La course entre deux joueurs qui entrent le code en même temps justifie 3 |
+| US-19 Combat en ligne | 8 / 13 / 8 / 8 | 8 / 8 / 8 / 8 | **8** | Owen à 13 (donc à découper) : le moteur existe depuis le sprint 1, il ne reste que le transport |
+| US-23 Abandonner | 1 / 1 / 2 / 1 | — | **1** | Une fonction courte et un bouton avec confirmation |
 
-Détail de la séance : [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi). Les US des sprints 3 et 4 seront rejouées au début de leur sprint.
+Détail des séances : [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les US du sprint 4 seront rejouées au début de leur sprint.
 
 ## 5. User stories détaillées
 

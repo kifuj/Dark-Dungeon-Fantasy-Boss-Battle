@@ -67,11 +67,19 @@ Dans `tsconfig.app.json`, ajouter `shared` à `include` :
 
 ```json
 {
-  "unstable": ["sloppy-imports"]
+  "imports": {
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2"
+  }
 }
 ```
 
-> `shared/` importe ses fichiers avec l'extension `.js` (`from './damage.js'`) alors qu'ils sont en `.ts`. Vite le comprend, Deno non par défaut : `sloppy-imports` l'autorise. **À vérifier dès le début du sprint 3** en déployant une fonction qui importe `shared/engine`. Plan B si le bundler refuse : copier `shared/` dans `supabase/functions/_shared/engine/` avant chaque déploiement (script npm).
+> **Décision du sprint 3 : c'est le plan B qui a été retenu.** `shared/` importe ses fichiers avec
+> l'extension `.js` (`from './damage.js'`) alors qu'ils sont en `.ts` ; Vite le comprend, Deno non, et
+> l'option `sloppy-imports` n'est pas garantie côté déploiement Supabase. `npm run functions:sync`
+> (script `tools/sync-shared.mjs`) recopie donc `shared/` dans **`supabase/functions/_shared/game/`** en
+> réécrivant les extensions au passage. Le dossier généré est commité, avec un en-tête « ne pas modifier :
+> éditer `shared/` puis relancer la commande ». `npm run functions:deploy` enchaîne la recopie et le
+> déploiement — c'est la commande à utiliser après toute modification du moteur ou d'une fonction.
 
 ### Réécriture SPA
 
@@ -88,6 +96,16 @@ routes:
     source: /*
     destination: /index.html
 ```
+
+3. **Repli livré au sprint 3** : `npm run build` recopie `index.html` en `dist/404.html`
+   (`tools/spa-fallback.mjs`). Tant que la règle du dashboard n'est pas activée, ouvrir ou rafraîchir
+   `/menu`, `/salon/<id>` ou `/match/<id>` charge quand même l'application — le serveur répond 404 mais
+   sert la page. Ce n'est pas un remplacement de la règle : il faut la faire.
+
+> ⚠️ **Conséquence à connaître pour Phaser** : sur une route imbriquée comme `/match/<uuid>`, un chemin
+> d'assets **relatif** (`this.load.setPath('assets')`) viserait `/match/assets/…` et la réécriture SPA
+> renverrait `index.html` à la place des PNG — canvas vide et animations en erreur. `PreloadScene` utilise
+> donc un chemin **absolu** (`/assets`). Bug rencontré et corrigé au sprint 3.
 
 
 ### `.env.example` (à commiter)
@@ -118,14 +136,21 @@ supabase/.branches
 ### Client Supabase
 
 ```ts
-// src/lib/supabase.ts
+// src/lib/supabase.ts (extrait)
 import { createClient } from '@supabase/supabase-js';
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, storageKey: 'ddfbb-auth' },
+});
 ```
+
+- `persistSession` garde la session anonyme dans le `localStorage` : c'est ce qui permet de rester
+  connecté après un rafraîchissement (US-15 CA3) et de reprendre un duel (US-21).
+- Les variables peuvent s'appeler `VITE_SUPABASE_…` **ou** `NEXT_PUBLIC_SUPABASE_…` (`envPrefix` dans
+  `vite.config.ts`) : les deux noms circulent selon l'endroit où l'on copie les clés dans le dashboard.
+- ⚠️ **Vérifier la clé après l'avoir collée** : une clé tronquée donne `401 Invalid API key` sur *tous* les
+  appels, y compris l'authentification. Contrôle en une ligne :
+  `curl -s -o /dev/null -w '%{http_code}\n' "$VITE_SUPABASE_URL/auth/v1/settings" -H "apikey: $VITE_SUPABASE_PUBLISHABLE_KEY"` → doit répondre `200`.
 
 > Sur un ancien projet Supabase, les clés s'appellent `anon` (client) et `service_role` (serveur). Elles fonctionnent de la même façon : il suffit de mettre leurs valeurs dans les mêmes variables.
 
@@ -147,13 +172,15 @@ console.log(data.user?.id, error);
 ### 2.1 Edge Functions
 
 ```bash
-npx supabase login
-npx supabase init                              # une seule fois : crée supabase/config.toml
-npx supabase link --project-ref <ref-du-projet> # ref = xxxxxxxx dans https://xxxxxxxx.supabase.co
+npx supabase login                             # ou : export SUPABASE_ACCESS_TOKEN=<token personnel>
 npx supabase functions new match-action        # crée supabase/functions/match-action/index.ts
-npx supabase functions deploy                  # déploie toutes les fonctions
-npx supabase functions deploy match-action     # ou une seule
+npm run functions:deploy                       # recopie shared/ puis déploie toutes les fonctions
+npx supabase functions deploy match-action --project-ref <ref>  # ou une seule
 ```
+
+- `supabase/config.toml` est déjà dans le dépôt : `supabase init` n'est pas à refaire.
+- Le déploiement a besoin de **Docker** (la CLI construit les fonctions dans l'image `edge-runtime`).
+- ✅ **Sprint 3** : `rooms-create`, `rooms-join`, `match-start`, `match-action` et `match-forfeit` sont déployées sur le projet.
 
 - Les fonctions sont appelables à `https://<ref>.supabase.co/functions/v1/<nom>` ; le client passe par `supabase.functions.invoke('<nom>')` ([doc 05 §5](05-API.md#5-appeler-lapi-depuis-le-client)).
 - La vérification du JWT par la passerelle Supabase reste **activée** (valeur par défaut) : un appel sans session est refusé avant d'atteindre la fonction.
