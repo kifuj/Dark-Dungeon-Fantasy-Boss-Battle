@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node tools/spa-fallback.mjs",
     "assets": "node tools/generate-sprites.mjs",
     "functions:sync": "node tools/sync-shared.mjs",
     "functions:deploy": "npm run functions:sync && npx supabase functions deploy",
