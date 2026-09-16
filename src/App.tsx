@@ -3,6 +3,7 @@ import { ProfileProvider, RequireProfile } from './lib/profile.tsx';
 import { Login } from './pages/Login.tsx';
 import { Menu } from './pages/Menu.tsx';
 import { Multiplayer } from './pages/Multiplayer.tsx';
+import { OnlineMatch } from './pages/OnlineMatch.tsx';
 import { Placeholder } from './pages/Placeholder.tsx';
 import { Room } from './pages/Room.tsx';
 import { SoloRun } from './pages/SoloRun.tsx';
@@ -29,6 +30,14 @@ export default function App() {
           element={
             <RequireProfile>
               <Room />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/match/:matchId"
+          element={
+            <RequireProfile>
+              <OnlineMatch />
             </RequireProfile>
           }
         />

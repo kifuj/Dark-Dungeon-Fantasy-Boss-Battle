@@ -848,3 +848,12 @@ h2,
 }
 
 .player-name { color: var(--bone); }
+
+.match-status {
+  margin: 0;
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
