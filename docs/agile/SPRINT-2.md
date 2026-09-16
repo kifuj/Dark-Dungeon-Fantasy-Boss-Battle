@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Créneau** | Mercredi 16/09, matin (08h45 → 10h30, 0,5 jour) |
+| **Créneau** | Mercredi 16/09, matin (08h45 → 12h30, 0,5 jour) |
 | **Product Owner** | *à compléter* |
 | **Scrum Master** | *à compléter* |
 | **Développeurs** | Mattéo, Owen, Paul, Donovan |
@@ -114,9 +114,9 @@ Hors sprint backlog, terminé aussi : mise à jour des docs 02 (événements Rea
 | 09h05 | **Les assets sont dessinés par notre propre code** (`tools/art/`, `npm run assets`) : 32 × 32 agrandi × 2, 2 images par monstre. | Aucun pack redistribuable ; le générateur donne exactement les 10 espèces du bestiaire, sous CC0, et se régénère en une commande. |
 | 10h00 | **Le menu d'action reste en React**, au-dessus du canvas ; la `BattleScene` n'affiche que l'état que React lui envoie. La version du menu dans Phaser (`87ef87d`) est remplacée. | C'est la recommandation de la doc 02 §5 ; le menu React est testable (Testing Library) et branché sur `validateAction` et sur le vrai combat, la version Phaser travaillait sur une équipe codée en dur. |
 | 10h00 | **L'écran starter garde la maquette d'Owen** (panneau, cartes, sélection puis « Valider · <monstre> ») et reçoit les vrais sprites et le moteur de run. | Le travail visuel déjà fait est conservé, seule la partie données est rebranchée. |
-| 10h05 | **Tests de composants React** (Vitest + Testing Library, `src/tests/`). | Les critères d'acceptation d'interface (grisé, menu masqué, clavier) doivent être vérifiables autrement qu'à l'œil. |
-| 10h05 | **2 ennemis à partir de la vague 6** (game design §6.1), au lieu d'un seul à toutes les vagues. | Coût nul (le moteur gère déjà les équipes) et cela rend visible le remplacement automatique d'un monstre KO. |
-| 10h20 | **`_redirects` abandonné au profit de `render.yaml` + règle dashboard.** | Vérification sur la production : Render ignore le format `_redirects`. |
+| 11h00 | **Tests de composants React** (Vitest + Testing Library, `src/tests/`). | Les critères d'acceptation d'interface (grisé, menu masqué, clavier) doivent être vérifiables autrement qu'à l'œil. |
+| 11h00 | **2 ennemis à partir de la vague 6** (game design §6.1), au lieu d'un seul à toutes les vagues. | Coût nul (le moteur gère déjà les équipes) et cela rend visible le remplacement automatique d'un monstre KO. |
+| 12h00 | **`_redirects` abandonné au profit de `render.yaml` + règle dashboard.** | Vérification sur la production : Render ignore le format `_redirects`. |
 
 ## 🗣️ Comptes rendus de Daily Scrum
 
@@ -138,20 +138,47 @@ Hors sprint backlog, terminé aussi : mise à jour des docs 02 (événements Rea
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| Mattéo | Générateur d'assets + 10 monstres + icônes + décor ; `PreloadScene`, `BattleScene`, encadrés et barres de PV ; `shared/engine/hp.ts` et ses tests ([PR #35](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/35)) | Fusion des PR du sprint et vérification sur la production | Doublon avec le menu Phaser d'Owen (voir décisions) |
-| Owen | Menu de combat dans la scène Phaser (`87ef87d`) ; menu React `ActionMenu` + tests ([PR #37](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/37)) ; écran starter branché sur le moteur ([PR #39](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/39)) | Vérifier le choix du starter sur la production | Aucun |
-| Paul | `chooseAiAction`, `run.ts`, `log.ts` et leurs tests ([PR #36](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/36)) ; page `SoloRun` ([PR #40](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/40)) | Enchaînement des vagues joué de bout en bout dans le navigateur | Aucun |
-| Donovan | Sous-menu « Changer » + 4 tests ([PR #38](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/38)) | Constat : impossible à montrer en solo avec une équipe d'un seul monstre | Dépend de l'US-12 (récompenses, sprint 4) |
+| Mattéo | Générateur d'assets (`tools/art/`) : 10 monstres, 6 icônes d'élément, décor de donjon ; `PreloadScene` et `BattleScene` | Encadrés nom / niveau / élément, barres de PV (`shared/engine/hp.ts`) et événements `EventBus` | Doublon avec le menu Phaser d'Owen (voir décisions) |
+| Owen | Menu de combat dans la scène Phaser (commit `87ef87d`, 09h34) | Reprise du menu en composant React `ActionMenu`, puis branchement de l'écran starter sur le moteur | Menu Phaser branché sur une équipe codée en dur, pas sur le vrai combat |
+| Paul | `chooseAiAction` et génération des ennemis par vague (`shared/engine/run.ts`) avec leurs tests | Textes de combat (`log.ts`), puis page `SoloRun` | Attend la `BattleScene` de Mattéo pour la page `SoloRun` |
+| Donovan | Sous-menu « Changer » et envoi de l'action `switch` au moteur | Tests du sous-menu | Dépend du menu d'actions d'Owen (US-08), qui change de technologie |
 
 **Décisions / actions :**
 - **Arbitrage du doublon** : le menu d'action reste **en React** (testable, branché sur le vrai combat) ; l'écran starter garde la **maquette d'Owen** et reçoit les sprites et le moteur. Les fichiers devenus doublons (`SoloStarter.tsx`, menu dans `BattleScene`) sont retirés — leur travail reste dans l'historique Git.
 - **Règle d'équipe ajoutée** : une US = une branche `feat/US-XX-…` et une PR. On ne pousse plus directement sur `main` pendant un sprint (c'est la cause du doublon).
-- Les 7 PR sont fusionnées dans `main` après `npm run build` + `npx vitest run` (102 tests verts) sur chaque branche.
-- Vérification sur la production : le jeu est jouable, mais `/menu` en URL directe renvoie encore 404 → `_redirects` ne marche pas sur Render, on passe à `render.yaml` + la règle du dashboard, et l'US-01 repart au sprint 3.
+- Donovan se cale sur l'interface du futur `ActionMenu` React pour ne pas refaire son sous-menu.
+
+### Daily n°3 — ⏰ 11h00
+
+| Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
+|---|---|---|---|
+| Mattéo | Encadrés, barres de PV colorées, `hp.ts` et ses tests, événements `EventBus` (doc 02 §5 mise à jour) ([PR #35](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/35)) | Fusion des PR du sprint après `build` + tests sur chaque branche | Aucun |
+| Owen | Menu React `ActionMenu` + 4 tests de composants ([PR #37](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/37)) ; écran starter branché sur le moteur ([PR #39](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/39)) | Vérifier le choix du starter sur la production après la fusion | Aucun |
+| Paul | `chooseAiAction`, `run.ts`, `log.ts` et leurs tests ([PR #36](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/36)) ; page `SoloRun` ([PR #40](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/40)) | Enchaînement des vagues joué de bout en bout dans le navigateur | Aucun |
+| Donovan | Sous-menu « Changer » + 4 tests ([PR #38](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/38)) | Essai du sous-menu en jeu | Aucun pour le code |
+
+**Décisions / actions :**
+- **Tests de composants React** (Vitest + Testing Library, `src/tests/`) : les critères d'interface (grisé, menu masqué, clavier) doivent être vérifiables autrement qu'à l'œil.
+- **2 ennemis à partir de la vague 6** (game design §6.1) : coût nul, le moteur gère déjà les équipes.
+- Les 7 PR ([#34](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/34) à [#40](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/40)) sont fusionnées dans `main` après `npm run build` + `npx vitest run` (102 tests verts) sur chaque branche.
+
+### Daily n°4 — ⏰ 12h00
+
+| Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
+|---|---|---|---|
+| Mattéo | 7 PR fusionnées ; vérification sur la production : le jeu est jouable, mais `/menu` en URL directe renvoie encore 404 ; `render.yaml` ajouté (commit `4205507`) | Préparation de la Sprint Review | Render ignore `_redirects` ; `render.yaml` ne s'applique qu'à un service relié à un Blueprint |
+| Owen | Choix du starter vérifié sur la production | Capture de la démo pour la review | Aucun |
+| Paul | Run jouée de bout en bout en ligne : starter → vagues → écran de fin | Relevé de la courbe de difficulté pour la review | Run très courte sans récompenses (US-12) |
+| Donovan | Constat : le bouton « Changer » reste désactivé en solo, l'équipe ne compte qu'un monstre | Rédaction du point pour la review | Démonstration impossible avant l'US-12 (récompenses, sprint 4) |
+
+**Décisions / actions :**
+- **`_redirects` abandonné** au profit de `render.yaml` + la règle **Redirects/Rewrites** du dashboard Render. L'US-01 (CA3 + protection de `main`) et l'US-02 repartent en tête du sprint 3.
+- **Écart de DoD relevé** : les PR ont été fusionnées sans relecture croisée ; il sera présenté à la review.
+- Les issues #1 et #2 seront rouvertes au Sprint Planning du sprint 3.
 
 ## 🎬 Sprint Review
 
-> Tenue à 10h15, avant la rétrospective.
+> Tenue à 12h05, avant la rétrospective.
 
 **Présentée par (PO) :** *à compléter* — **URL démontrée :** <https://dark-dungeon-fantasy-boss-battle.onrender.com>
 
@@ -178,7 +205,7 @@ Déroulé : écran titre → menu → Solo → choix du starter (Salamandre) →
 
 ## 🔁 Rétrospective Keep, Drop, Try
 
-> Tenue à 10h30, 15 minutes avant la fin du créneau.
+> Tenue à 12h15, 15 minutes avant la fin du créneau.
 
 | ✅ Keep | ❌ Drop | 🧪 Try |
 |---|---|---|
