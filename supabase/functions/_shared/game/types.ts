@@ -1,3 +1,4 @@
+// ⚠️ Fichier généré par `npm run functions:sync` — ne pas modifier : éditer shared/ puis relancer la commande.
 export type Element = 'feu' | 'eau' | 'nature' | 'lumiere' | 'ombre' | 'neutre';
 export type Seat = 0 | 1;
 
@@ -75,39 +76,3 @@ export interface TurnResult {
 }
 
 export type Rng = () => number; // renvoie un nombre dans [0, 1[
-
-// --- Lignes des tables Supabase (docs/03-BASE-DE-DONNEES.md) ---
-
-export interface ProfileRow {
-  id: string;
-  username: string;
-}
-
-export type RoomStatus = 'waiting' | 'playing' | 'finished' | 'cancelled';
-
-export interface RoomRow {
-  id: string;
-  code: string;
-  host_id: string;
-  guest_id: string | null;
-  status: RoomStatus;
-  current_match_id: string | null;
-}
-
-export type MatchPhase = 'draft' | 'battle' | 'reward' | 'finished';
-
-export interface MatchRow {
-  id: string;
-  room_id: string;
-  player1_id: string;
-  player2_id: string;
-  phase: MatchPhase;
-  round: number;
-  turn: number;
-  seed: number;
-  state: BattleState;
-  last_events: BattleEvent[];
-  version: number;
-  turn_deadline: string | null;
-  winner_id: string | null;
-}

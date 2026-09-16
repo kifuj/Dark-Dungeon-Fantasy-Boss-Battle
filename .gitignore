@@ -5,3 +5,5 @@ dist
 .env.local
 .env*.local
 CLAUDE.md
+supabase/.temp
+supabase/.branches
