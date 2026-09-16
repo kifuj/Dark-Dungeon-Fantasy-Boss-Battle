@@ -2,7 +2,19 @@ import { Scene, type GameObjects } from 'phaser';
 import { EventBus } from '../EventBus.ts';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config.ts';
 import { FighterView } from '../ui/FighterView.ts';
-import type { BattleState, Seat } from '../../../shared/types.js';
+import type { BattleEvent, BattleState, Seat } from '../../../shared/types.js';
+
+/** Durée (ms) allouée à chaque type d'événement rejoué (US-09 CA1/CA4 : un tour < 4 s). */
+const EVENT_DURATION: Record<BattleEvent['type'], number> = {
+  skill_used: 550,
+  damage: 550,
+  heal: 500,
+  buff: 500,
+  faint: 550,
+  switch: 400,
+  forfeit: 0,
+  battle_end: 0,
+};
 
 export interface BattleInit {
   state: BattleState;
@@ -21,6 +33,8 @@ export class BattleScene extends Scene {
   private state?: BattleState;
   private banner?: GameObjects.Text;
   private bannerTimer?: Phaser.Time.TimerEvent;
+  /** Vrai pendant la lecture d'une file `play-events` : `onUpdate` n'écrase alors pas l'affichage (US-09). */
+  private animating = false;
 
   constructor() {
     super('Battle');
@@ -54,12 +68,14 @@ export class BattleScene extends Scene {
     EventBus.on('battle-init', this.onInit, this);
     EventBus.on('battle-update', this.onUpdate, this);
     EventBus.on('battle-banner', this.onBanner, this);
+    EventBus.on('play-events', this.onPlayEvents, this);
     // `game.destroy()` (démontage de <PhaserGame>, ex. « Nouvelle run ») émet `destroy` sans `shutdown` :
     // sans ce double abonnement, la scène détruite resterait branchée sur l'EventBus et planterait la suivante.
     const unsubscribe = () => {
       EventBus.off('battle-init', this.onInit, this);
       EventBus.off('battle-update', this.onUpdate, this);
       EventBus.off('battle-banner', this.onBanner, this);
+      EventBus.off('play-events', this.onPlayEvents, this);
     };
     this.events.once('shutdown', unsubscribe);
     this.events.once('destroy', unsubscribe);
@@ -75,6 +91,9 @@ export class BattleScene extends Scene {
   private onUpdate(state: BattleState) {
     if (!this.views) return;
     this.state = state;
+    // Une file `play-events` est en train de piloter l'affichage : elle amène déjà la scène
+    // au bon état à la fin, un `show()` immédiat ici écraserait l'animation en cours (US-09).
+    if (this.animating) return;
     const enemySeat: Seat = this.playerSeat === 0 ? 1 : 0;
     for (const [seat, view] of [
       [this.playerSeat, this.views.player],
@@ -85,12 +104,70 @@ export class BattleScene extends Scene {
     }
   }
 
-  /** Bannière de vague : visible quelques instants au début de chaque vague. */
-  private onBanner(text: string | null) {
+  /** Bannière de vague ou de compétence : visible `duration` ms (US-07, réutilisée par US-09 CA1). */
+  private onBanner(text: string | null, duration = 1600) {
     if (!this.banner) return;
     this.bannerTimer?.remove();
     this.banner.setText(text ?? '').setVisible(Boolean(text));
-    if (text) this.bannerTimer = this.time.delayedCall(1600, () => this.banner?.setVisible(false));
+    if (text) this.bannerTimer = this.time.delayedCall(duration, () => this.banner?.setVisible(false));
+  }
+
+  private seatView(seat: Seat): FighterView {
+    return seat === this.playerSeat ? this.views!.player : this.views!.enemy;
+  }
+
+  /**
+   * Rejoue un tour événement par événement (US-09). `state` est l'état *avant* le tour :
+   * les compositions d'équipe n'y changent pas pendant un tour, seuls hp/PV bougent, et ceux-ci
+   * viennent directement de chaque événement (`hpAfter`/`maxHp`) — pas besoin du nouvel état.
+   */
+  private onPlayEvents(events: BattleEvent[]) {
+    if (!this.views || !this.state) return;
+    const state = this.state;
+    this.animating = true;
+    let delay = 0;
+    for (const event of events) {
+      this.time.delayedCall(delay, () => this.playEvent(event, state));
+      delay += EVENT_DURATION[event.type];
+    }
+    this.time.delayedCall(delay, () => {
+      this.animating = false;
+      EventBus.emit('events-played');
+    });
+  }
+
+  private playEvent(event: BattleEvent, state: BattleState) {
+    switch (event.type) {
+      case 'skill_used':
+        this.onBanner(`${event.actorName} utilise ${event.skillName} !`, EVENT_DURATION.skill_used);
+        break;
+      case 'damage': {
+        const view = this.seatView(event.targetSeat);
+        view.flash();
+        view.animateHpTo({ hp: event.hpAfter, maxHp: event.maxHp }, EVENT_DURATION.damage);
+        if (event.crit) view.popText('Coup critique !');
+        else if (event.effectiveness > 1) view.popText("C'est super efficace !");
+        else if (event.effectiveness < 1) view.popText("Ce n'est pas très efficace…");
+        break;
+      }
+      case 'heal':
+        this.seatView(event.seat).animateHpTo({ hp: event.hpAfter, maxHp: event.maxHp }, EVENT_DURATION.heal);
+        break;
+      case 'buff':
+        this.seatView(event.seat).popText('Défense en hausse !');
+        break;
+      case 'faint':
+        this.seatView(event.seat).playFaint(EVENT_DURATION.faint);
+        break;
+      case 'switch': {
+        const monster = state.players[event.seat].team[event.toIndex];
+        if (monster) this.seatView(event.seat).show(monster);
+        break;
+      }
+      case 'forfeit':
+      case 'battle_end':
+        break; // pas d'animation dédiée : React gère déjà la fin de combat (US-11).
+    }
   }
 
   /** Utilisé par les tests manuels de la review : l'état affiché est bien celui de React. */

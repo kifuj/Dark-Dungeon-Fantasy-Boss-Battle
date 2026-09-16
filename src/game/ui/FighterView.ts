@@ -22,6 +22,8 @@ export class FighterView {
   private readonly level: GameObjects.Text;
   private readonly numbers: GameObjects.Text;
   private readonly barFill: GameObjects.Rectangle;
+  /** Dernières PV affichées : sert de point de départ aux tweens de `animateHpTo` (US-09). */
+  private displayedHp = { hp: 0, maxHp: 1 };
 
   static readonly BOX_WIDTH = 186;
   static readonly BAR_WIDTH = 150;
@@ -65,19 +67,72 @@ export class FighterView {
     }
     this.sprite.play(`${textureKey}-idle`, true);
     this.sprite.setAlpha(1);
+    this.sprite.clearTint();
+    this.sprite.y = this.layout.sprite.y;
     this.name.setText(monster.name);
     this.level.setText(`N.${monster.level}`);
     this.icon.setFrame(ELEMENT_FRAME[monster.element]);
     this.update(monster);
   }
 
-  /** Met à jour la barre de PV et sa couleur. */
+  /** Met à jour la barre de PV et sa couleur, sans transition (rechargement / init — US-16 CA1). */
   update(monster: MonsterInstance) {
-    const ratio = hpRatio(monster);
+    this.displayedHp = { hp: monster.hp, maxHp: monster.maxHp };
+    this.applyHp(this.displayedHp);
+    this.sprite?.setAlpha(monster.hp > 0 ? 1 : 0.35);
+  }
+
+  private applyHp({ hp, maxHp }: { hp: number; maxHp: number }) {
+    const ratio = hpRatio({ hp, maxHp });
     this.barFill.setDisplaySize(Math.max(0, Math.round((FighterView.BAR_WIDTH - 2) * ratio)), 6);
     this.barFill.setFillStyle(HP_COLORS[hpTier(ratio)]);
     this.barFill.setVisible(ratio > 0);
-    this.numbers.setText(`${monster.hp} / ${monster.maxHp}`);
-    this.sprite?.setAlpha(monster.hp > 0 ? 1 : 0.35);
+    this.numbers.setText(`${Math.round(hp)} / ${Math.round(maxHp)}`);
+  }
+
+  /**
+   * Anime la barre de PV vers sa valeur finale (US-09 CA1). `hpAfter`/`maxHp` viennent
+   * directement de l'événement `damage`/`heal` : pas besoin de rejouer tout `BattleState`.
+   */
+  animateHpTo(target: { hp: number; maxHp: number }, duration = 450) {
+    const from = { ...this.displayedHp };
+    this.displayedHp = { ...target };
+    this.scene.tweens.addCounter({
+      from: 0,
+      to: 1,
+      duration,
+      onUpdate: (tween) => {
+        const t = tween.getValue() ?? 1;
+        this.applyHp({ hp: from.hp + (target.hp - from.hp) * t, maxHp: from.maxHp + (target.maxHp - from.maxHp) * t });
+      },
+    });
+  }
+
+  /** Flash rouge bref sur le monstre touché (US-09 CA1). */
+  flash() {
+    if (!this.sprite) return;
+    this.sprite.setTint(0xff4444);
+    this.scene.time.delayedCall(180, () => this.sprite?.clearTint());
+  }
+
+  /** Texte flottant au-dessus de l'encadré : efficacité / critique (US-09 CA2). */
+  popText(text: string) {
+    const t = this.scene.add
+      .text(this.layout.box.x + FighterView.BOX_WIDTH / 2, this.layout.box.y - 6, text, {
+        fontFamily: 'monospace',
+        fontSize: '10px',
+        color: '#F2D45C',
+        backgroundColor: '#0D0D0FCC',
+        padding: { x: 4, y: 2 },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(10);
+    this.scene.tweens.add({ targets: t, y: t.y - 14, alpha: 0, duration: 700, delay: 300, onComplete: () => t.destroy() });
+  }
+
+  /** Fondu + descente d'un monstre K.O. (US-09 CA3). */
+  playFaint(duration = 500) {
+    if (!this.sprite) return;
+    this.scene.tweens.add({ targets: this.sprite, y: this.sprite.y + 20, alpha: 0, duration });
   }
 }

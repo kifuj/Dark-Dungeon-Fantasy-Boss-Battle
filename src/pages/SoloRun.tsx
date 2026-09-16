@@ -5,14 +5,11 @@ import { chooseAiAction } from '../../shared/engine/ai.js';
 import { describeEvents } from '../../shared/engine/log.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
 import { battleForWave, createRun, nextWave, type RunState } from '../../shared/engine/run.js';
-import type { Action, BattleState } from '../../shared/types.js';
+import type { Action, BattleState, TurnResult } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
 import { ActionMenu } from '../components/ActionMenu.tsx';
 import { StarterSelect } from './StarterSelect.tsx';
-
-/** Durée pendant laquelle le menu reste masqué le temps d'« afficher » la résolution (US-08 CA3). */
-const RESOLUTION_MS = 900;
 
 /**
  * Mode solo (US-10, US-11) : choix du starter, puis enchaînement des vagues contre l'IA.
@@ -25,6 +22,8 @@ export function SoloRun() {
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState<{ wave: number } | null>(null);
   const battleRef = useRef<BattleState | null>(null);
+  // Tour résolu en attente de la fin de l'animation Phaser (US-09) avant d'être appliqué à l'état React.
+  const pendingRef = useRef<TurnResult | null>(null);
 
   // La scène prévient quand elle est prête : on lui envoie alors l'état courant.
   useEffect(() => {
@@ -46,6 +45,31 @@ export function SoloRun() {
     if (run) EventBus.emit('battle-banner', `Vague ${run.wave}`);
   }, [run]);
 
+  // La scène prévient quand elle a fini de rejouer les événements du tour (US-09) : c'est
+  // seulement là qu'on applique le nouvel état et qu'on enchaîne (vague suivante / défaite).
+  useEffect(() => {
+    const onEventsPlayed = () => {
+      const result = pendingRef.current;
+      pendingRef.current = null;
+      if (!result || !run) return;
+      setBattle(result.state);
+      if (result.winnerSeat === 0) {
+        const advanced = nextWave(run, result.state.players[0].team); // +20 % de PV max (US-11 CA3)
+        const next = battleForWave(advanced);
+        setRun(advanced);
+        setBattle(next);
+        setLog((lines) => [...lines, `Vague ${advanced.wave} : ${next.players[1].team.map((m) => m.name).join(' et ')} apparaît !`]);
+      } else if (result.winnerSeat === 1) {
+        setOver({ wave: run.wave }); // fin de run (US-11 CA4)
+      }
+      setBusy(false);
+    };
+    EventBus.on('events-played', onEventsPlayed);
+    return () => {
+      EventBus.off('events-played', onEventsPlayed);
+    };
+  }, [run]);
+
   const start = useCallback((starterId: string) => {
     const seed = Math.floor(Math.random() * 2 ** 31); // seed tirée une seule fois, hors de shared/
     const fresh = createRun(starterId, seed);
@@ -63,23 +87,9 @@ export function SoloRun() {
       const rng = createTurnRng(run.seed, run.wave, battle.turn);
       const aiAction = chooseAiAction(battle, 1, rng);
       const result = resolveTurn(battle, [action, aiAction], rng);
-      setBattle(result.state);
       setLog(describeEvents(result.events, 0));
-      EventBus.emit('play-events', result.events);
-
-      window.setTimeout(() => {
-        EventBus.emit('events-played');
-        if (result.winnerSeat === 0) {
-          const advanced = nextWave(run, result.state.players[0].team); // +20 % de PV max (US-11 CA3)
-          const next = battleForWave(advanced);
-          setRun(advanced);
-          setBattle(next);
-          setLog((lines) => [...lines, `Vague ${advanced.wave} : ${next.players[1].team.map((m) => m.name).join(' et ')} apparaît !`]);
-        } else if (result.winnerSeat === 1) {
-          setOver({ wave: run.wave }); // fin de run (US-11 CA4)
-        }
-        setBusy(false);
-      }, RESOLUTION_MS);
+      pendingRef.current = result;
+      EventBus.emit('play-events', result.events); // la scène applique `result` à la fin (`events-played`)
     },
     [battle, busy, run],
   );
