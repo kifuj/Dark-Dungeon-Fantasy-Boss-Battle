@@ -730,3 +730,71 @@ h2,
 .starter-sprite {
   overflow: hidden;
 }
+
+/* ---------- Connexion et multijoueur (US-15 à US-23) ---------- */
+
+.centered-page { justify-content: center; }
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 540px);
+  padding: clamp(1.5rem, 4vw, 2.6rem);
+  border: 3px solid var(--stone);
+  background: var(--anthracite);
+  text-align: center;
+  animation: panel-enter 700ms ease-out both;
+}
+
+.panel h1 {
+  margin: 0 0 1rem;
+  color: var(--bone);
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: min(100%, 320px);
+  margin-top: 1.4rem;
+  text-align: left;
+}
+
+.login-form label {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(194, 181, 154, 0.72);
+}
+
+.login-form input {
+  padding: 0.7rem 0.8rem;
+  border: 2px solid var(--stone);
+  background: var(--charcoal);
+  color: var(--bone);
+  font: inherit;
+}
+
+.login-form input:focus-visible { outline: 2px solid var(--ember); }
+
+.login-form .button {
+  justify-content: center;
+  font: inherit;
+  cursor: pointer;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--ember);
+  font-size: 0.9rem;
+}
+
+.loading-line {
+  font-family: ui-monospace, 'Courier New', monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(194, 181, 154, 0.72);
+}
