@@ -9,7 +9,7 @@
 
 ## 2. Objectifs
 
-1. Livrer un jeu **jouable en ligne** sur Vercel avant la présentation.
+1. Livrer un jeu **jouable en ligne** sur Render avant la présentation.
 2. Proposer un **mode multijoueur au tour par tour** fonctionnel entre deux navigateurs.
 3. Appliquer Scrum sur **4 sprints** et documenter tout le processus en Markdown.
 
@@ -22,7 +22,7 @@
 - Connexion par pseudo (auth anonyme Supabase).
 - Multijoueur : créer ou rejoindre un salon par code, duel 1v1 avec choix simultanés et résolution côté serveur.
 - Écran titre, menu et écran des crédits.
-- Déploiement Vercel et repo GitHub public.
+- Déploiement Render (front) + Supabase Edge Functions (serveur), et repo GitHub public.
 
 ### 🟡 Si on a le temps (Should / Could)
 - Draft d'équipe en duel, format en 3 manches (BO3), récompenses entre les manches.
@@ -39,8 +39,8 @@
 | 4 sprints de **0,5 jour** chacun | MVP très resserré, US de 8 points maximum |
 | Présentation **jeudi après-midi** (~30 min), rendu **jeudi 13h30** par mail | Le sprint 4 se termine par la préparation de la démo |
 | Supabase **gratuit** : 200 connexions Realtime simultanées, 2 M messages/mois, projet mis en pause après 7 jours d'inactivité | Largement suffisant pour une démo ; se reconnecter au dashboard la veille |
-| Vercel **Hobby** : usage non commercial | OK pour un projet étudiant |
-| Pas de WebSocket maison sur Vercel | Temps réel délégué à **Supabase Realtime** (voir [04-MULTIJOUEUR](04-MULTIJOUEUR.md)) |
+| Render **Static Site** gratuit : aucun code serveur exécuté | Serveur autoritaire en **Supabase Edge Functions** (voir [05-API](05-API.md)) |
+| Pas de WebSocket maison (ni Static Site ni Edge Function ne gardent de connexion ouverte) | Temps réel délégué à **Supabase Realtime** (voir [04-MULTIJOUEUR](04-MULTIJOUEUR.md)) |
 | Repo GitHub **public** | Ne commiter que des assets dont la licence autorise la redistribution (voir [08-CONVENTIONS](08-CONVENTIONS.md#4-assets-et-licences)) |
 | Documentation en `.md` : **1 fichier par sprint** + 1 global | Dossier `docs/agile/` |
 
@@ -60,14 +60,14 @@
 |---|---|---|
 | 🧠 Moteur | `shared/` : règles, formules, IA, tests Vitest | 01, 06 |
 | 🎮 Jeu | `src/game/` : scènes Phaser, sprites, animations | 01, 02 |
-| 🔌 Backend | `api/`, Supabase, RLS, Realtime | 03, 04, 05 |
+| 🔌 Backend | `supabase/functions/`, Supabase, RLS, Realtime | 03, 04, 05 |
 | 🖥️ UI | `src/pages/` : menus, lobby, crédits (maquettes Lovable possibles) | 02 |
 
 ## 6. Planning
 
 | Sprint | Créneau *(à ajuster)* | Sprint Goal proposé | Doc |
 |---|---|---|---|
-| 1 | Mar. 15/09 après-midi | Le squelette est en ligne sur Vercel et un combat 1v1 se résout correctement dans les tests | [SPRINT-1](agile/SPRINT-1.md) |
+| 1 | Mar. 15/09 après-midi | Le squelette est en ligne sur Render et un combat 1v1 se résout correctement dans les tests | [SPRINT-1](agile/SPRINT-1.md) |
 | 2 | Mer. 16/09 matin | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites | [SPRINT-2](agile/SPRINT-2.md) |
 | 3 | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire | [SPRINT-3](agile/SPRINT-3.md) |
 | 4 | Jeu. 17/09 matin, **gel du code à 13h** | La boucle roguelike est complète et le jeu est présentable (US-09 en bonus) | [SPRINT-4](agile/SPRINT-4.md) |
@@ -102,7 +102,7 @@
 | Le multijoueur prend plus de temps que prévu | Haute | Haut | Moteur partagé testé dès le sprint 1 ; plan B par polling (voir 04) ; le solo reste livrable seul |
 | Conflits Git dans une petite équipe | Moyenne | Moyen | Branches courtes, PR petites, un pôle par dossier |
 | Assets de styles ou de tailles hétérogènes | Moyenne | Moyen | Choisir **un** pack de base au sprint 1 et fixer une taille de sprite |
-| Variables d'environnement oubliées sur Vercel | Moyenne | Haut | Checklist de déploiement (doc 07), `.env.example` à jour |
+| Variables d'environnement oubliées sur Render, ou Edge Functions non redéployées | Moyenne | Haut | Checklist de déploiement (doc 07 §6), `.env.example` à jour |
 | Projet Supabase en pause le jour J | Faible | Haut | Ouvrir le dashboard la veille et le matin |
 | Sprint 4 trop court pour tout finir | Haute | Haut | Engagement réduit à 12 pts, US-09 en objectif bonus, gel du code à 13h |
 | Démo qui plante en direct | Moyenne | Haut | Vidéo de secours enregistrée au sprint 4, deux navigateurs préparés |

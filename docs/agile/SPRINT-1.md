@@ -10,7 +10,9 @@
 
 ## 🎯 Sprint Goal
 
-> **Le squelette du jeu est en ligne sur Vercel, relié à Supabase, et un combat 1v1 se résout correctement dans les tests automatisés.**
+> **Le squelette du jeu est en ligne sur Render, relié à Supabase, et un combat 1v1 se résout correctement dans les tests automatisés.**
+>
+> *Goal initialement formulé avec Vercel ; l'hébergement a été migré sur Render pendant le sprint (voir [journal des décisions](../08-CONVENTIONS.md#journal-des-décisions)). Les dailies ci-dessous gardent la mention de Vercel, qui était exacte à leur date.*
 
 ## 📋 Sprint Backlog
 
@@ -18,21 +20,32 @@
 |---|---|---|---|---|
 | **US-01** Projet en ligne | 3 | Créer le repo GitHub public + protection de `main` | Mattéo | 🟡 Repo public créé ; protection de `main` à faire (non activée) |
 | | | Scaffold Vite React-TS, installer Phaser, Supabase, Vitest | Mattéo | ✅ Fait ([PR #29](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/29) fusionnée) |
-| | | `vercel.json` (rewrites) + import sur Vercel + 1er déploiement | Mattéo | 🟡 `vercel.json` fusionné (#29) ; import sur Vercel et 1er déploiement à faire (aucun déploiement) |
+| | | Réécriture SPA + import sur Render + 1er déploiement | Mattéo | 🟡 Migré de Vercel vers Render : Static Site en ligne ([dark-dungeon-fantasy-boss-battle.onrender.com](https://dark-dungeon-fantasy-boss-battle.onrender.com)) ; `vercel.json` supprimé ; **règle de réécriture `/*` → `/index.html` à ajouter sur Render** (`/menu` renvoie 404, CA3 non validé) |
 | | | Composant `PhaserGame` avec canvas 480×270 `pixelArt` | Mattéo | ✅ Fait (#29) |
-| **US-02** Supabase | 3 | Créer le projet (région Paris) + exécuter `001_init.sql` | Owen | 🟡 `001_init.sql` fusionné ([PR #31](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/31)) ; création du projet et exécution à faire |
+| **US-02** Supabase | 3 | Créer le projet (région Paris) + exécuter `001_init.sql` | Owen | ❌ `001_init.sql` fusionné ([PR #31](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/31)) mais **absent de `main`** (perdu lors du déplacement de `rogue-arena/`) ; fichier à restaurer, création du projet et exécution à faire |
 | | | Activer l'auth anonyme + vérifier la publication Realtime | Owen | ☐ À faire (dashboard) |
-| | | Variables d'environnement sur Vercel + `.env.example` | Owen | 🟡 `.env.example` fusionné (#31) ; variables Vercel à faire |
+| | | Variables d'environnement sur Render + `.env.example` | Owen | ❌ `.env.example` fusionné (#31) mais absent de `main` ; aucune URL `*.supabase.co` dans le bundle déployé → variables Render non configurées |
 | | | Tester la RLS (select interdit sur le match d'un autre joueur) | Owen | ☐ À faire |
 | **US-03** Compétences | 5 | `shared/types.ts` + `data/` (éléments, compétences, monstres) | Paul | ✅ Fait ([PR #30](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/30) fusionnée) |
 | | | `rng.ts`, `stats.ts`, `damage.ts` | Paul | ✅ Fait (#30) |
 | | | Tests éléments + déterminisme + PP | Paul | ✅ Fait (#30), tests verts |
 | **US-05** Ordre | 2 | `getActionOrder` + tests | Donovan | ✅ Fait (#30), tests verts |
 | **US-06** KO / fin | 3 | `resolveTurn` (KO, remplacement auto, victoire) + `validateAction` + tests | Donovan | ✅ Fait (#30), tests verts |
-| **US-24** Titre / menu | 2 | Maquette Lovable (optionnel) + pages Titre et Menu + routes | Owen | 🟡 Pages et routes fusionnées ([PR #32](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/32)) ; à vérifier sur Vercel (bloqué par US-01) ; maquette Lovable non utilisée |
+| **US-24** Titre / menu | 2 | Maquette Lovable (optionnel) + pages Titre et Menu + routes | Owen | 🟡 Pages et routes fusionnées ([PR #32](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/32)) ; écran titre en ligne sur Render, navigation directe vers `/menu` en 404 tant que la réécriture n'est pas configurée ; maquette Lovable non utilisée |
 | | **18** | | | |
 
-**Avancement (mar. 15/09, 14h40)** : **10 / 18 points terminés** (US-03, US-05, US-06 : issues fermées). Sur `main` : `npm run build` passe, `npx vitest run` → 71 tests verts. En cours : US-01 (import Vercel, protection de `main`), US-02 (dashboard Supabase), US-24 (vérification sur Vercel, bloquée par US-01).
+**Avancement (mer. 16/09, 09h05 — vérification de fin de sprint)** : **12 / 18 points réellement terminés** (US-03 5, US-05 2, US-06 3, US-24 2). Sur `main` : `npm run build` passe, `npx vitest run` → **71 tests verts**.
+
+Les issues US-01 et US-02 avaient été fermées à 15h18 sans que la DoD soit atteinte ; conformément à la décision du daily n°2, elles sont **rouvertes et repassées en `In progress`** sur le GitHub Project :
+
+| US | Vérification du 16/09 | Reste à faire |
+|---|---|---|
+| **US-01** | `/` → 200, mais `/menu` et `/solo` → **404** (CA3 non validé) ; `branches/main.protected = false` | Règle de réécriture `/*` → `/index.html` sur Render ; protection de `main` |
+| **US-02** | Aucun fichier Supabase ni `.env.example` dans `git ls-files` ; aucun `createClient` / `VITE_SUPABASE_*` dans le code ; aucune URL `*.supabase.co` dans le bundle déployé | Restaurer `001_init.sql` et `.env.example` sur `main`, créer le projet Supabase, auth anonyme, Realtime, variables Render, test RLS |
+
+US-24 reste terminée : l'écran titre est en ligne sur `/` et la navigation interne (SPA) atteint les pages du menu ; le 404 sur URL directe relève de CA3 de US-01.
+
+**Migration vers Render** : le projet a ensuite été migré de Vercel vers **Render** (Static Site), où il tourne : https://dark-dungeon-fantasy-boss-battle.onrender.com. Le serveur autoritaire prévu en Vercel Functions passe en **Supabase Edge Functions** (décisions dans [08 §5](../08-CONVENTIONS.md#journal-des-décisions)). `vercel.json`, le script `dev:full` et `@vercel/node` sont retirés. Vérification du 15/09 : `/` répond 200, `/menu` et `/solo` répondent 404 → règle de réécriture à ajouter sur Render.
 
 📸 **Capture du board au début du sprint** : `![Sprint backlog sprint 1](./captures/sprint-1-backlog.png)`
 

@@ -345,7 +345,7 @@ export function validateAction(state: BattleState, seat: Seat, action: unknown):
 }
 ```
 
-> Côté client, `validateAction` sert à **griser** les boutons impossibles. Côté serveur, il **bloque** les requêtes trafiquées. L'abandon passe par `/api/match/forfeit`, pas par `/api/match/action`.
+> Côté client, `validateAction` sert à **griser** les boutons impossibles. Côté serveur, il **bloque** les requêtes trafiquées. L'abandon passe par la fonction `match-forfeit`, pas par `match-action`.
 
 ## 8. IA (mode solo)
 
