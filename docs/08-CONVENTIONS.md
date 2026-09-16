@@ -62,7 +62,9 @@ public/assets/
 ```
 
 - Noms de fichiers en `snake_case`, identiques à l'`id` de l'espèce (`flying_eye.png`).
-- Taille de cadre fixée au sprint 1 (recommandé : **64 × 64**), documentée dans `PreloadScene.ts`.
+- Taille de cadre fixée au sprint 1 : **64 × 64**, déclarée par `FRAME_SIZE` dans `src/game/scenes/PreloadScene.ts`.
+- **Les assets sont générés par notre code** (`tools/art/`, `npm run assets`) : dessin en 32 × 32 puis agrandissement × 2,
+  2 images par monstre (animation d'attente). Modifier un sprite = modifier `tools/art/monsters.mjs`, pas le PNG.
 - Chaque asset ajouté → **une ligne dans [CREDITS.md](CREDITS.md)** dans la même PR.
 
 ## 4. Assets et licences
@@ -95,4 +97,5 @@ Le repo étant **public**, commiter un asset revient à le **redistribuer**. Mê
 | 15/09 | Hébergement du front migré de Vercel vers **Render** (Static Site) : https://dark-dungeon-fantasy-boss-battle.onrender.com | Choix de l'équipe ; le projet tourne sur Render | Équipe |
 | 15/09 | Serveur autoritaire en **Supabase Edge Functions** au lieu des Vercel Functions | Un Static Site Render n'exécute pas de code serveur ; un Web Service Render gratuit se met en veille ; les Edge Functions sont gratuites et déjà dans la stack | Équipe |
 | 16/09 | Réécriture SPA par un fichier `public/_redirects` (`/* → /index.html 200`) | Corrige le 404 sur les URL directes sans avoir à configurer le dashboard Render (US-01 CA3) | Mattéo (sprint 2) |
+| 16/09 | Assets **générés par notre propre code** (`tools/art/`) plutôt qu'un pack itch.io | Le dépôt est public : redistribuer un pack sous licence restrictive est interdit ; un pack CC0 imposait un style et des noms qui ne collent pas au bestiaire | Équipe (sprint 2) |
 | | | | |

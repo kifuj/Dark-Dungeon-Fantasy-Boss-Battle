@@ -55,10 +55,18 @@ cp .env.example .env.local   # renseigner l'URL et la clé publishable Supabase
 npm run dev                  # front sur http://localhost:5173
 ```
 
-Tests du moteur de combat :
+Tests (moteur de combat `shared/` + composants React `src/tests/`) :
 
 ```bash
-npm test
+npm test          # mode veille
+npm run test:run  # une seule passe
+```
+
+Les images du jeu (monstres, icônes d'élément, décor) sont **dessinées par notre propre code** et commitées.
+Pour les régénérer après avoir modifié `tools/art/` :
+
+```bash
+npm run assets
 ```
 
 Le guide complet (dont le déploiement des Edge Functions) est dans [07-INSTALLATION-DEPLOIEMENT.md](docs/07-INSTALLATION-DEPLOIEMENT.md).

@@ -163,10 +163,16 @@ export function PhaserGame() {
 | Événement | Sens | Données | Usage |
 |---|---|---|---|
 | `scene-ready` | Phaser → React | — | La scène est prête à recevoir un état |
-| `battle-init` | React → Phaser | `BattleState`, `mySeat` | Afficher les monstres et les PV |
-| `play-events` | React → Phaser | `BattleEvent[]` | Animer un tour résolu |
-| `events-played` | Phaser → React | — | Réafficher le menu d'actions |
+| `battle-init` | React → Phaser | `{ state, playerSeat }` | Afficher les monstres et les PV |
+| `battle-update` | React → Phaser | `BattleState` | Rafraîchir sprites, noms et barres de PV après un tour |
+| `battle-banner` | React → Phaser | `string \| null` | Bandeau « Vague N » au début d'une vague |
+| `play-events` | React → Phaser | `BattleEvent[]` | Rejouer un tour résolu |
+| `events-played` | — | — | Le menu d'actions peut réapparaître |
 | `battle-end` | Phaser → React | `winnerSeat` | Afficher l'écran de fin ou de récompense |
+
+> **État au sprint 2** : `battle-init`, `battle-update`, `battle-banner` et `scene-ready` sont implémentés.
+> `play-events` est bien émis, mais la scène **n'anime pas encore** les événements : React applique l'état final
+> et rend la main après un court délai (`events-played`). Les animations et les textes dans le canvas sont l'**US-09**.
 
 Le **menu d'actions** (4 compétences, Changer, Abandonner) peut être en React par-dessus le canvas (plus rapide à coder, compatible avec Lovable) ou dans Phaser. **Recommandation : React.**
 
