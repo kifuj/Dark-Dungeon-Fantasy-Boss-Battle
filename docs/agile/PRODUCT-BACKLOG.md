@@ -23,7 +23,7 @@ Une user story est terminée si :
 - [ ] Le code est sur `main` via une **PR relue** par au moins 1 autre personne.
 - [ ] `npm run build` passe, sans erreur TypeScript.
 - [ ] `npx vitest run` passe ; toute nouvelle règle de `shared/` a son test.
-- [ ] La fonctionnalité est **testée sur le déploiement Vercel** (preview ou production), pas seulement en local.
+- [ ] La fonctionnalité est **testée sur le déploiement Render** (preview ou production), pas seulement en local.
 - [ ] Le multijoueur (s'il est concerné) est testé sur **2 navigateurs** distincts.
 - [ ] Aucun secret commité ; `.env.example` est à jour.
 - [ ] `CREDITS.md` est à jour si un asset a été ajouté.
@@ -33,7 +33,7 @@ Une user story est terminée si :
 
 | ID | Epic | User story (résumé) | MoSCoW | Estim. proposée | Estim. équipe | Sprint |
 |---|---|---|---|---|---|---|
-| US-01 | Socle | Projet en ligne sur Vercel | Must | 3 | | 1 |
+| US-01 | Socle | Projet en ligne sur Render | Must | 3 | | 1 |
 | US-02 | Socle | Supabase configuré (schéma + RLS) | Must | 3 | | 1 |
 | US-03 | Moteur | Attaquer avec des compétences et des éléments | Must | 5 | | 1 |
 | US-05 | Moteur | Ordre d'action par priorité et vitesse | Must | 2 | | 1 |
@@ -94,11 +94,11 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 
 ### Epic 1 — Socle technique
 
-#### US-01 — Projet en ligne sur Vercel · Must · 3 pts
-**En tant que** membre de l'équipe, **je veux** un projet React + TypeScript + Phaser déployé automatiquement sur Vercel **afin de** pouvoir tester chaque changement en ligne et le montrer au PO.
+#### US-01 — Projet en ligne sur Render · Must · 3 pts
+**En tant que** membre de l'équipe, **je veux** un projet React + TypeScript + Phaser déployé automatiquement sur Render **afin de** pouvoir tester chaque changement en ligne et le montrer au PO.
 
-- **CA1** : Étant donné un push sur `main`, quand le build Vercel se termine, alors l'URL de production affiche la page d'accueil.
-- **CA2** : Étant donné une PR ouverte, quand Vercel la construit, alors une URL de preview est commentée sur la PR.
+- **CA1** : Étant donné un push sur `main`, quand le build Render se termine, alors l'URL de production (https://dark-dungeon-fantasy-boss-battle.onrender.com) affiche la page d'accueil.
+- **CA2** : Étant donné une PR ouverte, quand Render la construit (Pull Request Previews), alors une URL de preview est disponible sur la PR.
 - **CA3** : Étant donné l'URL `/n-importe-quelle-route`, quand je rafraîchis la page, alors l'application se charge (pas de 404).
 - **CA4** : Un canvas Phaser de 480×270 s'affiche, mis à l'échelle sans flou.
 
@@ -108,7 +108,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA1** : La migration `001_init.sql` s'exécute sans erreur sur un projet vide.
 - **CA2** : Étant donné un utilisateur A, quand il fait `select` sur `matches`, alors il ne voit que les matchs dont il est joueur.
 - **CA3** : Étant donné un client connecté, quand il tente un `insert` dans `matches`, alors la requête est refusée.
-- **CA4** : Les variables d'environnement sont configurées sur Vercel et documentées dans `.env.example`.
+- **CA4** : Les variables d'environnement sont configurées sur Render et documentées dans `.env.example`.
 
 ---
 
@@ -251,7 +251,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 **En tant que** joueur, **je veux** affronter un autre joueur au tour par tour en temps réel **afin de** jouer à deux à distance.
 
 - **CA1** : Étant donné un duel lancé, alors les 2 joueurs voient les 2 équipes (3 monstres de niveau 10 tirés au hasard) et le même état.
-- **CA2** : Quand je choisis une action, elle est envoyée à `/api/match/action`, et « En attente de l'adversaire… » s'affiche.
+- **CA2** : Quand je choisis une action, elle est envoyée à la fonction `match-action`, et « En attente de l'adversaire… » s'affiche.
 - **CA3** : Quand les 2 actions sont reçues, le serveur résout le tour et les 2 écrans rejouent **les mêmes événements** en moins de 2 secondes.
 - **CA4** : Une action invalide, pour un tour dépassé, ou envoyée par un non-joueur est refusée avec le bon code d'erreur ([doc 05](../05-API.md#2-codes-derreur)).
 - **CA5** : Un double-clic n'enregistre qu'une seule action.
@@ -268,7 +268,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 
 - **CA1** : Un compte à rebours de 60 s est visible pendant le choix.
 - **CA2** : À 0, l'action par défaut est jouée pour le joueur absent et le tour est résolu.
-- **CA3** : Un appel à `/api/match/timeout` avant la deadline renvoie `409 TOO_EARLY`.
+- **CA3** : Un appel à la fonction `match-timeout` avant la deadline renvoie `409 TOO_EARLY`.
 
 #### US-21 — Reconnexion · Should · 3 pts
 **En tant que** joueur, **je veux** retrouver ma partie après un rafraîchissement **afin de** ne pas perdre un duel à cause d'une erreur de manipulation.

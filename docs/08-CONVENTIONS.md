@@ -3,7 +3,7 @@
 ## 1. Git
 
 ### Branches
-- `main` : toujours déployable (production Vercel). **Aucun push direct.**
+- `main` : toujours déployable (production Render). **Aucun push direct.**
 - Une branche par user story : `feat/US-19-tour-en-ligne`, `fix/US-07-barre-pv`, `docs/sprint-2`.
 - Branches courtes : **fusionnées dans le sprint** où elles ont été ouvertes.
 
@@ -23,7 +23,7 @@ Portées : `engine`, `game`, `ui`, `api`, `db`, `assets`, `sprint-N`.
 
 ### Pull Requests
 - Titre : `US-19 — Jouer un tour en ligne`.
-- Description : lien vers l'US, captures ou GIF si c'est visuel, **URL de preview Vercel**, étapes pour tester.
+- Description : lien vers l'US, captures ou GIF si c'est visuel, **URL de preview Render**, étapes pour tester.
 - **1 relecture minimum** par une autre personne avant de fusionner.
 - On préfère « Squash and merge » pour garder un historique lisible.
 
@@ -33,7 +33,7 @@ Portées : `engine`, `game`, `ui`, `api`, `db`, `assets`, `sprint-N`.
 |---|---|
 | `shared/` | Moteur |
 | `src/game/`, `public/assets/` | Jeu |
-| `api/`, `supabase/` | Backend |
+| `supabase/` (dont `supabase/functions/`) | Backend |
 | `src/pages/`, `src/components/` | UI |
 | `docs/agile/` | Scrum Master (tout le monde contribue) |
 
@@ -46,7 +46,7 @@ Portées : `engine`, `game`, `ui`, `api`, `db`, `assets`, `sprint-N`.
 - Nommage : `camelCase` pour les variables et fonctions, `PascalCase` pour les composants, scènes et types, `SCREAMING_CASE` pour les constantes, identifiants de données en `snake_case` (`quick_strike`).
 - Code et identifiants en **anglais**, textes affichés au joueur en **français**.
 - `shared/` : **aucun** import de React, Phaser, Supabase ou `Math.random`.
-- `api/` et `shared/` : imports relatifs **avec extension `.js`**.
+- `shared/` : imports relatifs **avec extension `.js`**. `supabase/functions/` (Deno) : imports relatifs **avec extension `.ts`**, paquets npm avec le préfixe `npm:`.
 - Aucun secret dans le code. Les variables d'environnement sont documentées dans `.env.example`.
 
 ## 3. Organisation des assets
@@ -90,6 +90,8 @@ Le repo étant **public**, commiter un asset revient à le **redistribuer**. Mê
 
 | Date | Décision | Raison | Qui |
 |---|---|---|---|
-| 15/09 | Temps réel via Supabase Realtime plutôt que WebSocket sur Vercel | Les Functions Vercel ne gardent pas de connexion ouverte ; offre gratuite suffisante | Équipe |
+| 15/09 | Temps réel via Supabase Realtime plutôt que des WebSockets maison | Ni l'hébergement du front ni les fonctions serveur ne gardent de connexion ouverte ; offre gratuite suffisante | Équipe |
 | 15/09 | Moteur de combat partagé et déterministe (`shared/`) | Même code en solo et en multi, testable, empêche la triche | Équipe |
+| 15/09 | Hébergement du front migré de Vercel vers **Render** (Static Site) : https://dark-dungeon-fantasy-boss-battle.onrender.com | Choix de l'équipe ; le projet tourne sur Render | Équipe |
+| 15/09 | Serveur autoritaire en **Supabase Edge Functions** au lieu des Vercel Functions | Un Static Site Render n'exécute pas de code serveur ; un Web Service Render gratuit se met en veille ; les Edge Functions sont gratuites et déjà dans la stack | Équipe |
 | | | | |

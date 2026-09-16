@@ -1,5 +1,11 @@
 # 07 — Installation et déploiement
 
+| Partie | Hébergée sur | Déploiement |
+|---|---|---|
+| Front (build Vite `dist/`) | **Render** — Static Site | Automatique à chaque push sur `main` |
+| Serveur autoritaire (`supabase/functions/`) | **Supabase Edge Functions** | `npx supabase functions deploy` |
+| BDD, Auth, Realtime | **Supabase** | Migration SQL exécutée une fois |
+
 ## 0. Prérequis
 
 | Outil | Version | Vérifier |
@@ -7,7 +13,8 @@
 | Node.js | 22 ou 24 (LTS) | `node -v` |
 | npm | fourni avec Node | `npm -v` |
 | Git | récent | `git --version` |
-| Comptes | GitHub, [Vercel](https://vercel.com) (connexion avec GitHub), [Supabase](https://supabase.com) | — |
+| Comptes | GitHub, [Render](https://render.com) (connexion avec GitHub), [Supabase](https://supabase.com) | — |
+| Docker *(optionnel)* | récent | Seulement pour exécuter les Edge Functions en local (§5) |
 
 ## 1. Créer le projet (une seule fois, par une personne)
 
@@ -18,16 +25,16 @@ npm create vite@latest . -- --template react-ts
 
 npm install
 npm install phaser @supabase/supabase-js react-router-dom
-npm install -D vitest @vercel/node vercel
+npm install -D vitest supabase
 ```
 
 Créer les dossiers :
 
 ```bash
-mkdir -p api/_lib api/rooms api/match shared/data shared/engine shared/tests \
+mkdir -p shared/data shared/engine shared/tests \
          src/game/scenes src/lib src/pages src/components \
          public/assets/sprites public/assets/ui public/assets/fonts public/assets/audio \
-         supabase/migrations
+         supabase/migrations supabase/functions/_shared
 ```
 
 ### `package.json` (scripts)
@@ -37,12 +44,11 @@ mkdir -p api/_lib api/rooms api/match shared/data shared/engine shared/tests \
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:full": "vercel dev",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
-    "lint": "eslint ."
+    "lint": "oxlint"
   }
 }
 ```
@@ -55,48 +61,33 @@ Dans `tsconfig.app.json`, ajouter `shared` à `include` :
 { "include": ["src", "shared"] }
 ```
 
-Créer `api/tsconfig.json` (typage des fonctions) :
+> `supabase/functions/` n'est **pas** inclus : ce code tourne sous **Deno**, pas sous Node. Il est typé par Deno (extension VS Code *Deno* activée uniquement sur ce dossier).
+
+### `supabase/functions/deno.json`
 
 ```json
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "types": ["node"]
-  },
-  "include": ["./**/*.ts", "../shared/**/*.ts"]
+  "unstable": ["sloppy-imports"]
 }
 ```
 
-> Si `types: ["node"]` provoque une erreur, installer `npm i -D @types/node`.
+> `shared/` importe ses fichiers avec l'extension `.js` (`from './damage.js'`) alors qu'ils sont en `.ts`. Vite le comprend, Deno non par défaut : `sloppy-imports` l'autorise. **À vérifier dès le début du sprint 3** en déployant une fonction qui importe `shared/engine`. Plan B si le bundler refuse : copier `shared/` dans `supabase/functions/_shared/engine/` avant chaque déploiement (script npm).
 
-### `vercel.json`
+### Réécriture SPA
 
-```json
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
-}
-```
-
-> Cette réécriture renvoie toutes les routes du front (`/match/123`…) vers `index.html`, sans toucher à `/api/*`. Sans elle, un rafraîchissement sur `/match/123` donne une 404.
+Render sert des fichiers statiques : sans règle de réécriture, un rafraîchissement sur `/menu` ou `/match/123` donne une **404**. La règle se configure dans le dashboard Render (§4.1, étape 5), il n'y a pas de fichier de config dans le dépôt.
 
 ### `.env.example` (à commiter)
 
 ```bash
 # --- Client (exposées au navigateur, préfixe VITE_) ---
+# En local : dans .env.local. En production : dans Render → Environment.
 VITE_SUPABASE_URL=https://xxxxxxxx.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
 
-# --- Serveur uniquement (Vercel Functions) ---
-SUPABASE_URL=https://xxxxxxxx.supabase.co
-SUPABASE_SECRET_KEY=sb_secret_xxx
+# --- Serveur (Edge Functions) ---
+# Rien à renseigner : Supabase injecte automatiquement SUPABASE_URL et
+# SUPABASE_SERVICE_ROLE_KEY dans les fonctions déployées.
 ```
 
 ### `.gitignore` (vérifier la présence de)
@@ -107,7 +98,8 @@ dist
 .env
 .env.local
 .env*.local
-.vercel
+supabase/.temp
+supabase/.branches
 ```
 
 ### Client Supabase
@@ -130,7 +122,7 @@ export const supabase = createClient(
 2. **SQL Editor → New query** : coller `supabase/migrations/001_init.sql` ([doc 03](03-BASE-DE-DONNEES.md#2-migration-sql)) puis **Run**.
 3. **Authentication → Sign In / Providers** : activer **Allow anonymous sign-ins**.
 4. **Database → Publications** : vérifier que `rooms` et `matches` sont dans `supabase_realtime`.
-5. **Project Settings → API Keys** : copier l'URL du projet, la clé publishable et la clé secret.
+5. **Project Settings → API Keys** : copier l'URL du projet et la clé publishable (la clé secrète n'est jamais copiée ailleurs : les Edge Functions la reçoivent automatiquement).
 
 Test rapide de connexion anonyme (dans l'app ou la console du navigateur) :
 
@@ -138,6 +130,21 @@ Test rapide de connexion anonyme (dans l'app ou la console du navigateur) :
 const { data, error } = await supabase.auth.signInAnonymously();
 console.log(data.user?.id, error);
 ```
+
+### 2.1 Edge Functions
+
+```bash
+npx supabase login
+npx supabase init                              # une seule fois : crée supabase/config.toml
+npx supabase link --project-ref <ref-du-projet> # ref = xxxxxxxx dans https://xxxxxxxx.supabase.co
+npx supabase functions new match-action        # crée supabase/functions/match-action/index.ts
+npx supabase functions deploy                  # déploie toutes les fonctions
+npx supabase functions deploy match-action     # ou une seule
+```
+
+- Les fonctions sont appelables à `https://<ref>.supabase.co/functions/v1/<nom>` ; le client passe par `supabase.functions.invoke('<nom>')` ([doc 05 §5](05-API.md#5-appeler-lapi-depuis-le-client)).
+- La vérification du JWT par la passerelle Supabase reste **activée** (valeur par défaut) : un appel sans session est refusé avant d'atteindre la fonction.
+- Les dossiers qui commencent par `_` (`_shared/`) ne sont pas déployés comme fonctions.
 
 ## 3. GitHub
 
@@ -154,32 +161,35 @@ git push -u origin main
 - *Settings → Collaborators* : ajouter les membres de l'équipe.
 - *Settings → Branches* : protéger `main` (PR obligatoire, 1 relecture).
 
-## 4. Vercel
+## 4. Render
 
 ### 4.1 Premier déploiement
-1. [vercel.com/new](https://vercel.com/new) → **Import Git Repository** → choisir `dark-dungeon-fantasy-boss-battle`.
-2. Framework Preset : **Vite** (détecté automatiquement). Build : `npm run build`. Output : `dist`.
-3. **Environment Variables** : ajouter les **4 variables** de `.env.example` pour *Production*, *Preview* **et** *Development*.
-4. **Deploy**.
-5. *Project Settings → Functions → Function Region* : **Paris (cdg1)**, pour être proche de Supabase.
+1. [dashboard.render.com](https://dashboard.render.com) → **New → Static Site** → connecter le repo GitHub `dark-dungeon-fantasy-boss-battle`.
+2. Branche : `main`. Build Command : `npm ci && npm run build`. Publish Directory : `dist`.
+3. **Environment** : ajouter `VITE_SUPABASE_URL` et `VITE_SUPABASE_PUBLISHABLE_KEY`.
+4. **Deploy Static Site**.
+5. **Redirects/Rewrites** : ajouter la règle Source `/*` → Destination `/index.html`, Action **Rewrite** (indispensable pour les routes du front, voir §1).
+
+URL de production : **https://dark-dungeon-fantasy-boss-battle.onrender.com**
 
 ### 4.2 Déploiements suivants
-- Push sur `main` → déploiement en **production** automatique.
-- Chaque PR → une **URL de preview** unique, à tester avant de fusionner (ça fait partie de la DoD).
+- Push sur `main` → déploiement en **production** automatique (*Auto-Deploy* activé).
+- **Pull Request Previews** (*Settings → PR Previews*) : chaque PR obtient sa propre URL de preview, à tester avant de fusionner (ça fait partie de la DoD).
+- Les variables `VITE_…` sont intégrées **au moment du build** : après les avoir modifiées, relancer un déploiement (*Manual Deploy → Clear build cache & deploy*).
+- Les Edge Functions ne sont **pas** déployées par Render : après une modification de `supabase/functions/`, lancer `npx supabase functions deploy` (§2.1).
 
 ## 5. Développement local
 
 ```bash
-npx vercel login
-npx vercel link                  # lier le dossier au projet Vercel
-npx vercel env pull .env.local   # récupère les variables "Development"
-npx vercel dev                   # front (Vite) + /api sur http://localhost:3000
+cp .env.example .env.local   # renseigner l'URL et la clé publishable Supabase
+npm run dev                  # front sur http://localhost:5173
 ```
 
 | Commande | Quand l'utiliser |
 |---|---|
-| `npx vercel dev` | Tout ce qui touche à `/api` (multijoueur) |
-| `npm run dev` | Travail sur le front ou Phaser uniquement, plus rapide (les appels `/api` échouent) |
+| `npm run dev` | Front et Phaser. Les appels aux Edge Functions partent vers le projet Supabase en ligne |
+| `npx supabase functions deploy <nom>` | Tester une fonction modifiée sans Docker : la déployer puis rejouer le scénario avec `npm run dev` |
+| `npx supabase start` puis `npx supabase functions serve` | Exécuter les fonctions en local (**Docker requis**) |
 | `npm test` | Moteur de combat en mode watch |
 | `npm run build` | Vérifier que le build passe **avant chaque PR** |
 
@@ -187,7 +197,9 @@ npx vercel dev                   # front (Vite) + /api sur http://localhost:3000
 
 - [ ] `npm run build` passe en local
 - [ ] `npx vitest run` passe
-- [ ] Les 4 variables d'environnement sont présentes sur Vercel
+- [ ] Les 2 variables `VITE_…` sont présentes sur Render
+- [ ] La règle de réécriture `/*` → `/index.html` est active (rafraîchir `/menu` ne donne pas de 404)
+- [ ] Les Edge Functions sont déployées avec la même version de `shared/` que le front
 - [ ] La preview de la PR est testée : connexion, solo, multi sur 2 navigateurs
 - [ ] Aucune clé secrète dans le code (`git grep -n "sb_secret"` ne renvoie rien)
 - [ ] `docs/CREDITS.md` est à jour si des assets ont été ajoutés
@@ -197,15 +209,19 @@ npx vercel dev                   # front (Vite) + /api sur http://localhost:3000
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
-| 404 en rafraîchissant une page du jeu | Réécriture SPA absente | Ajouter `rewrites` dans `vercel.json` |
-| `/api/...` renvoie 500 « supabaseUrl is required » | Variables serveur absentes | Les ajouter sur Vercel puis **redéployer** (les variables ne s'appliquent qu'aux nouveaux déploiements) |
-| `ERR_MODULE_NOT_FOUND` dans les logs d'une Function | Import relatif sans extension | Écrire `from './turns.js'` dans `api/` et `shared/` |
-| `import.meta.env.VITE_…` vaut `undefined` | Variable sans préfixe `VITE_` ou serveur non relancé | Vérifier le préfixe, relancer `vercel dev` |
+| 404 en rafraîchissant une page du jeu | Réécriture SPA absente | Render → **Redirects/Rewrites** : `/*` → `/index.html` (Rewrite) |
+| Le front ne voit pas une variable modifiée sur Render | Les `VITE_…` sont figées au build | **Manual Deploy → Clear build cache & deploy** |
+| Une Edge Function renvoie 500 « supabaseUrl is required » | Code qui lit un autre nom de variable | Utiliser `Deno.env.get('SUPABASE_URL')` et `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` |
+| `Module not found` au déploiement d'une fonction | Import sans extension, ou `.js` vers un `.ts` sans `sloppy-imports` | Vérifier `supabase/functions/deno.json` ; imports `.ts` dans `supabase/functions/` |
+| Erreur CORS dans la console en appelant une fonction | Requête `OPTIONS` non gérée | Répondre au preflight avec `corsHeaders` ([doc 05 §4](05-API.md#4-code-commun)) |
+| 401 sur toutes les fonctions | Pas de session anonyme au moment de l'appel | Appeler `signInAnonymously` avant, passer par `supabase.functions.invoke` |
+| `import.meta.env.VITE_…` vaut `undefined` | Variable sans préfixe `VITE_` ou serveur non relancé | Vérifier le préfixe, relancer `npm run dev` |
 | « Anonymous sign-ins are disabled » | Option non activée | Supabase → Authentication → activer les connexions anonymes |
 | Aucun événement Realtime reçu | Table absente de la publication, RLS qui bloque, ou abonnement fait avant d'être participant | Vérifier la publication et la policy `select` ; s'abonner après le `join` |
 | Realtime OK à la maison, KO à l'école | WebSockets filtrés par le réseau | Plan B polling ([doc 04 §10](04-MULTIJOUEUR.md#10-plan-b--polling)) ou partage de connexion 4G |
 | Sprites flous | Lissage actif | `pixelArt: true` dans la config Phaser ; `image-rendering: pixelated` en CSS |
 | Le jeu Phaser apparaît en double en dev | React StrictMode monte le composant 2 fois | `return () => game.destroy(true)` dans le `useLayoutEffect` |
-| `new row violates row-level security policy` | Écriture client dans une table réservée à l'API | Passer par `/api`, ou vérifier `id = auth.uid()` |
+| `new row violates row-level security policy` | Écriture client dans une table réservée à l'API | Passer par une Edge Function, ou vérifier `id = auth.uid()` |
 | Projet Supabase « Paused » | 7 jours d'inactivité (offre gratuite) | Dashboard → **Restore project** (quelques minutes) |
-| Logs d'une Function | — | Vercel → projet → **Logs** (filtrer par `/api/match/action`) |
+| Logs d'une Edge Function | — | Supabase → **Edge Functions** → la fonction → **Logs** |
+| Logs du build du front | — | Render → le Static Site → **Events** / **Logs** |
