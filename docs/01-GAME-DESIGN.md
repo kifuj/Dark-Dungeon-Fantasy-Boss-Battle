@@ -101,6 +101,14 @@ Un triangle (comme Feu / Plante / Eau) plus un duo opposé :
 | `life_drain` | Drain vital | Ombre | 40 | 5 | 0 | Soigne 50 % des dégâts infligés |
 | `holy_ray` | Rayon sacré | Lumière | 50 | 10 | 0 | — |
 | `blessing` | Bénédiction | Lumière | — | 2 | 0 | DEF ×1,25 jusqu'à la fin du combat |
+| `bite` | Morsure | Neutre | 60 | 8 | 0 | — |
+| `rock_throw` | Jet de roc | Neutre | 70 | 5 | 0 | — |
+| `harden` | Durcissement | Neutre | — | 2 | 0 | DEF ×1,25 jusqu'à la fin du combat |
+| `shell_guard` | Carapace | Eau | — | 2 | 0 | DEF ×1,25 jusqu'à la fin du combat |
+| `soothing_song` | Chant apaisant | Eau | — | 3 | 0 | Soigne 30 % des PV max |
+| `thorn_storm` | Tempête d'épines | Nature | 80 | 3 | 0 | — |
+| `sunburst` | Éclat solaire | Lumière | 80 | 3 | 0 | — |
+| `soul_leech` | Siphon d'âme | Ombre | 60 | 4 | 0 | Soigne 50 % des dégâts infligés |
 
 > `∞` : la compétence ne s'épuise jamais, ce qui garantit qu'un monstre a toujours une action possible.
 
@@ -117,9 +125,21 @@ Les sprites proposés sont indicatifs : **adapter selon le pack choisi** (voir [
 | `skeleton` | Squelette | Ombre | 50 | 55 | 55 | 40 | shadow_claw, life_drain, strike | Commun |
 | `flying_eye` | Œil volant | Ombre | 40 | 60 | 35 | 75 | shadow_claw, quick_strike, life_drain | Commun |
 | `slime` | Slime | Nature | 65 | 40 | 50 | 30 | vine, regrowth, strike | Commun |
+| `imp` | Diablotin | Feu | 45 | 65 | 35 | 70 | fireball, quick_strike, shadow_claw | Commun |
+| `crab` | Crabe des abysses | Eau | 55 | 60 | 70 | 25 | water_jet, shell_guard, strike | Commun |
+| `wolf` | Loup sylvestre | Nature | 55 | 65 | 40 | 65 | vine, bite, quick_strike | Commun |
+| `wisp` | Feu follet | Lumière | 40 | 60 | 35 | 80 | holy_ray, quick_strike, blessing | Commun |
+| `ghost` | Spectre | Ombre | 45 | 60 | 45 | 60 | soul_leech, shadow_claw, quick_strike | Commun |
 | `knight` | Chevalier déchu | Lumière | 65 | 55 | 65 | 35 | holy_ray, blessing, strike | Rare |
+| `golem` | Golem de pierre | Neutre | 80 | 60 | 75 | 20 | rock_throw, harden, strike | Rare |
+| `siren` | Sirène | Eau | 60 | 60 | 50 | 60 | deluge, water_jet, soothing_song | Rare |
+| `treant` | Tréant | Nature | 75 | 60 | 65 | 25 | thorn_storm, vine, regrowth | Rare |
+| `griffin` | Griffon | Lumière | 60 | 65 | 50 | 65 | sunburst, holy_ray, bite | Rare |
 | `demon` | Démon mineur | Feu | 90 | 70 | 60 | 50 | inferno, fireball, shadow_claw | **Boss** |
 | `lich` | Liche | Ombre | 85 | 75 | 55 | 55 | life_drain, shadow_claw, holy_ray | **Boss** |
+| `dragon` | Dragon ancien | Feu | 95 | 75 | 65 | 45 | inferno, bite, rock_throw | **Boss** |
+
+> 20 espèces (US-29). Chaque élément compte au moins 2 espèces non-boss, pour que le draft du duel (US-18) offre toujours des choix variés. Les boss restent réservés au solo.
 
 ## 6. Boucle roguelike (solo)
 

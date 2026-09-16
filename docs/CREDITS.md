@@ -8,7 +8,7 @@ Dark Dungeon Fantasy Boss battle est un projet étudiant non commercial. Merci a
 
 | Asset / pack | Auteur | Lien | Licence | Utilisé pour | Dans le repo ? |
 |---|---|---|---|---|---|
-| Sprites des 10 monstres (`public/assets/sprites/monsters/`) | Équipe groupe 3 | `tools/art/monsters.mjs` | CC0 (création de l'équipe) | Tous les monstres du bestiaire | Oui |
+| Sprites des 20 monstres (`public/assets/sprites/monsters/`) | Équipe groupe 3 | `tools/art/monsters.mjs` | CC0 (création de l'équipe) | Tous les monstres du bestiaire | Oui |
 | Icônes d'élément (`public/assets/ui/elements.png`) | Équipe groupe 3 | `tools/art/icons.mjs` | CC0 (création de l'équipe) | Encadrés de combat, cartes de starter | Oui |
 | Décor de combat (`public/assets/backgrounds/dungeon.png`) | Équipe groupe 3 | `tools/art/background.mjs` | CC0 (création de l'équipe) | Fond de la scène de combat | Oui |
 
