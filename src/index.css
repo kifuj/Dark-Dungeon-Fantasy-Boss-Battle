@@ -857,3 +857,28 @@ h2,
   text-transform: uppercase;
   color: var(--ember);
 }
+
+.forfeit-button,
+.forfeit-confirm .button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.forfeit-button {
+  width: min(100%, 260px);
+  border-color: var(--blood);
+  color: rgba(194, 181, 154, 0.8);
+}
+
+.forfeit-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
+  border: 3px solid var(--blood);
+  background: var(--anthracite);
+  text-align: center;
+}
+
+.forfeit-confirm p { margin: 0; }

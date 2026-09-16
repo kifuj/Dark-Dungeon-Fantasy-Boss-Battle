@@ -57,23 +57,23 @@ Inspiré de *PokeRogue*.
 | Critères d'acceptation | [US détaillées](docs/agile/PRODUCT-BACKLOG.md#5-user-stories-détaillées) |
 | Definition of Ready (DoR) | [DoR](docs/agile/PRODUCT-BACKLOG.md#1-definition-of-ready-dor) |
 | Definition of Done (DoD) | [DoD](docs/agile/PRODUCT-BACKLOG.md#2-definition-of-done-dod) |
-| Estimation (Planning Poker, Fibonacci) | [Planning Poker](docs/agile/PRODUCT-BACKLOG.md#4-planning-poker) · [séance du sprint 2](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) |
+| Estimation (Planning Poker, Fibonacci) | [Planning Poker](docs/agile/PRODUCT-BACKLOG.md#4-planning-poker) · [séance du sprint 2](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) · [séance du sprint 3](docs/agile/SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint) |
 
 ### Sprints
 
 | | [Sprint 1](docs/agile/SPRINT-1.md) — Le socle | [Sprint 2](docs/agile/SPRINT-2.md) — Premier combat jouable | [Sprint 3](docs/agile/SPRINT-3.md) — Multijoueur | [Sprint 4](docs/agile/SPRINT-4.md) — Roguelike et finitions |
 |---|---|---|---|---|
-| **État** | Terminé — 12 / 18 pts | Terminé — 18 / 18 pts | À venir (mer. après-midi) | À venir (jeu. matin) |
+| **État** | Terminé — 12 / 18 pts | Terminé — 18 / 18 pts | Terminé — 18 / 18 pts (+3 pts d'US-02) | À venir (jeu. matin) |
 | **Sprint Goal** | [lien](docs/agile/SPRINT-1.md#-sprint-goal) | [lien](docs/agile/SPRINT-2.md#-sprint-goal) | [lien](docs/agile/SPRINT-3.md#-sprint-goal) | [lien](docs/agile/SPRINT-4.md#-sprint-goal) |
 | **Sprint Backlog** | [lien](docs/agile/SPRINT-1.md#-sprint-backlog) | [lien](docs/agile/SPRINT-2.md#-sprint-backlog) | [lien](docs/agile/SPRINT-3.md#-sprint-backlog) | [lien](docs/agile/SPRINT-4.md#-sprint-backlog) |
 | **Qui a fait quoi** | [lien](docs/agile/SPRINT-1.md#-répartition-des-tâches) | [lien](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) | [lien](docs/agile/SPRINT-3.md#-répartition-des-tâches) | [lien](docs/agile/SPRINT-4.md#-répartition-des-tâches) |
-| **Tâches terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-terminées) | — | — |
-| **Tâches non terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-non-terminées) | — | — |
-| **Problèmes rencontrés** | [lien](docs/agile/SPRINT-1.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-2.md#-problèmes-rencontrés) | — | — |
-| **Décisions prises** | [lien](docs/agile/SPRINT-1.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-2.md#-décisions-prises-pendant-le-sprint) | — | — |
-| **Daily Scrums** | [lien](docs/agile/SPRINT-1.md#-daily-scrums) | [lien](docs/agile/SPRINT-2.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-3.md#-daily-scrums) | [lien](docs/agile/SPRINT-4.md#-daily-scrums) |
-| **Sprint Review** | [lien](docs/agile/SPRINT-1.md#-sprint-review-t-15-min) | [lien](docs/agile/SPRINT-2.md#-sprint-review) | [lien](docs/agile/SPRINT-3.md#-sprint-review-t-15-min) | [lien](docs/agile/SPRINT-4.md#-sprint-review-t-15-min) |
-| **Rétrospective `Keep / Drop / Try`** | [lien](docs/agile/SPRINT-1.md#-rétrospective--keep--drop--try) | [lien](docs/agile/SPRINT-2.md#-rétrospective-keep-drop-try) | [lien](docs/agile/SPRINT-3.md#-rétrospective--keep--drop--try) | [lien](docs/agile/SPRINT-4.md#-rétrospective--keep--drop--try) |
+| **Tâches terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-terminées) | [lien](docs/agile/SPRINT-3.md#-tâches-terminées) | — |
+| **Tâches non terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-3.md#-tâches-non-terminées) | — |
+| **Problèmes rencontrés** | [lien](docs/agile/SPRINT-1.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-2.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-3.md#-problèmes-rencontrés) | — |
+| **Décisions prises** | [lien](docs/agile/SPRINT-1.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-2.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-3.md#-décisions-prises-pendant-le-sprint) | — |
+| **Daily Scrums** | [lien](docs/agile/SPRINT-1.md#-daily-scrums) | [lien](docs/agile/SPRINT-2.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-3.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-4.md#-daily-scrums) |
+| **Sprint Review** | [lien](docs/agile/SPRINT-1.md#-sprint-review-t-15-min) | [lien](docs/agile/SPRINT-2.md#-sprint-review) | [lien](docs/agile/SPRINT-3.md#-sprint-review) | [lien](docs/agile/SPRINT-4.md#-sprint-review-t-15-min) |
+| **Rétrospective `Keep / Drop / Try`** | [lien](docs/agile/SPRINT-1.md#-rétrospective--keep--drop--try) | [lien](docs/agile/SPRINT-2.md#-rétrospective-keep-drop-try) | [lien](docs/agile/SPRINT-3.md#-rétrospective-keep-drop-try) | [lien](docs/agile/SPRINT-4.md#-rétrospective--keep--drop--try) |
 
 Vue d'ensemble du projet (vision, rôles, planning, vélocité, risques) : [`docs/00-PROJET-GLOBAL.md`](docs/00-PROJET-GLOBAL.md).
 
@@ -92,6 +92,15 @@ Tests (moteur de combat `shared/` + composants React `src/tests/`) :
 ```bash
 npm test          # mode veille
 npm run test:run  # une seule passe
+npm run test:multi  # scénarios multijoueur joués contre le vrai Supabase (docs/04 §11)
+```
+
+Serveur autoritaire (Supabase Edge Functions) : `shared/` est recopié dans
+`supabase/functions/_shared/game/` avant chaque déploiement.
+
+```bash
+npm run functions:sync    # recopie shared/ (extensions .js → .ts pour Deno)
+npm run functions:deploy  # sync + npx supabase functions deploy
 ```
 
 Les images du jeu (monstres, icônes d'élément, décor) sont **dessinées par notre propre code** et commitées.
@@ -105,9 +114,11 @@ Le guide complet (dont le déploiement des Edge Functions) est dans [07-INSTALLA
 
 ## 👥 Équipe
 
-| Rôle | Nom |
-|---|---|
-| Product Owner | *à compléter* |
-| Scrum Master | *à compléter* |
-| Développeur·se | *à compléter* |
-| Développeur·se | *à compléter* |
+| Rôle | Nom | Compte GitHub |
+|---|---|---|
+| Product Owner | Mattéo | [`kifuj`](https://github.com/kifuj) |
+| Scrum Master | Paul | [`Paul-B-O`](https://github.com/Paul-B-O) |
+| Développeur | Owen | [`Owen-Cazaux`](https://github.com/Owen-Cazaux) |
+| Développeur | Donovan | [`donovanmessager0-tech`](https://github.com/donovanmessager0-tech) |
+
+> Dans une équipe de 4, le PO et le SM développent aussi (voir [00-PROJET-GLOBAL §5](docs/00-PROJET-GLOBAL.md#5-rôles-scrum)).

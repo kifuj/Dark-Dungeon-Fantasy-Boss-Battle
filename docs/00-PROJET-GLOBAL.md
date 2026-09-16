@@ -48,9 +48,9 @@
 
 | Rôle | Responsabilités | Nom |
 |---|---|---|
-| **Product Owner** | Tient le Product Backlog, priorise, valide les critères d'acceptation, présente la Sprint Review | |
-| **Scrum Master** | Anime le Planning Poker, les dailies (toutes les heures), la rétro ; lève les blocages ; vérifie que la doc est à jour | |
-| **Développeurs** | Découpent les US en tâches, développent, testent, se relisent entre eux | |
+| **Product Owner** | Tient le Product Backlog, priorise, valide les critères d'acceptation, présente la Sprint Review | **Mattéo** (`kifuj`) |
+| **Scrum Master** | Anime le Planning Poker, les dailies (toutes les heures), la rétro ; lève les blocages ; vérifie que la doc est à jour | **Paul** (`Paul-B-O`) |
+| **Développeurs** | Découpent les US en tâches, développent, testent, se relisent entre eux | **Owen** (`Owen-Cazaux`), **Donovan** (`donovanmessager0-tech`), + le PO et le SM |
 
 > Dans une équipe de 3 ou 4 personnes, le PO et le SM développent aussi.
 
@@ -69,7 +69,7 @@
 |---|---|---|---|
 | 1 ⚠️ | Mar. 15/09 après-midi | Le squelette est en ligne sur Render et un combat 1v1 se résout correctement dans les tests — **partiellement atteint** (Supabase non configuré) | [SPRINT-1](agile/SPRINT-1.md) |
 | 2 ✅ | Mer. 16/09 matin | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites — **atteint** | [SPRINT-2](agile/SPRINT-2.md) |
-| 3 | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire | [SPRINT-3](agile/SPRINT-3.md) |
+| 3 ✅ | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire — **atteint** (Supabase en ligne, 5 Edge Functions déployées) | [SPRINT-3](agile/SPRINT-3.md) |
 | 4 | Jeu. 17/09 matin, **gel du code à 13h** | La boucle roguelike est complète et le jeu est présentable (US-09 en bonus) | [SPRINT-4](agile/SPRINT-4.md) |
 | — | Jeu. 17/09 13h30 | 📧 Rendu : lien GitHub + fichiers `.md` | |
 | — | Jeu. 17/09 après-midi | 🎤 Présentation | |
@@ -92,19 +92,19 @@
 |---|---|---|---|
 | 1 | 18 | **12** | US-01 et US-02 non terminées : elles dépendaient de comptes externes (Render, Supabase) plutôt que de code |
 | 2 | 18 | **18** | Sprint Goal atteint ; mode solo jouable en ligne. Les 2 US du sprint 1 restent ouvertes |
-| 3 | 18 | | Les 30 premières minutes sont réservées à US-01 et US-02 (reste du sprint 1) |
+| 3 | 18 | **18** (+ 3 pts d'US-02 récupérés du sprint 1) | Sprint Goal atteint : duel en ligne complet entre deux navigateurs. US-01 reste ouverte (configuration Render) |
 | 4 | 12 | | Engagement réduit : sprint court (gel du code + rendu), US-09 en bonus |
 
-**Vélocité moyenne après 2 sprints : 15 points.** L'engagement du sprint 3 est maintenu à 18 points car les 6 points manquants du sprint 1 correspondaient à de la configuration de services externes, pas à de la charge de développement — mais US-01 et US-02 doivent être fermées en premier.
+**Vélocité moyenne après 3 sprints : 16 points** (12, 18, 18). L'équipe livre bien ce qu'elle engage en développement ; ce qui traîne depuis le sprint 1, c'est uniquement la **configuration des services externes** (US-01 : règle de réécriture Render, variables d'environnement, protection de `main`). D'où l'action de la rétro du sprint 3 : les 30 premières minutes du sprint 4 y sont consacrées, avant toute nouvelle US. L'engagement du sprint 4 reste à **12 points** : le créneau est amputé par la préparation du rendu de 13h30.
 
 ## 8. Risques
 
 | Risque | Probabilité | Impact | Parade |
 |---|---|---|---|
-| Le multijoueur prend plus de temps que prévu | Haute | Haut | Moteur partagé testé dès le sprint 1 ; plan B par polling (voir 04) ; le solo reste livrable seul |
+| ~~Le multijoueur prend plus de temps que prévu~~ | — | — | **Levé au sprint 3** : duel complet livré et testé sur deux navigateurs. Le plan B polling est resté actif en permanence |
 | Conflits Git dans une petite équipe | Moyenne | Moyen | Branches courtes, PR petites, un pôle par dossier |
 | Assets de styles ou de tailles hétérogènes | Moyenne | Moyen | Choisir **un** pack de base au sprint 1 et fixer une taille de sprite |
-| Variables d'environnement oubliées sur Render, ou Edge Functions non redéployées | Moyenne | Haut | Checklist de déploiement (doc 07 §6), `.env.example` à jour |
+| Variables d'environnement oubliées sur Render, ou Edge Functions non redéployées | **Avérée** | Haut | **Réalisée au sprint 3** : les clés Supabase ne sont pas sur Render, le multijoueur ne marche donc pas encore sur la production. Première tâche du sprint 4 (checklist doc 07 §6) |
 | Projet Supabase en pause le jour J | Faible | Haut | Ouvrir le dashboard la veille et le matin |
 | Sprint 4 trop court pour tout finir | Haute | Haut | Engagement réduit à 12 pts, US-09 en objectif bonus, gel du code à 13h |
 | Démo qui plante en direct | Moyenne | Haut | Vidéo de secours enregistrée au sprint 4, deux navigateurs préparés |

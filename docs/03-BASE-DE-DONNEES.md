@@ -194,6 +194,9 @@ alter publication supabase_realtime add table public.rooms, public.matches;
 
 ## 3. Configuration du dashboard Supabase
 
+> ✅ **Fait au sprint 3 (16/09/2026)** sur le projet `wdjhbwdtlkpizzfhcsoj` : migration exécutée (7 tables + la vue `leaderboard`), connexions anonymes activées, `rooms` et `matches` présentes dans la publication `supabase_realtime`. Vérifié par `npm run test:multi`.
+> Il reste à renseigner `VITE_SUPABASE_URL` et `VITE_SUPABASE_PUBLISHABLE_KEY` **dans Render** (voir [07 §4.1](07-INSTALLATION-DEPLOIEMENT.md#41-premier-déploiement)).
+
 1. **Authentication → Sign In / Providers → Allow anonymous sign-ins** : activer.
 2. **SQL Editor** : coller et exécuter `001_init.sql`.
 3. **Database → Publications → supabase_realtime** : vérifier que `rooms` et `matches` sont cochées.
