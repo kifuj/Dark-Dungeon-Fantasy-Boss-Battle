@@ -11,11 +11,12 @@ import { resolveTurn } from '../../shared/engine/battle.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
 import type { MatchRow } from '../../shared/types.js';
 
-const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, loadProfile } = vi.hoisted(() => ({
+const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, forfeitMatch, loadProfile } = vi.hoisted(() => ({
   subscribeToMatch: vi.fn(),
   hasPlayedThisTurn: vi.fn(),
   fetchUsernames: vi.fn(),
   sendAction: vi.fn(),
+  forfeitMatch: vi.fn(),
   loadProfile: vi.fn(),
 }));
 
@@ -25,6 +26,7 @@ vi.mock('../lib/rooms.ts', () => ({ fetchUsernames, fetchRoom: vi.fn() }));
 vi.mock('../lib/api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../lib/api.ts')>()),
   sendAction,
+  forfeitMatch,
 }));
 vi.mock('../lib/session.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../lib/session.ts')>()),
@@ -170,6 +172,43 @@ describe('US-19 — jouer un combat en ligne', () => {
     const guest = await renderMatch('guest');
     await guest.push(finished);
     expect(screen.getByRole('heading', { name: /Défaite/ })).toBeDefined();
+  });
+
+  it('demande confirmation avant d’abandonner (US-23 CA1)', async () => {
+    const { user, push } = await renderMatch();
+    await push(BASE);
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+
+    await user.click(screen.getByRole('button', { name: /^Abandonner/ }));
+    expect(forfeitMatch).not.toHaveBeenCalled(); // un seul clic n'abandonne pas
+    expect(screen.getByRole('alertdialog')).toBeDefined();
+
+    await user.click(screen.getByRole('button', { name: /Continuer le duel/ }));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+
+    forfeitMatch.mockResolvedValue({ status: 'finished' });
+    await user.click(screen.getByRole('button', { name: /^Abandonner/ }));
+    await user.click(screen.getByRole('button', { name: /Confirmer l’abandon/ }));
+    expect(forfeitMatch).toHaveBeenCalledWith('match-1');
+  });
+
+  it('affiche « Victoire par abandon » chez l’adversaire (US-23 CA2)', async () => {
+    const { push } = await renderMatch('guest');
+    await push(BASE);
+    await push({
+      ...BASE,
+      phase: 'finished',
+      winner_id: 'guest',
+      last_events: [
+        { type: 'forfeit', seat: 0 },
+        { type: 'battle_end', winnerSeat: 1 },
+      ],
+      version: 2,
+    });
+    await act(async () => EventBus.emit('events-played'));
+
+    expect(screen.getByRole('heading', { name: /Victoire par abandon/ })).toBeDefined();
+    expect(screen.getByText(/Mattéo a abandonné le duel/)).toBeDefined();
   });
 
   it('affiche « En attente de l’adversaire… » après un rafraîchissement si le tour est déjà joué (US-21 CA2)', async () => {

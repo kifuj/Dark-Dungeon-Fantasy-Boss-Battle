@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ApiError, errorMessage, sendAction } from '../lib/api.ts';
+import { ApiError, errorMessage, forfeitMatch, sendAction } from '../lib/api.ts';
 import { useProfile } from '../lib/profile.tsx';
 import { hasPlayedThisTurn } from '../lib/matches.ts';
 import { subscribeToMatch } from '../lib/realtime.ts';
@@ -34,6 +34,7 @@ export function OnlineMatch() {
   const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const [missing, setMissing] = useState(false);
+  const [confirmingForfeit, setConfirmingForfeit] = useState(false);
 
   const versionRef = useRef<number | null>(null);
   const pendingRef = useRef<MatchRow | null>(null);
@@ -137,6 +138,18 @@ export function OnlineMatch() {
     [ui],
   );
 
+  async function forfeit() {
+    const row = matchRef.current;
+    if (!row) return;
+    setConfirmingForfeit(false);
+    setError(null);
+    try {
+      await forfeitMatch(row.id); // la fin de partie revient aux deux joueurs par le Realtime
+    } catch (failure) {
+      setError(errorMessage(failure));
+    }
+  }
+
   if (!match) {
     return (
       <main className="page centered-page">
@@ -153,6 +166,7 @@ export function OnlineMatch() {
 
   const opponentId = seat === 0 ? match.player2_id : match.player1_id;
   const won = match.winner_id === profile?.id;
+  const forfeited = match.last_events.some((event) => event.type === 'forfeit'); // US-23 CA2
 
   return (
     <main className="page solo-page">
@@ -165,8 +179,16 @@ export function OnlineMatch() {
 
       {ui === 'finished' ? (
         <section className="run-over" aria-label="Fin du duel">
-          <h2>{won ? 'Victoire !' : 'Défaite…'}</h2>
-          <p>{won ? `Vous l’emportez contre ${names[opponentId] ?? 'votre adversaire'}.` : `${names[opponentId] ?? 'Votre adversaire'} remporte le duel.`}</p>
+          <h2>{won ? (forfeited ? 'Victoire par abandon' : 'Victoire !') : 'Défaite…'}</h2>
+          <p>
+            {forfeited
+              ? won
+                ? `${names[opponentId] ?? 'Votre adversaire'} a abandonné le duel.`
+                : 'Vous avez abandonné le duel.'
+              : won
+                ? `Vous l’emportez contre ${names[opponentId] ?? 'votre adversaire'}.`
+                : `${names[opponentId] ?? 'Votre adversaire'} remporte le duel.`}
+          </p>
           <div className="run-over-actions">
             <Link to="/multi" className="button">
               <span>Nouveau duel</span>
@@ -188,6 +210,26 @@ export function OnlineMatch() {
               <li key={`${line}-${i}`}>{line}</li>
             ))}
           </ul>
+          {confirmingForfeit ? (
+            <div className="forfeit-confirm" role="alertdialog" aria-label="Confirmer l’abandon">
+              <p>Abandonner le duel ? Votre adversaire gagne la partie.</p>
+              <div className="run-over-actions">
+                <button type="button" className="button" onClick={forfeit}>
+                  <span>Confirmer l’abandon</span>
+                  <span className="button-arrow" aria-hidden="true">⚑</span>
+                </button>
+                <button type="button" className="button" onClick={() => setConfirmingForfeit(false)}>
+                  <span>Continuer le duel</span>
+                  <span className="button-arrow" aria-hidden="true">↩</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" className="button forfeit-button" onClick={() => setConfirmingForfeit(true)}>
+              <span>Abandonner</span>
+              <span className="button-arrow" aria-hidden="true">⚑</span>
+            </button>
+          )}
         </>
       )}
     </main>
