@@ -13,6 +13,9 @@ import { ActionMenu } from '../components/ActionMenu.tsx';
 
 type UiState = 'loading' | 'choosing' | 'waiting' | 'animating' | 'finished';
 
+/** Un tour animé dure moins de 4 s (US-09 CA4) : au-delà, on considère la scène en échec. */
+const ANIMATION_TIMEOUT_MS = 4500;
+
 const STATUS_TEXT: Record<UiState, string> = {
   loading: 'Chargement du duel…',
   choosing: 'À vous de jouer.',
@@ -40,6 +43,7 @@ export function OnlineMatch() {
   const pendingRef = useRef<MatchRow | null>(null);
   const matchRef = useRef<MatchRow | null>(null);
   const seatRef = useRef<Seat>(0);
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const seat: Seat = match && profile && match.player2_id === profile.id ? 1 : 0;
 
@@ -57,6 +61,8 @@ export function OnlineMatch() {
   /** Fin d'animation : on applique l'état du tour résolu, puis on rouvre le menu. */
   useEffect(() => {
     const onEventsPlayed = () => {
+      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
       const row = pendingRef.current;
       pendingRef.current = null;
       if (!row) return;
@@ -68,6 +74,7 @@ export function OnlineMatch() {
     EventBus.on('events-played', onEventsPlayed);
     return () => {
       EventBus.off('events-played', onEventsPlayed);
+      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
     };
   }, []);
 
@@ -101,6 +108,10 @@ export function OnlineMatch() {
       setLog(describeEvents(row.last_events, mySeat));
       setUi('animating');
       EventBus.emit('play-events', row.last_events);
+      // Filet de sécurité : si la scène ne rend jamais la main (canvas en échec, onglet
+      // en arrière-plan…), on applique quand même le tour — un duel ne doit pas se figer.
+      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = setTimeout(() => EventBus.emit('events-played'), ANIMATION_TIMEOUT_MS);
     };
 
     const stop = subscribeToMatch(matchId, onRow);
