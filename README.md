@@ -45,6 +45,38 @@ Inspiré de *PokeRogue*.
 | 🟦 | [Product Backlog](docs/agile/PRODUCT-BACKLOG.md) | User stories, critères d'acceptation, DoR, DoD, estimations |
 | 🟩 | [Sprint 1](docs/agile/SPRINT-1.md) · [Sprint 2](docs/agile/SPRINT-2.md) · [Sprint 3](docs/agile/SPRINT-3.md) · [Sprint 4](docs/agile/SPRINT-4.md) | Sprint goal, backlog, dailies, review, rétro |
 
+## 📋 Documentation Scrum (TP Agile)
+
+> Tout le travail Scrum est écrit en Markdown dans [`docs/agile/`](docs/agile/). Un fichier par sprint, plus le Product Backlog.
+
+### Product Backlog — [`docs/agile/PRODUCT-BACKLOG.md`](docs/agile/PRODUCT-BACKLOG.md)
+
+| Élément | Lien direct |
+|---|---|
+| User Stories (format « En tant que… Je veux… Afin de… ») | [Vue d'ensemble](docs/agile/PRODUCT-BACKLOG.md#3-vue-densemble) · [US détaillées](docs/agile/PRODUCT-BACKLOG.md#5-user-stories-détaillées) |
+| Critères d'acceptation | [US détaillées](docs/agile/PRODUCT-BACKLOG.md#5-user-stories-détaillées) |
+| Definition of Ready (DoR) | [DoR](docs/agile/PRODUCT-BACKLOG.md#1-definition-of-ready-dor) |
+| Definition of Done (DoD) | [DoD](docs/agile/PRODUCT-BACKLOG.md#2-definition-of-done-dod) |
+| Estimation (Planning Poker, Fibonacci) | [Planning Poker](docs/agile/PRODUCT-BACKLOG.md#4-planning-poker) · [séance du sprint 2](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) |
+
+### Sprints
+
+| | [Sprint 1](docs/agile/SPRINT-1.md) — Le socle | [Sprint 2](docs/agile/SPRINT-2.md) — Premier combat jouable | [Sprint 3](docs/agile/SPRINT-3.md) — Multijoueur | [Sprint 4](docs/agile/SPRINT-4.md) — Roguelike et finitions |
+|---|---|---|---|---|
+| **État** | Terminé — 12 / 18 pts | Terminé — 18 / 18 pts | À venir (mer. après-midi) | À venir (jeu. matin) |
+| **Sprint Goal** | [lien](docs/agile/SPRINT-1.md#-sprint-goal) | [lien](docs/agile/SPRINT-2.md#-sprint-goal) | [lien](docs/agile/SPRINT-3.md#-sprint-goal) | [lien](docs/agile/SPRINT-4.md#-sprint-goal) |
+| **Sprint Backlog** | [lien](docs/agile/SPRINT-1.md#-sprint-backlog) | [lien](docs/agile/SPRINT-2.md#-sprint-backlog) | [lien](docs/agile/SPRINT-3.md#-sprint-backlog) | [lien](docs/agile/SPRINT-4.md#-sprint-backlog) |
+| **Qui a fait quoi** | [lien](docs/agile/SPRINT-1.md#-répartition-des-tâches) | [lien](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) | [lien](docs/agile/SPRINT-3.md#-répartition-des-tâches) | [lien](docs/agile/SPRINT-4.md#-répartition-des-tâches) |
+| **Tâches terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-terminées) | — | — |
+| **Tâches non terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-non-terminées) | — | — |
+| **Problèmes rencontrés** | [lien](docs/agile/SPRINT-1.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-2.md#-problèmes-rencontrés) | — | — |
+| **Décisions prises** | [lien](docs/agile/SPRINT-1.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-2.md#-décisions-prises-pendant-le-sprint) | — | — |
+| **Daily Scrums** | [lien](docs/agile/SPRINT-1.md#-daily-scrums) | [lien](docs/agile/SPRINT-2.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-3.md#-daily-scrums) | [lien](docs/agile/SPRINT-4.md#-daily-scrums) |
+| **Sprint Review** | [lien](docs/agile/SPRINT-1.md#-sprint-review-t-15-min) | [lien](docs/agile/SPRINT-2.md#-sprint-review) | [lien](docs/agile/SPRINT-3.md#-sprint-review-t-15-min) | [lien](docs/agile/SPRINT-4.md#-sprint-review-t-15-min) |
+| **Rétrospective `Keep / Drop / Try`** | [lien](docs/agile/SPRINT-1.md#-rétrospective--keep--drop--try) | [lien](docs/agile/SPRINT-2.md#-rétrospective-keep-drop-try) | [lien](docs/agile/SPRINT-3.md#-rétrospective--keep--drop--try) | [lien](docs/agile/SPRINT-4.md#-rétrospective--keep--drop--try) |
+
+Vue d'ensemble du projet (vision, rôles, planning, vélocité, risques) : [`docs/00-PROJET-GLOBAL.md`](docs/00-PROJET-GLOBAL.md).
+
 ## 🚀 Démarrage rapide
 
 ```bash

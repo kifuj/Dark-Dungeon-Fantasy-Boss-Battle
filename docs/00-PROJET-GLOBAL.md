@@ -67,8 +67,8 @@
 
 | Sprint | Créneau *(à ajuster)* | Sprint Goal proposé | Doc |
 |---|---|---|---|
-| 1 | Mar. 15/09 après-midi | Le squelette est en ligne sur Render et un combat 1v1 se résout correctement dans les tests | [SPRINT-1](agile/SPRINT-1.md) |
-| 2 | Mer. 16/09 matin | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites | [SPRINT-2](agile/SPRINT-2.md) |
+| 1 ⚠️ | Mar. 15/09 après-midi | Le squelette est en ligne sur Render et un combat 1v1 se résout correctement dans les tests — **partiellement atteint** (Supabase non configuré) | [SPRINT-1](agile/SPRINT-1.md) |
+| 2 ✅ | Mer. 16/09 matin | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites — **atteint** | [SPRINT-2](agile/SPRINT-2.md) |
 | 3 | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire | [SPRINT-3](agile/SPRINT-3.md) |
 | 4 | Jeu. 17/09 matin, **gel du code à 13h** | La boucle roguelike est complète et le jeu est présentable (US-09 en bonus) | [SPRINT-4](agile/SPRINT-4.md) |
 | — | Jeu. 17/09 13h30 | 📧 Rendu : lien GitHub + fichiers `.md` | |
@@ -84,16 +84,18 @@
 | T-15 min | Sprint Review : le PO présente le travail réalisé, avec trace écrite et capture |
 | T-7 min | Rétrospective Keep / Drop / Try |
 
-## 7. Suivi de la vélocité *(à compléter)*
+## 7. Suivi de la vélocité
 
 > À la fin de chaque sprint, calculer la vélocité réelle (points terminés, DoD respectée) et réajuster l'engagement des sprints suivants sur la moyenne des sprints terminés. Répercuter le changement dans les `SPRINT-N.md`, les milestones et le GitHub Project.
 
 | Sprint | Points engagés | Points terminés (DoD respectée) | Commentaire |
 |---|---|---|---|
-| 1 | 18 | | |
-| 2 | 18 | | |
-| 3 | 18 | | |
+| 1 | 18 | **12** | US-01 et US-02 non terminées : elles dépendaient de comptes externes (Render, Supabase) plutôt que de code |
+| 2 | 18 | **18** | Sprint Goal atteint ; mode solo jouable en ligne. Les 2 US du sprint 1 restent ouvertes |
+| 3 | 18 | | Les 30 premières minutes sont réservées à US-01 et US-02 (reste du sprint 1) |
 | 4 | 12 | | Engagement réduit : sprint court (gel du code + rendu), US-09 en bonus |
+
+**Vélocité moyenne après 2 sprints : 15 points.** L'engagement du sprint 3 est maintenu à 18 points car les 6 points manquants du sprint 1 correspondaient à de la configuration de services externes, pas à de la charge de développement — mais US-01 et US-02 doivent être fermées en premier.
 
 ## 8. Risques
 

@@ -66,6 +66,41 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 - Faire valider `shared/types.ts` par toute l'équipe tôt : tout le monde en dépend.
 - Pas de `Math.random` dans `shared/`.
 
+## ✅ Tâches terminées
+
+| US | Points | Preuve |
+|---|---|---|
+| **US-03** Attaquer avec des compétences et des éléments | 5 | [PR #30](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/30), tests `damage.test.ts` et `elements.test.ts` |
+| **US-05** Ordre d'action par priorité et vitesse | 2 | PR #30, tests `battle.test.ts` |
+| **US-06** KO, remplacement automatique, victoire | 3 | PR #30, tests `battle.test.ts` |
+| **US-24** Écran titre et menu principal | 2 | [PR #32](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/32), écran titre en ligne sur Render |
+| | **12** | **Vélocité du sprint 1 : 12 points sur 18 engagés** |
+
+## ⏳ Tâches non terminées
+
+| US | Points | Ce qui manque | Suite |
+|---|---|---|---|
+| **US-01** Projet en ligne | 3 | Réécriture SPA (`/menu` et `/solo` en 404 sur URL directe) et protection de `main` | Issue rouverte, reprise au sprint 2 puis reportée au sprint 3 |
+| **US-02** Supabase configuré | 3 | `001_init.sql` et `.env.example` perdus lors du déplacement de `rogue-arena/`, projet Supabase non créé, auth anonyme, Realtime, variables Render, test RLS | Issue rouverte, **bloquante pour le sprint 3** |
+
+## ⚠️ Problèmes rencontrés
+
+- **Fichiers perdus lors d'un déplacement de dossier** : `001_init.sql` et `.env.example`, fusionnés par la [PR #31](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/31), ne sont plus sur `main` après le déplacement de `rogue-arena/` à la racine.
+- **Issues fermées trop tôt** : US-01 et US-02 ont été fermées à 15h18 alors que leur DoD n'était pas atteinte ; elles ont été rouvertes le 16/09 après vérification de la version en ligne.
+- **Dépendance à des comptes externes** (Vercel puis Render, Supabase) : une partie des points engagés ne dépendait pas du code.
+- **Changement d'hébergeur en cours de sprint** (Vercel → Render), qui a invalidé une partie du travail de déploiement et de la documentation.
+
+## 🧭 Décisions prises pendant le sprint
+
+| Décision | Raison |
+|---|---|
+| Temps réel via **Supabase Realtime** plutôt que des WebSockets maison | Ni le front statique ni les fonctions serveur ne gardent de connexion ouverte |
+| **Moteur de combat partagé et déterministe** (`shared/`) | Même code en solo et en multi, testable, empêche la triche |
+| Hébergement migré de **Vercel vers Render** (Static Site) | Choix de l'équipe ; le projet tourne sur Render |
+| Serveur autoritaire en **Supabase Edge Functions** | Un Static Site Render n'exécute pas de code serveur |
+| Renommage du jeu en **Dark Dungeon Fantasy Boss battle** | Décision d'équipe, appliquée partout au fil de l'eau |
+| **Ne fermer une issue qu'après vérification en ligne** (action de fin de sprint) | Les US-01 et US-02 avaient été fermées sans DoD |
+
 ---
 
 ## 🗣️ Daily Scrums

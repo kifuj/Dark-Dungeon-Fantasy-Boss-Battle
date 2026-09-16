@@ -39,11 +39,11 @@ Une user story est terminée si :
 | US-05 | Moteur | Ordre d'action par priorité et vitesse | Must | 2 | | 1 |
 | US-06 | Moteur | KO, remplacement, victoire/défaite | Must | 3 | | 1 |
 | US-24 | Contenu | Écran titre et menu principal | Must | 2 | | 1 |
-| US-07 | Interface combat | Scène de combat avec sprites et barres de PV | Must | 5 | | 2 |
-| US-08 | Interface combat | Menu de choix d'action | Must | 3 | | 2 |
-| US-04 | Moteur | Changer de monstre actif | Should | 3 | | 2 |
-| US-10 | Solo | Choisir un starter | Must | 2 | | 2 |
-| US-11 | Solo | Enchaîner des vagues contre l'IA | Must | 5 | | 2 |
+| US-07 | Interface combat | Scène de combat avec sprites et barres de PV | Must | 5 | **5** | 2 |
+| US-08 | Interface combat | Menu de choix d'action | Must | 3 | **3** | 2 |
+| US-04 | Moteur | Changer de monstre actif | Should | 3 | **3** | 2 |
+| US-10 | Solo | Choisir un starter | Must | 2 | **2** | 2 |
+| US-11 | Solo | Enchaîner des vagues contre l'IA | Must | 5 | **5** | 2 |
 | US-15 | Comptes | Se connecter avec un pseudo | Must | 3 | | 3 |
 | US-16 | Multijoueur | Créer un salon avec un code | Must | 3 | | 3 |
 | US-17 | Multijoueur | Rejoindre un salon avec un code | Must | 3 | | 3 |
@@ -75,16 +75,19 @@ Une user story est terminée si :
 5. Pas de consensus au 3ᵉ vote → on retient la valeur la plus fréquente. **13 ou 21 → découper l'US.**
 6. Référence : **US-05 (ordre d'action) = 2 points**.
 
-### Journal des votes *(à compléter pendant la séance)*
+### Journal des votes
 
-| US | Tour 1 (votes) | Tour 2 (votes) | Estimation retenue | Remarque |
+Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, avec le détail du vote dans le fichier du sprint. La colonne « Estim. équipe » du tableau ci-dessus est remplie au fur et à mesure ; tant qu'elle est vide, c'est l'estimation proposée qui fait foi.
+
+| US | Tour 1 (Mattéo / Owen / Paul / Donovan) | Tour 2 | Estimation retenue | Remarque |
 |---|---|---|---|---|
-| US-01 | | | | |
-| US-02 | | | | |
-| US-03 | | | | |
-| … | | | | |
+| US-07 Scène de combat | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | Owen comptait les animations : elles sont dans l'US-09 |
+| US-08 Menu d'actions | 3 / 3 / 5 / 2 | — | **3** | `validateAction` existe déjà, il ne reste que l'affichage |
+| US-04 Changer de monstre | 3 / 2 / 3 / 3 | — | **3** | Le moteur gère déjà le changement depuis le sprint 1 |
+| US-10 Choisir un starter | 2 / 2 / 1 / 2 | — | **2** | Trois cartes et une création de run |
+| US-11 Vagues contre l'IA | 5 / 8 / 5 / 5 | 5 / 5 / 5 / 5 | **5** | Owen comptait les récompenses : elles sont dans l'US-12 |
 
-📸 `![Planning Poker](./captures/planning-poker.png)`
+Détail de la séance : [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi). Les US des sprints 3 et 4 seront rejouées au début de leur sprint.
 
 ## 5. User stories détaillées
 

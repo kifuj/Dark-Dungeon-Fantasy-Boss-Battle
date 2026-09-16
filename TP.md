@@ -81,3 +81,68 @@ Tout :
 
 jeudi 13h30, par mail à : k.niel.pro@gmail.com
 Jeudi aprem, vous ferez une présentation de votre travail à tout le monde : 30 minutes par groupe environ
+
+
+# Ajout infos jour 2
+
+Je remet ici les instructions qui étaient au tableau en jour 1, mais que vous n'avez visiblement pas tous suivi : 
+
+➡️ Je dois avoir les liens des documentations réalisées (en lien avec Scrum) sur vos readme pour m'y retrouver facilement.
+
+Chaque README doit donc contenir une partie claire avec les liens vers :
+- le fichier du Product Backlog
+  - les User Stories
+  - les critères d'acceptation
+  - la Definition of Ready
+  - la Definition of Done
+- le fichier markdown du Sprint 1
+  - le Sprint Goal
+  - le Sprint Backlog
+  - qui a fait quoi
+  - les tâches terminées
+  - les tâches non terminées
+  - les problèmes rencontrés
+  - les décisions prises pendant le sprint
+  - les comptes rendus de Daily Scrum
+  - la Sprint Review
+  - la Sprint Retrospective au format `Keep / Drop / Try`
+- le fichier markdown du Sprint 2
+  - le Sprint Goal
+  - le Sprint Backlog
+  - qui a fait quoi
+  - les tâches terminées
+  - les tâches non terminées
+  - les problèmes rencontrés
+  - les décisions prises pendant le sprint
+  - les comptes rendus de Daily Scrum
+  - la Sprint Review
+  - la Sprint Retrospective au format `Keep / Drop / Try`
+- le fichier markdown du Sprint 3
+  - le Sprint Goal
+  - le Sprint Backlog
+  - qui a fait quoi
+  - les tâches terminées
+  - les tâches non terminées
+  - les problèmes rencontrés
+  - les décisions prises pendant le sprint
+  - les comptes rendus de Daily Scrum
+  - la Sprint Review
+  - la Sprint Retrospective au format `Keep / Drop / Try`
+- le fichier markdown du Sprint 4
+  - le Sprint Goal
+  - le Sprint Backlog
+  - qui a fait quoi
+  - les tâches terminées
+  - les tâches non terminées
+  - les problèmes rencontrés
+  - les décisions prises pendant le sprint
+  - les comptes rendus de Daily Scrum
+  - la Sprint Review
+  - la Sprint Retrospective au format `Keep / Drop / Try`
+
+Pour le Product Backlog et tous les autres éléments nécessaires, un screen me suffit, mais il doit être inclus directement dans le fichier markdown concerné.
+
+Chaque sprint doit avoir son propre fichier markdown. Le lien vers chaque fichier de sprint doit être présent dans le README principal du projet.
+
+
+⚠️ Vous devez merge votre travail sur la branche principale pour que je n'aie pas à fouiller vos X branches. Tout travail qui n'est pas merge sur la main sera considéré comme non rendu !
