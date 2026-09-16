@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:multi": "node tools/test-multijoueur.mjs",
     "lint": "oxlint"
   },
   "dependencies": {
