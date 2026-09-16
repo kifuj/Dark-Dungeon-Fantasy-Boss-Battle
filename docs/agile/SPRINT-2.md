@@ -94,7 +94,8 @@ Hors sprint backlog, terminé aussi : mise à jour des docs 02 (événements Rea
 |---|---|---|
 | **US-01 CA3** (404 sur les URL directes) | ❌ Non corrigé. La piste `public/_redirects` ne marche pas sur Render. `render.yaml` est en place mais ne s'applique qu'à un service relié à un Blueprint. | Reste ouverte : activer la règle **Redirects/Rewrites** dans le dashboard Render (2 min). Reportée au sprint 3. |
 | **US-01** protection de `main` | ❌ Toujours désactivée | Reportée au sprint 3 |
-| **US-02** Supabase (schéma, RLS, Realtime, variables) | ❌ Non entamée au sprint 2 | **Bloquante pour le sprint 3** (multijoueur) : à faire en tout début de sprint 3 |
+| **US-02** Supabase (schéma, RLS, Realtime, variables) | ❌ Non entamée au sprint 2 — aucun fichier Supabase ni `.env.example` sur `main` | **Bloquante pour le sprint 3** (multijoueur) : à faire en tout début de sprint 3 |
+| Issues [#1](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/issues/1) et [#2](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/issues/2) | ⚠️ Rouvertes à 09h01 puis **refermées à 09h10** alors que leur DoD n'est pas atteinte (vérifié : `/menu` → 404, aucun fichier Supabase sur `main`) | À rouvrir au Sprint Planning du sprint 3 — c'est exactement l'action décidée à la rétro du sprint 1 |
 | **US-09** animations et textes dans le canvas | Non engagée (objectif bonus du sprint 4) | `play-events` est déjà émis ; la scène applique l'état final et le journal texte est en HTML sous le canvas |
 | Capture du board GitHub Project | Manquante | À prendre depuis l'onglet Projects et à déposer dans `captures/` |
 
@@ -164,6 +165,7 @@ Déroulé : écran titre → menu → Solo → choix du starter (Salamandre) →
 | US-10 | ✅ | ✅ | La sélection puis la validation évitent les clics par erreur |
 | US-11 | ✅ | ✅ | La boucle tourne ; la run est courte tant qu'il n'y a pas de récompenses |
 
+- **Écart de DoD assumé** : les 7 PR ont été **fusionnées sans relecture croisée formelle** (un seul compte a ouvert et fusionné). Le reste de la DoD est respecté (critères vérifiés, `build` et 102 tests verts, fonctionnalité testée sur la production). À corriger au sprint 3 : une PR = un relecteur désigné au daily.
 - **Points engagés** : 18 — **Points terminés** : **18**
 - **Sprint Goal atteint ?** ☑ Oui
 - **US non terminées → retour au Product Backlog :** aucune du sprint 2 ; l'US-01 (CA3 + protection de `main`) et l'US-02 restent ouvertes et passent en tête du sprint 3.
@@ -183,5 +185,6 @@ Déroulé : écran titre → menu → Solo → choix du starter (Salamandre) →
 | Une PR par US, avec `build` + tests verts avant la fusion | Pousser directement sur `main` pendant un sprint : c'est ce qui a créé deux fois le même écran | Annoncer au daily **le fichier** sur lequel on travaille, pas seulement l'US |
 | Tester sur la production avant d'annoncer une US terminée (a permis de voir que `_redirects` ne marchait pas) | Croire une solution technique sur parole sans la vérifier en ligne | Vérifier en DoR que le PO peut **démontrer** l'US avec ce qu'on aura à la fin du sprint (cas de l'US-04) |
 | Les tests de composants : les critères d'interface deviennent vérifiables | Reporter US-01 et US-02 de sprint en sprint | Commencer le sprint 3 par les 2 restes du sprint 1 (Supabase, réécriture Render) avant toute nouvelle US |
+| | Fusionner ses propres PR sans relecture (écart de DoD du sprint 2) | Désigner au daily un relecteur par PR, et le noter dans la description de la PR |
 
 **Action d'amélioration retenue pour le sprint 3 :** *les 30 premières minutes du sprint 3 sont réservées à la fermeture d'US-01 et US-02 ; ensuite, toute US engagée passe par une branche et une PR, et la DoR est relue à voix haute avec la question « comment le PO le montrera-t-il ? ».*
