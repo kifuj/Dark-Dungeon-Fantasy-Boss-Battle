@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "assets": "node tools/generate-sprites.mjs",
+    "functions:sync": "node tools/sync-shared.mjs",
+    "functions:deploy": "npm run functions:sync && npx supabase functions deploy",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",

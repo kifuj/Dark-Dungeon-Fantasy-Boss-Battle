@@ -1,0 +1,18 @@
+# Configuration minimale de la CLI Supabase (US-02).
+# `npx supabase link --project-ref <ref>` complète le reste dans supabase/.temp.
+project_id = "dark-dungeon-fantasy-boss-battle"
+
+[functions.rooms-create]
+verify_jwt = true
+
+[functions.rooms-join]
+verify_jwt = true
+
+[functions.match-start]
+verify_jwt = true
+
+[functions.match-action]
+verify_jwt = true
+
+[functions.match-forfeit]
+verify_jwt = true
