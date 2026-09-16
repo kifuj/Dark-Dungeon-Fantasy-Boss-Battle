@@ -526,3 +526,195 @@ h2,
 .game-container canvas {
   image-rendering: pixelated;
 }
+
+/* ---------------------------------------------------------------------------
+   Écran de combat solo : scène, menu d'actions (US-08) et journal du tour
+   --------------------------------------------------------------------------- */
+.solo-page {
+  justify-content: flex-start;
+  gap: 1rem;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+.run-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  width: min(100%, 960px);
+  font-family: ui-monospace, 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.run-wave {
+  color: var(--ember);
+  font-size: 0.85rem;
+}
+
+.run-enemy {
+  color: rgba(194, 181, 154, 0.66);
+  font-size: 0.66rem;
+}
+
+.action-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(100%, 960px);
+}
+
+/* Masqué pendant la résolution du tour, mais la place est gardée (pas de saut). */
+.action-menu-hidden {
+  min-height: 7.6rem;
+  visibility: hidden;
+}
+
+.skill-grid,
+.switch-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-button,
+.switch-entry,
+.switch-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0.55rem 0.9rem;
+  border: 2px solid var(--stone);
+  border-left: 5px solid var(--element, var(--stone));
+  background: var(--anthracite);
+  color: var(--bone);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--charcoal);
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.switch-button {
+  justify-content: center;
+  border-left-color: var(--stone);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+}
+
+.skill-button:hover:not(:disabled),
+.skill-button:focus-visible:not(:disabled),
+.switch-entry:hover:not(:disabled),
+.switch-entry:focus-visible:not(:disabled),
+.switch-button:hover:not(:disabled),
+.switch-button:focus-visible:not(:disabled) {
+  outline: none;
+  border-color: var(--ember);
+  background: var(--violet);
+  transform: translate(-2px, -2px);
+}
+
+/* Action impossible : grisée (US-08 CA2) */
+.skill-button:disabled,
+.switch-entry:disabled,
+.switch-button:disabled {
+  border-color: #33312f;
+  border-left-color: #33312f;
+  background: #1a1a1d;
+  color: rgba(194, 181, 154, 0.32);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.skill-name {
+  font-size: 0.95rem;
+}
+
+.skill-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.skill-element {
+  color: var(--element, var(--ember));
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.skill-pp,
+.hp-pill {
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.68rem;
+  color: rgba(194, 181, 154, 0.72);
+}
+
+.hp-pill {
+  padding: 0.1rem 0.45rem;
+  border: 1px solid currentcolor;
+}
+
+.hp-ok { color: #5dbb4a; }
+.hp-warn { color: #f2d45c; }
+.hp-danger { color: #c0392b; }
+
+.battle-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: min(100%, 960px);
+  min-height: 5.2rem;
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--stone);
+  background: rgba(36, 35, 41, 0.6);
+  list-style: none;
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: rgba(194, 181, 154, 0.85);
+}
+
+.run-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  width: min(100%, 520px);
+  padding: 1.6rem;
+  border: 3px solid var(--stone);
+  background: var(--anthracite);
+  text-align: center;
+}
+
+.run-over h2 {
+  margin: 0;
+  color: var(--ember);
+}
+
+.run-over-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.run-over-actions .button {
+  min-width: 190px;
+  font: inherit;
+  cursor: pointer;
+}
+
+
+@media (max-width: 560px) {
+  .solo-page { padding: 1rem 0.6rem 2rem; }
+  .skill-grid { grid-template-columns: 1fr; }
+}

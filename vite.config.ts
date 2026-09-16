@@ -6,6 +6,8 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [react()],
   test: {
-    include: ['shared/tests/**/*.test.ts'],
+    // Moteur (`shared/`) + composants React (`src/tests/`, rendus dans jsdom).
+    include: ['shared/tests/**/*.test.ts', 'src/tests/**/*.test.tsx'],
+    environment: 'jsdom',
   },
 });
