@@ -1,0 +1,13 @@
+# Blueprint Render (https://render.com/docs/blueprint-spec).
+# Le site est un Static Site : la réécriture SPA est indispensable, sinon
+# rafraîchir /menu ou /solo renvoie une 404 (US-01 CA3).
+services:
+  - name: dark-dungeon-fantasy-boss-battle
+    type: web
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

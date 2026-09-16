@@ -76,13 +76,19 @@ Dans `tsconfig.app.json`, ajouter `shared` à `include` :
 ### Réécriture SPA
 
 Render sert des fichiers statiques : sans règle de réécriture, un rafraîchissement sur `/menu` ou `/match/123` donne une **404**.
-Depuis le sprint 2, la règle est **dans le dépôt** : le fichier [`public/_redirects`](../public/_redirects) (copié tel quel dans `dist/` par Vite) contient
 
-```
-/*  /index.html  200
+⚠️ **Render ne lit pas de fichier `_redirects`** (contrairement à Netlify) : un `public/_redirects` a été essayé au sprint 2, il est servi comme un fichier ordinaire et ne change rien. Les deux seules méthodes qui fonctionnent sont :
+
+1. **Dashboard** (méthode retenue, §4.1 étape 5) : le Static Site → onglet **Redirects/Rewrites** → `Source /*`, `Destination /index.html`, `Action Rewrite`.
+2. **Blueprint** : le fichier [`render.yaml`](../render.yaml) à la racine déclare la même règle, mais il n'est appliqué que si le service est géré par un Blueprint (Render → *New* → *Blueprint*, ou *Settings* → lier le blueprint). Un service créé à la main dans le dashboard **n'applique pas** `render.yaml` tant qu'il n'est pas relié.
+
+```yaml
+routes:
+  - type: rewrite
+    source: /*
+    destination: /index.html
 ```
 
-Render lit ce fichier au déploiement ; il n'y a donc plus rien à configurer dans le dashboard. La règle **Redirects/Rewrites** du dashboard (§4.1, étape 5) reste une alternative équivalente.
 
 ### `.env.example` (à commiter)
 
@@ -216,7 +222,7 @@ npm run dev                  # front sur http://localhost:5173
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
-| 404 en rafraîchissant une page du jeu | `public/_redirects` absent du build | Vérifier que `dist/_redirects` existe après `npm run build`, sinon Render → **Redirects/Rewrites** : `/*` → `/index.html` (Rewrite) |
+| 404 en rafraîchissant une page du jeu | Règle de réécriture absente | Render → le Static Site → **Redirects/Rewrites** : `/*` → `/index.html` (Rewrite). Un fichier `_redirects` ne sert à rien sur Render. |
 | Le front ne voit pas une variable modifiée sur Render | Les `VITE_…` sont figées au build | **Manual Deploy → Clear build cache & deploy** |
 | Une Edge Function renvoie 500 « supabaseUrl is required » | Code qui lit un autre nom de variable | Utiliser `Deno.env.get('SUPABASE_URL')` et `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` |
 | `Module not found` au déploiement d'une fonction | Import sans extension, ou `.js` vers un `.ts` sans `sloppy-imports` | Vérifier `supabase/functions/deno.json` ; imports `.ts` dans `supabase/functions/` |
