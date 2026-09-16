@@ -718,3 +718,15 @@ h2,
   .solo-page { padding: 1rem 0.6rem 2rem; }
   .skill-grid { grid-template-columns: 1fr; }
 }
+
+/* Sprite réel dans la pastille de la carte de starter (US-10) */
+
+.monster-sprite {
+  display: block;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+.starter-sprite {
+  overflow: hidden;
+}
