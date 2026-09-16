@@ -30,7 +30,7 @@
 ## 3. Endpoints
 
 > ✅ **Déployées au sprint 3** : `rooms-create`, `rooms-join`, `match-start`, `match-action`, `match-forfeit`
-> (`npm run functions:deploy`). `match-draft`, `match-timeout` et `match-reward` restent à faire.
+> (`npm run functions:deploy`). **Ajoutée ensuite** : `match-draft` (US-18). `match-timeout` et `match-reward` restent à faire.
 > Toutes les fonctions livrées sont **idempotentes** : rejoindre deux fois, lancer deux fois ou abandonner
 > deux fois renvoie `200` avec le même résultat, pour qu'un double-clic ne produise jamais d'erreur visible.
 
@@ -61,17 +61,17 @@ Règles : le salon existe et est en statut `waiting`, l'appelant n'est pas l'hô
 |---|---|
 | `{ "roomId": "uuid" }` | `{ "matchId": "uuid" }` |
 
-Règles : l'appelant est l'hôte et un invité est présent. Le serveur génère une `seed` (entier 31 bits), crée l'état initial (MVP : équipes de 3 tirées au hasard → phase `battle`, `turn = 1` ; avec draft : 6 offres par joueur → phase `draft`, `turn = 0`), fixe `turn_deadline`, puis met à jour `rooms.status = 'playing'` et `rooms.current_match_id`.
+Règles : l'appelant est l'hôte et un invité est présent. Le serveur génère une `seed` (entier 31 bits), crée l'état initial (6 offres par joueur → phase `draft`, `turn = 0`, voir `match-draft`), fixe `turn_deadline`, puis met à jour `rooms.status = 'playing'` et `rooms.current_match_id`.
 
 ---
 
-### `match-draft` *(Should)*
+### `match-draft` (US-18)
 
 | Requête | Réponse `200` |
 |---|---|
 | `{ "matchId": "uuid", "picks": [0, 3, 5] }` | `{ "status": "waiting" \| "resolved" }` |
 
-Règles : phase `draft`, 3 indices distincts compris dans les offres du joueur. Quand les 2 drafts sont reçus, les équipes sont construites et le match passe en phase `battle`, `turn = 1`.
+Règles : phase `draft`, 3 indices distincts compris dans les offres du joueur (0 à 5) ; l'ordre des indices est l'ordre d'entrée en combat. Le choix est inséré dans `match_actions` (`phase = 'draft'`, `turn = 0`). Quand les 2 drafts sont reçus, les équipes sont construites et le match passe en phase `battle`, `turn = 1`, `draftOffers = null`. Erreurs : `WRONG_PHASE`, `INVALID_ACTION`, `ALREADY_PLAYED`, `NOT_A_PLAYER`.
 
 ---
 

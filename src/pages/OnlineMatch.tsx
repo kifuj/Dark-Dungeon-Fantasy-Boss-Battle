@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ApiError, errorMessage, forfeitMatch, sendAction } from '../lib/api.ts';
+import { ApiError, errorMessage, forfeitMatch, sendAction, sendDraft } from '../lib/api.ts';
 import { useProfile } from '../lib/profile.tsx';
 import { hasPlayedThisTurn } from '../lib/matches.ts';
 import { subscribeToMatch } from '../lib/realtime.ts';
@@ -10,6 +10,7 @@ import type { Action, MatchRow, Seat } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
 import { ActionMenu } from '../components/ActionMenu.tsx';
+import { DraftPanel } from '../components/DraftPanel.tsx';
 
 type UiState = 'loading' | 'choosing' | 'waiting' | 'animating' | 'finished';
 
@@ -25,7 +26,7 @@ const STATUS_TEXT: Record<UiState, string> = {
 };
 
 /**
- * Duel en ligne (US-19). Le serveur fait autorité : la page n'envoie que des actions
+ * Duel en ligne (US-18, US-19) : draft des équipes, puis combat. Le serveur fait autorité : la page n'envoie que des actions
  * et affiche la ligne `matches` que le Realtime lui pousse (docs/04-MULTIJOUEUR.md §6).
  */
 export function OnlineMatch() {
@@ -88,6 +89,7 @@ export function OnlineMatch() {
 
       const mySeat: Seat = row.player2_id === profile.id ? 1 : 0;
       seatRef.current = mySeat;
+      const wasDrafting = matchRef.current?.phase === 'draft';
 
       if (firstLoad) {
         // Reconnexion ou premier affichage : on montre l'état sans rejouer d'animation (US-21 CA1).
@@ -98,8 +100,18 @@ export function OnlineMatch() {
           setUi('finished');
           setLog(describeEvents(row.last_events, mySeat));
         } else {
-          void hasPlayedThisTurn(row.id, row.round, row.turn).then((played) => setUi(played ? 'waiting' : 'choosing'));
+          const phase = row.phase === 'draft' ? 'draft' : 'battle';
+          void hasPlayedThisTurn(row.id, row.round, row.turn, phase).then((played) => setUi(played ? 'waiting' : 'choosing'));
         }
+        return;
+      }
+
+      // Fin du draft (US-18 CA3) : rien à animer, la scène Phaser se monte avec les équipes.
+      if (wasDrafting) {
+        matchRef.current = row;
+        setMatch(row);
+        setLog(describeEvents(row.last_events, mySeat));
+        setUi(row.phase === 'finished' ? 'finished' : 'choosing');
         return;
       }
 
@@ -149,6 +161,25 @@ export function OnlineMatch() {
     [ui],
   );
 
+  const draft = useCallback(
+    async (picks: number[]) => {
+      const row = matchRef.current;
+      if (!row || ui !== 'choosing') return;
+      setUi('waiting');
+      setError(null);
+      try {
+        await sendDraft(row.id, picks);
+      } catch (failure) {
+        const code = failure instanceof ApiError ? failure.code : 'INTERNAL';
+        // Choix déjà reçu ou draft déjà terminé : le Realtime apportera la suite.
+        if (code === 'ALREADY_PLAYED' || code === 'WRONG_PHASE') return;
+        setError(errorMessage(failure));
+        setUi('choosing');
+      }
+    },
+    [ui],
+  );
+
   async function forfeit() {
     const row = matchRef.current;
     if (!row) return;
@@ -178,15 +209,19 @@ export function OnlineMatch() {
   const opponentId = seat === 0 ? match.player2_id : match.player1_id;
   const won = match.winner_id === profile?.id;
   const forfeited = match.last_events.some((event) => event.type === 'forfeit'); // US-23 CA2
+  const drafting = match.phase === 'draft';
+  // Un abandon pendant le draft termine le match sans équipes : pas de scène à afficher.
+  const hasTeams = match.state.players.every((player) => player.team.length > 0);
+  const status = drafting && ui === 'waiting' ? 'Équipe validée. En attente du choix de l’adversaire…' : STATUS_TEXT[ui];
 
   return (
     <main className="page solo-page">
       <header className="run-header">
-        <span className="run-wave">Tour {match.turn}</span>
+        <span className="run-wave">{drafting ? 'Draft' : `Tour ${match.turn}`}</span>
         <span className="run-enemy">contre {names[opponentId] ?? '…'}</span>
       </header>
 
-      <PhaserGame />
+      {hasTeams && <PhaserGame />}
 
       {ui === 'finished' ? (
         <section className="run-over" aria-label="Fin du duel">
@@ -213,14 +248,20 @@ export function OnlineMatch() {
         </section>
       ) : (
         <>
-          <p className="match-status" role="status">{STATUS_TEXT[ui]}</p>
-          <ActionMenu state={match.state} seat={seat} busy={ui !== 'choosing'} onAction={play} />
+          <p className="match-status" role="status">{status}</p>
+          {drafting ? (
+            <DraftPanel offer={match.state.draftOffers?.[seat] ?? []} locked={ui !== 'choosing'} onConfirm={draft} />
+          ) : (
+            <ActionMenu state={match.state} seat={seat} busy={ui !== 'choosing'} onAction={play} />
+          )}
           {error && <p className="form-error" role="alert">{error}</p>}
-          <ul className="battle-log" aria-live="polite">
-            {log.slice(-4).map((line, i) => (
-              <li key={`${line}-${i}`}>{line}</li>
-            ))}
-          </ul>
+          {!drafting && (
+            <ul className="battle-log" aria-live="polite">
+              {log.slice(-4).map((line, i) => (
+                <li key={`${line}-${i}`}>{line}</li>
+              ))}
+            </ul>
+          )}
           {confirmingForfeit ? (
             <div className="forfeit-confirm" role="alertdialog" aria-label="Confirmer l’abandon">
               <p>Abandonner le duel ? Votre adversaire gagne la partie.</p>

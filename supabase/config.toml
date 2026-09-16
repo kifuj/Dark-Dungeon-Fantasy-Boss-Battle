@@ -11,6 +11,9 @@ verify_jwt = true
 [functions.match-start]
 verify_jwt = true
 
+[functions.match-draft]
+verify_jwt = true
+
 [functions.match-action]
 verify_jwt = true
 

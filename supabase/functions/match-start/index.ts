@@ -2,9 +2,9 @@ import { getUser } from '../_shared/auth.ts';
 import { fail, json, preflight } from '../_shared/http.ts';
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts';
 import { TURN_DURATION_MS } from '../_shared/turns.ts';
-import { createOnlineBattle } from '../_shared/game/engine/online.ts';
+import { createDraftState } from '../_shared/game/engine/online.ts';
 
-/** POST /match-start { roomId } → { matchId } (US-19, docs/05-API.md §3). */
+/** POST /match-start { roomId } → { matchId } (US-18, US-19, docs/05-API.md §3). */
 Deno.serve(async (req) => {
   const early = preflight(req);
   if (early) return early;
@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
   if (room.current_match_id) return json(200, { matchId: room.current_match_id });
 
   const seed = Math.floor(Math.random() * 2 ** 31);
-  const state = createOnlineBattle(seed, room.host_id, room.guest_id);
+  const state = createDraftState(seed, room.host_id, room.guest_id);
 
   const { data: match, error } = await supabaseAdmin
     .from('matches')
@@ -35,9 +35,9 @@ Deno.serve(async (req) => {
       room_id: room.id,
       player1_id: room.host_id,
       player2_id: room.guest_id,
-      phase: 'battle', // MVP : pas de draft (docs/04 §2)
+      phase: 'draft', // chaque joueur choisit son équipe avant le combat (US-18)
       round: 1,
-      turn: 1,
+      turn: 0,
       seed,
       state,
       turn_deadline: new Date(Date.now() + TURN_DURATION_MS).toISOString(),

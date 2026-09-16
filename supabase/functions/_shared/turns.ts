@@ -1,6 +1,7 @@
 import { supabaseAdmin } from './supabaseAdmin.ts';
 import { resolveTurn } from './game/engine/battle.ts';
 import { createTurnRng } from './game/engine/rng.ts';
+import { startBattleFromDrafts } from './game/engine/online.ts';
 import type { Action, BattleState } from './game/types.ts';
 
 export const TURN_DURATION_MS = 60_000;
@@ -59,4 +60,41 @@ export async function tryResolveBattleTurn(matchId: string): Promise<boolean> {
     await supabaseAdmin.from('rooms').update({ status: 'finished' }).eq('id', match.room_id);
   }
   return true;
+}
+
+/**
+ * Lance le combat si les 2 drafts sont reçus (US-18 CA3). Même verrou optimiste que
+ * pour un tour : deux appels simultanés ne construisent les équipes qu'une fois.
+ */
+export async function tryResolveDraft(matchId: string): Promise<boolean> {
+  const { data: match } = await supabaseAdmin.from('matches').select('*').eq('id', matchId).single();
+  if (!match || match.phase !== 'draft') return false;
+
+  const { data: drafts } = await supabaseAdmin
+    .from('match_actions')
+    .select('player_id, payload')
+    .eq('match_id', matchId)
+    .eq('phase', 'draft')
+    .eq('round', match.round);
+
+  const p1 = drafts?.find((d) => d.player_id === match.player1_id)?.payload?.picks as number[] | undefined;
+  const p2 = drafts?.find((d) => d.player_id === match.player2_id)?.payload?.picks as number[] | undefined;
+  if (!p1 || !p2) return false; // on attend l'autre joueur
+
+  const state = startBattleFromDrafts(match.state as BattleState, [p1, p2]);
+  const { data: updated } = await supabaseAdmin
+    .from('matches')
+    .update({
+      state,
+      phase: 'battle',
+      turn: 1,
+      last_events: [],
+      version: match.version + 1,
+      turn_deadline: new Date(Date.now() + TURN_DURATION_MS).toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', matchId)
+    .eq('version', match.version)
+    .select('id');
+  return Boolean(updated?.length);
 }

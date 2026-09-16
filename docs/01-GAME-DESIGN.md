@@ -20,7 +20,7 @@
 
 ### 2.2 Multijoueur : « Duel Rogue » (1v1 en ligne)
 1. Le joueur A crée un **salon** et reçoit un **code à 6 caractères**. Le joueur B le rejoint avec ce code.
-2. **Draft** *(Should)* : chaque joueur reçoit 6 monstres tirés au hasard et en garde 3. Les deux joueurs choisissent en même temps. *Sans draft (MVP) : équipes de 3 tirées au hasard.*
+2. **Draft** (US-18) : chaque joueur reçoit 6 monstres tirés au hasard (hors boss) et en garde 3, dans l'ordre d'entrée en combat. Les deux joueurs choisissent en même temps ; le choix adverse n'est révélé qu'au début du combat.
 3. **Combat** : à chaque tour, les deux joueurs choisissent leur action **en même temps et en secret**. Le serveur résout le tour quand les deux actions sont reçues.
 4. **Format** : MVP en 1 manche. *Could* : BO3 avec une phase de récompense entre les manches (le perdant de la manche choisit parmi 4 récompenses au lieu de 3) et soin complet des équipes.
 

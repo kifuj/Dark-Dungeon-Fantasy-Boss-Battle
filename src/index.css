@@ -455,6 +455,32 @@ h2,
 .run-starter-summary p { color: rgba(194, 181, 154, 0.65); font-size: 0.8rem; }
 .back-button { margin-top: 1rem; width: min(100%, 320px); }
 
+/* Draft du duel (US-18) : mêmes cartes que le starter, 6 par écran. */
+.starter-card { position: relative; }
+.starter-card:disabled { cursor: default; }
+.starter-card:disabled:not(.starter-card-selected) { opacity: 0.45; transform: none; box-shadow: none; border-color: var(--stone); }
+
+.card-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.15rem 0.45rem;
+  background: var(--ember);
+  color: var(--bone);
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.draft-summary {
+  min-height: 1.5em;
+  margin: -1rem 0 1rem;
+  color: rgba(194, 181, 154, 0.72);
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
 @media (max-width: 700px) {
   .starter-grid { grid-template-columns: 1fr; max-width: 360px; }
   .starter-card { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0 1rem; text-align: left; }

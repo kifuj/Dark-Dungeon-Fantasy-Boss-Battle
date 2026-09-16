@@ -1,5 +1,5 @@
 // Scénarios de test du multijoueur (docs/04-MULTIJOUEUR.md §11) joués contre le vrai
-// projet Supabase : trois sessions anonymes, un salon, un duel complet, un abandon.
+// projet Supabase : trois sessions anonymes, un salon, un draft, un duel complet, un abandon.
 // Usage : `npm run test:multi` (lit VITE_SUPABASE_URL et VITE_SUPABASE_PUBLISHABLE_KEY
 // dans .env / .env.local ou dans l'environnement).
 import { readFileSync } from 'node:fs';
@@ -88,8 +88,32 @@ const matchId = started.body.matchId;
 check('match-start est idempotent', (await fn('match-start', A, { roomId })).body.matchId, matchId);
 
 let row = await readMatch(A, matchId);
-check('US-19 CA1 deux équipes de 3 monstres de niveau 10', row.state.players.map((p) => `${p.team.length}×N${p.team[0].level}`), ['3×N10', '3×N10']);
 check('RLS : un tiers ne voit pas la ligne du match', await readMatch(C, matchId), null);
+
+// --- Draft (US-18) ---
+check('US-18 le match démarre en phase draft, tour 0', [row.phase, row.turn], ['draft', 0]);
+check('US-18 CA1 six offres distinctes par joueur', row.state.draftOffers.map((offer) => new Set(offer).size), [6, 6]);
+check('US-18 équipes vides pendant le draft', row.state.players.map((p) => p.team.length), [0, 0]);
+check('US-18 action de combat refusée pendant le draft', (await fn('match-action', A, { matchId, round: 1, turn: 0, action: { type: 'skill', skillId: 'strike' } })).body.error, 'WRONG_PHASE');
+check('US-18 draft avec un doublon → INVALID_ACTION', (await fn('match-draft', A, { matchId, picks: [0, 0, 1] })).body.error, 'INVALID_ACTION');
+check('US-18 draft de 2 monstres → INVALID_ACTION', (await fn('match-draft', A, { matchId, picks: [0, 1] })).body.error, 'INVALID_ACTION');
+check('US-18 draft par un tiers → NOT_A_PLAYER', (await fn('match-draft', C, { matchId, picks: [0, 1, 2] })).body.error, 'NOT_A_PLAYER');
+check('US-18 premier draft → waiting', (await fn('match-draft', A, { matchId, picks: [5, 0, 2] })).body.status, 'waiting');
+check('US-18 double envoi du draft → ALREADY_PLAYED', (await fn('match-draft', A, { matchId, picks: [1, 2, 3] })).body.error, 'ALREADY_PLAYED');
+const hostDraftSeenByGuest = (await call(`/rest/v1/match_actions?match_id=eq.${matchId}&phase=eq.draft&select=player_id`, { token: B.token })).body;
+check('US-18 CA2 le choix de l’hôte est invisible pour l’invité', hostDraftSeenByGuest, []);
+check('US-18 CA2 le combat n’a pas commencé', (await readMatch(B, matchId)).phase, 'draft');
+check('US-18 CA3 second draft → resolved', (await fn('match-draft', B, { matchId, picks: [1, 3, 4] })).body.status, 'resolved');
+check('US-18 draft après le lancement → WRONG_PHASE', (await fn('match-draft', B, { matchId, picks: [1, 3, 4] })).body.error, 'WRONG_PHASE');
+
+const offers = row.state.draftOffers;
+row = await readMatch(A, matchId);
+check('US-18 CA3 le combat démarre au tour 1', [row.phase, row.turn, row.state.draftOffers], ['battle', 1, null]);
+check('US-18 CA3 les équipes sont celles choisies, dans l’ordre', row.state.players.map((p) => p.team.map((m) => m.speciesId)), [
+  [5, 0, 2].map((i) => offers[0][i]),
+  [1, 3, 4].map((i) => offers[1][i]),
+]);
+check('US-19 CA1 deux équipes de 3 monstres de niveau 10', row.state.players.map((p) => `${p.team.length}×N${p.team[0].level}`), ['3×N10', '3×N10']);
 
 // --- Actions (US-19 CA4, CA5) ---
 const turnBody = (skillId) => ({ matchId, round: row.round, turn: row.turn, action: { type: 'skill', skillId } });
@@ -125,6 +149,7 @@ console.log(`   (duel joué en ${turns} tours)`);
 const room2 = (await fn('rooms-create', A)).body;
 await fn('rooms-join', B, { code: room2.code });
 const match2 = (await fn('match-start', A, { roomId: room2.roomId })).body.matchId;
+check('US-23 abandon possible pendant le draft', (await readMatch(A, match2)).phase, 'draft');
 check('US-23 abandon refusé à un tiers', (await fn('match-forfeit', C, { matchId: match2 })).body.error, 'NOT_A_PLAYER');
 check('US-23 CA2 abandon → match terminé', (await fn('match-forfeit', B, { matchId: match2 })).body.status, 'finished');
 const forfeited = await readMatch(A, match2);

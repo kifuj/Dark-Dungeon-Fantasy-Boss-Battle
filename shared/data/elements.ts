@@ -24,3 +24,12 @@ export const ELEMENT_COLORS: Record<Element, string> = {
   ombre: '#7b4fb5',
   neutre: '#b0a8a0',
 };
+
+export const ELEMENT_LABELS: Record<Element, string> = {
+  feu: 'Feu',
+  eau: 'Eau',
+  nature: 'Nature',
+  lumiere: 'Lumière',
+  ombre: 'Ombre',
+  neutre: 'Neutre',
+};
