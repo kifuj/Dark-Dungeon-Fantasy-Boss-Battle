@@ -24,7 +24,7 @@ stateDiagram-v2
   finished --> [*]
 ```
 
-> **MVP** : `start` crée directement le match en phase `battle` avec des équipes tirées au hasard. `draft` et `reward` sont ajoutés si le temps le permet.
+> **Draft (US-18)** : `match-start` crée le match en phase `draft` (tour 0, 6 offres par joueur dans `state.draftOffers`). Chaque choix est rangé dans `match_actions` (`phase = 'draft'`), que la RLS cache à l'adversaire. Quand les 2 choix sont reçus, `match-draft` construit les équipes et passe le match en `battle`, tour 1. La phase `reward` reste à faire (US-22).
 
 ## 3. Cycle de vie d'un salon
 

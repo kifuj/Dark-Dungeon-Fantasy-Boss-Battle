@@ -6,16 +6,18 @@ import { OnlineMatch } from '../pages/OnlineMatch.tsx';
 import { ProfileProvider } from '../lib/profile.tsx';
 import { ApiError } from '../lib/api.ts';
 import { EventBus } from '../game/EventBus.ts';
-import { createOnlineBattle } from '../../shared/engine/online.js';
+import { createDraftState, createOnlineBattle, startBattleFromDrafts } from '../../shared/engine/online.js';
+import { SPECIES } from '../../shared/data/monsters.js';
 import { resolveTurn } from '../../shared/engine/battle.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
 import type { MatchRow } from '../../shared/types.js';
 
-const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, forfeitMatch, loadProfile } = vi.hoisted(() => ({
+const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, sendDraft, forfeitMatch, loadProfile } = vi.hoisted(() => ({
   subscribeToMatch: vi.fn(),
   hasPlayedThisTurn: vi.fn(),
   fetchUsernames: vi.fn(),
   sendAction: vi.fn(),
+  sendDraft: vi.fn(),
   forfeitMatch: vi.fn(),
   loadProfile: vi.fn(),
 }));
@@ -26,6 +28,7 @@ vi.mock('../lib/rooms.ts', () => ({ fetchUsernames, fetchRoom: vi.fn() }));
 vi.mock('../lib/api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../lib/api.ts')>()),
   sendAction,
+  sendDraft,
   forfeitMatch,
 }));
 vi.mock('../lib/session.ts', async (importOriginal) => ({
@@ -69,13 +72,13 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-async function renderMatch(userId = 'host') {
+async function renderMatch(userId = 'host', playedAlready = false) {
   let push: (row: MatchRow) => void = () => {};
   subscribeToMatch.mockImplementation((_id: string, onRow: (row: MatchRow) => void) => {
     push = onRow;
     return () => {};
   });
-  hasPlayedThisTurn.mockResolvedValue(false);
+  hasPlayedThisTurn.mockResolvedValue(playedAlready);
   fetchUsernames.mockResolvedValue({ host: 'Mattéo', guest: 'Owen' });
   loadProfile.mockResolvedValue({ id: userId, username: userId === 'host' ? 'Mattéo' : 'Owen' });
 
@@ -217,5 +220,82 @@ describe('US-19 — jouer un combat en ligne', () => {
     await push(BASE);
 
     await waitFor(() => expect(screen.getByRole('status').textContent).toBe('En attente de l’adversaire…'));
+  });
+});
+
+describe('US-18 — draft d’équipe en duel', () => {
+  const DRAFT: MatchRow = { ...BASE, phase: 'draft', turn: 0, state: createDraftState(SEED, 'host', 'guest') };
+  const card = (speciesId: string) => screen.getByRole('button', { name: new RegExp(SPECIES[speciesId].name) });
+
+  it('propose les 6 monstres du joueur, sans scène de combat (CA1)', async () => {
+    const { push } = await renderMatch('guest');
+    await push(DRAFT);
+
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+    expect(screen.queryByTestId('phaser-canvas')).toBeNull();
+    expect(screen.getByText('Draft')).toBeDefined();
+    for (const speciesId of DRAFT.state.draftOffers![1]) expect(card(speciesId)).toBeDefined();
+    expect(hasPlayedThisTurn).toHaveBeenCalledWith('match-1', 1, 0, 'draft');
+  });
+
+  it('n’envoie le choix qu’avec exactement 3 monstres, dans l’ordre des clics (CA1)', async () => {
+    const { user, push } = await renderMatch();
+    await push(DRAFT);
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+    const offer = DRAFT.state.draftOffers![0];
+    const confirm = () => screen.getByRole('button', { name: /Valider mon équipe/ }) as HTMLButtonElement;
+
+    await user.click(card(offer[4]));
+    await user.click(card(offer[1]));
+    expect(confirm().disabled).toBe(true);
+    await user.click(card(offer[1])); // un 2e clic retire le monstre
+    await user.click(card(offer[2]));
+    await user.click(card(offer[0]));
+    expect((card(offer[3]) as HTMLButtonElement).disabled).toBe(true); // équipe complète
+    expect(confirm().disabled).toBe(false);
+
+    sendDraft.mockResolvedValue({ status: 'waiting' });
+    await user.click(confirm());
+    expect(sendDraft).toHaveBeenCalledWith('match-1', [4, 2, 0]);
+    expect(screen.getByRole('status').textContent).toMatch(/En attente du choix de l’adversaire/);
+  });
+
+  it('reste en attente après un rafraîchissement si le choix est déjà envoyé', async () => {
+    const { push } = await renderMatch('host', true);
+    await push(DRAFT);
+    await waitFor(() => expect(screen.getByRole('status').textContent).toMatch(/En attente du choix/));
+    expect(screen.getByRole('button', { name: /Équipe validée/ })).toBeDefined();
+  });
+
+  it('lance le combat avec les équipes choisies quand les 2 drafts sont reçus (CA3)', async () => {
+    const { push } = await renderMatch();
+    await push(DRAFT);
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+
+    const state = startBattleFromDrafts(DRAFT.state, [[0, 1, 2], [3, 4, 5]]);
+    const inits: unknown[] = [];
+    EventBus.on('battle-init', (payload: unknown) => inits.push(payload));
+    await push({ ...DRAFT, phase: 'battle', turn: 1, state, version: 2 });
+
+    expect(screen.getByTestId('phaser-canvas')).toBeDefined();
+    expect(screen.getByText(/Tour 1/)).toBeDefined();
+    expect(screen.getByRole('status').textContent).toBe('À vous de jouer.');
+    expect(screen.getAllByRole('button', { name: /PP/ }).length).toBeGreaterThan(0);
+    await act(async () => EventBus.emit('scene-ready'));
+    expect(inits.at(-1)).toEqual({ state, playerSeat: 0 });
+  });
+
+  it('affiche la fin du duel si l’adversaire abandonne pendant le draft', async () => {
+    const { push } = await renderMatch();
+    await push(DRAFT);
+    await push({
+      ...DRAFT,
+      phase: 'finished',
+      winner_id: 'host',
+      version: 2,
+      last_events: [{ type: 'forfeit', seat: 1 }, { type: 'battle_end', winnerSeat: 0 }],
+    });
+    expect(screen.getByRole('heading', { name: /Victoire par abandon/ })).toBeDefined();
+    expect(screen.queryByTestId('phaser-canvas')).toBeNull();
   });
 });

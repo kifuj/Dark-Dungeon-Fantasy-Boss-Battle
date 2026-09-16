@@ -1,7 +1,7 @@
 import { Canvas, rgb } from '../lib/canvas.mjs';
 
 /**
- * Sprites des 10 espèces du bestiaire (docs/01-GAME-DESIGN.md §5).
+ * Sprites des 20 espèces du bestiaire (docs/01-GAME-DESIGN.md §5).
  * Chaque espèce est dessinée dans une grille 32 × 32 puis agrandie × 2 → cadre de 64 × 64.
  * Les pieds sont posés vers y = 29 pour laisser la place au contour et à l'oscillation d'attente.
  */
@@ -206,6 +206,212 @@ const lich = (c) => {
   c.line(14, 17, 18, 17, rgb('#2f7a4e'), 1);
 };
 
+const imp = (c) => {
+  const dark = rgb('#6e1a0e');
+  const mid = rgb('#d1451f');
+  const light = rgb('#f58a4a');
+  const wing = rgb('#3a1410');
+  c.triangle([11, 17], [2, 10], [7, 24], wing); // petites ailes
+  c.triangle([21, 17], [30, 10], [25, 24], wing);
+  c.line(20, 26, 27, 27, dark, 1); // queue fourchue
+  c.triangle([26, 25], [30, 27], [26, 29], dark);
+  c.ellipse(16, 24, 5, 5, dark, mid);
+  c.ellipse(13, 29, 2, 1.6, dark, mid);
+  c.ellipse(19, 29, 2, 1.6, dark, mid);
+  c.ellipse(10.5, 23, 1.8, 3, dark, mid);
+  c.ellipse(21.5, 23, 1.8, 3, dark, mid);
+  c.triangle([10, 12], [8, 4], [13, 10], rgb('#2a0a0c')); // cornes
+  c.triangle([22, 12], [24, 4], [19, 10], rgb('#2a0a0c'));
+  c.ellipse(16, 14, 6.5, 5.5, dark, light);
+  eyes(c, 16, 13, 2.8, 1.8, 1.8, rgb('#ffd24a'), BLACK);
+  c.line(13, 17, 19, 17, rgb('#2a0a0c'), 1);
+  c.set(14, 16, WHITE);
+  c.set(18, 16, WHITE);
+};
+
+const crab = (c) => {
+  const dark = rgb('#12406a');
+  const mid = rgb('#2f7fc0');
+  const light = rgb('#8fcaf0');
+  for (const sx of [-1, 1]) {
+    for (const k of [0, 1, 2]) c.line(16 + sx * 6, 25 + k, 16 + sx * (11 + k), 29 + k * 0.5, dark, 1); // pattes
+    c.line(16 + sx * 8, 21, 16 + sx * 11, 15, dark, 2); // bras
+    c.ellipse(16 + sx * 12, 12, 3.5, 3, dark, mid); // pinces
+    c.clearRect(16 + sx * 12 - (sx < 0 ? 1 : 0), 9, 1, 3);
+  }
+  c.ellipse(16, 23, 9.5, 6, dark, light); // carapace
+  for (const x of [11, 16, 21]) c.set(x, 20, rgb('#dff3ff'));
+  c.line(13, 17, 13, 14, dark, 1); // yeux pédonculés
+  c.line(19, 17, 19, 14, dark, 1);
+  c.ellipse(13, 13, 1.6, 1.6, WHITE, WHITE, { shade: false });
+  c.ellipse(19, 13, 1.6, 1.6, WHITE, WHITE, { shade: false });
+  c.set(13, 13, BLACK);
+  c.set(19, 13, BLACK);
+  c.line(14, 25, 18, 25, rgb('#0d3350'), 1);
+};
+
+const wolf = (c) => {
+  const dark = rgb('#2f4a22');
+  const mid = rgb('#5a8a3e');
+  const light = rgb('#a9cf7a');
+  const leaf = rgb('#8fdc5a');
+  c.line(24, 20, 30, 13, mid, 3); // queue
+  c.ellipse(30, 12, 1.8, 2.5, dark, leaf);
+  c.ellipse(19, 21, 8, 5.5, dark, mid); // corps
+  for (const x of [13, 17, 21, 25]) c.line(x, 24, x, 29, dark, 2); // pattes
+  c.triangle([7, 9], [8, 2], [11, 8], dark); // oreilles
+  c.triangle([15, 9], [15, 2], [12, 8], dark);
+  c.ellipse(11, 13, 6, 5, dark, mid); // tête
+  c.ellipse(6, 16, 3.5, 2.2, dark, light); // museau
+  c.set(3, 15, BLACK);
+  c.rect(8, 11, 2, 2, rgb('#ffd24a'));
+  c.rect(12, 11, 2, 2, rgb('#ffd24a'));
+  c.set(9, 12, BLACK);
+  c.set(13, 12, BLACK);
+  for (const [x, y] of [[18, 16], [22, 17], [25, 18]]) c.ellipse(x, y, 1.5, 1, rgb('#3e7a2a'), leaf, { shade: false }); // feuilles
+};
+
+const wisp = (c) => {
+  const core = rgb('#fff6c8');
+  const glow = rgb('#f2d45c');
+  const halo = [242, 212, 92, 90];
+  c.ellipse(16, 17, 11, 11, halo, halo, { shade: false });
+  c.triangle([10, 18], [16, 1], [22, 18], glow); // flamme
+  c.triangle([12, 18], [9, 6], [16, 14], glow);
+  c.triangle([20, 18], [24, 7], [16, 14], glow);
+  c.ellipse(16, 20, 7, 7, rgb('#d9a830'), glow);
+  c.ellipse(16, 20, 4, 4, glow, core, { shade: false });
+  c.line(14, 27, 12, 30, glow, 1); // traînée
+  c.line(18, 27, 20, 31, glow, 1);
+  c.rect(13, 19, 2, 3, rgb('#5a3d0a'));
+  c.rect(17, 19, 2, 3, rgb('#5a3d0a'));
+};
+
+const ghost = (c) => {
+  const dark = rgb('#3b2a55');
+  const mid = rgb('#8a78b8');
+  const light = rgb('#d9cff2');
+  c.ellipse(16, 14, 9, 9, dark, light); // tête et corps
+  c.rect(7, 14, 19, 10, light);
+  c.line(7, 14, 7, 24, dark, 1);
+  c.line(25, 14, 25, 24, dark, 1);
+  for (const x of [7, 12, 17, 22]) c.triangle([x, 23], [x + 2.5, 30], [x + 5, 23], mid); // bas en lambeaux
+  c.ellipse(5, 18, 2, 3, dark, mid); // bras flottants
+  c.ellipse(27, 18, 2, 3, dark, mid);
+  c.ellipse(12.5, 13, 2, 2.6, BLACK, BLACK, { shade: false });
+  c.ellipse(19.5, 13, 2, 2.6, BLACK, BLACK, { shade: false });
+  c.set(12, 12, rgb('#a86bff'));
+  c.set(19, 12, rgb('#a86bff'));
+  c.ellipse(16, 19, 2, 1.6, BLACK, BLACK, { shade: false }); // bouche
+};
+
+const golem = (c) => {
+  const dark = rgb('#4a4640');
+  const mid = rgb('#8a8378');
+  const light = rgb('#c9c1b0');
+  const moss = rgb('#5dbb4a');
+  c.ellipse(6, 20, 4, 6, dark, mid); // bras massifs
+  c.ellipse(26, 20, 4, 6, dark, mid);
+  c.ellipse(6, 27, 3.5, 2.5, dark, light);
+  c.ellipse(26, 27, 3.5, 2.5, dark, light);
+  c.rect(11, 25, 4, 6, dark); // jambes
+  c.rect(17, 25, 4, 6, dark);
+  c.ellipse(16, 19, 8, 8, dark, mid); // torse
+  c.line(12, 17, 15, 21, dark, 1); // fissures
+  c.line(20, 15, 18, 19, dark, 1);
+  c.ellipse(16, 9, 5, 4, dark, light); // tête
+  c.rect(12.5, 8, 7, 2, rgb('#1c1a17'));
+  c.set(14, 8, rgb('#7fe0ff'));
+  c.set(18, 8, rgb('#7fe0ff'));
+  for (const [x, y] of [[13, 5], [21, 13], [10, 16]]) c.ellipse(x, y, 1.6, 1, moss, moss, { shade: false }); // mousse
+};
+
+const siren = (c) => {
+  const dark = rgb('#14507f');
+  const mid = rgb('#3a8fe0');
+  const light = rgb('#a9dcff');
+  const skin = rgb('#bfe2da');
+  const hair = rgb('#1f8f8a');
+  c.line(16, 20, 20, 26, mid, 5); // queue de poisson
+  c.line(20, 26, 23, 28, mid, 3);
+  c.triangle([22, 27], [29, 23], [28, 31], light); // nageoire
+  c.ellipse(16, 18, 4.5, 5, rgb('#7fb3aa'), skin); // buste
+  c.ellipse(11, 18, 1.6, 4, rgb('#7fb3aa'), skin);
+  c.ellipse(21, 18, 1.6, 4, rgb('#7fb3aa'), skin);
+  c.line(13, 17, 19, 17, dark, 1);
+  c.ellipse(16, 10, 6.5, 6.5, rgb('#10524f'), hair); // chevelure
+  c.rect(10, 11, 2, 9, hair);
+  c.rect(20, 11, 2, 9, hair);
+  c.ellipse(16, 11, 4, 4.2, rgb('#7fb3aa'), skin); // visage
+  eyes(c, 16, 11, 1.8, 1, 1.3, rgb('#0d3350'), rgb('#0d3350'));
+  c.set(16, 14, rgb('#5d8f88'));
+  c.ellipse(13, 6, 1.4, 1.4, rgb('#f7f2e4'), rgb('#ffffff'), { shade: false }); // coquillage
+};
+
+const treant = (c) => {
+  const bark = rgb('#4a2f1a');
+  const wood = rgb('#8a5a32');
+  const leafDark = rgb('#2f5a22');
+  const leaf = rgb('#6fcf4a');
+  c.ellipse(16, 8, 12, 7, leafDark, leaf); // feuillage
+  c.ellipse(7, 12, 5, 4, leafDark, leaf);
+  c.ellipse(25, 12, 5, 4, leafDark, leaf);
+  c.line(9, 17, 3, 23, bark, 2); // branches-bras
+  c.line(23, 17, 29, 23, bark, 2);
+  c.ellipse(16, 20, 6, 9, bark, wood); // tronc
+  c.line(10, 29, 7, 31, bark, 2); // racines
+  c.line(22, 29, 25, 31, bark, 2);
+  c.line(16, 28, 16, 31, bark, 2);
+  c.line(14, 23, 14, 27, bark, 1); // écorce
+  c.line(18, 24, 18, 28, bark, 1);
+  c.ellipse(13.5, 17, 1.4, 1.4, rgb('#ffe27a'), rgb('#ffe27a'), { shade: false });
+  c.ellipse(18.5, 17, 1.4, 1.4, rgb('#ffe27a'), rgb('#ffe27a'), { shade: false });
+  c.line(14, 21, 18, 21, rgb('#2a1a0c'), 1);
+};
+
+const griffin = (c) => {
+  const dark = rgb('#7a5a20');
+  const fur = rgb('#c9953e');
+  const feather = rgb('#f2e6c4');
+  const gold = rgb('#f2d45c');
+  c.triangle([14, 16], [2, 3], [8, 22], gold); // ailes dorées
+  c.triangle([20, 16], [31, 3], [26, 22], gold);
+  c.line(24, 24, 30, 20, fur, 2); // queue
+  c.ellipse(30, 19, 1.5, 1.8, dark, fur);
+  c.ellipse(18, 22, 8, 5.5, dark, fur); // corps de lion
+  for (const x of [12, 16, 21, 24]) c.line(x, 25, x, 30, dark, 2);
+  c.ellipse(11, 12, 5.5, 5.5, rgb('#a89a78'), feather); // tête d'aigle
+  c.triangle([6, 11], [2, 14], [6, 15], rgb('#e0a020')); // bec
+  c.triangle([13, 8], [16, 4], [15, 10], feather); // plumes
+  c.ellipse(9.5, 11, 1.2, 1.2, BLACK, BLACK, { shade: false });
+};
+
+const dragon = (c) => {
+  const dark = rgb('#3a0d0d');
+  const mid = rgb('#b02a1a');
+  const light = rgb('#e8663a');
+  const belly = rgb('#f2c08a');
+  const wing = rgb('#5a1410');
+  c.triangle([12, 14], [0, 0], [3, 24], wing); // grandes ailes
+  c.triangle([20, 14], [32, 0], [29, 24], wing);
+  c.line(22, 27, 30, 29, mid, 3); // queue
+  c.triangle([29, 26], [32, 29], [29, 31], light);
+  c.ellipse(16, 23, 8.5, 7, dark, mid);
+  c.ellipse(16, 25, 5, 4.5, rgb('#b8864e'), belly);
+  for (const y of [22, 25, 28]) c.line(13, y, 19, y, rgb('#c98a4e'), 1);
+  c.ellipse(10, 30, 3, 2, dark, mid);
+  c.ellipse(22, 30, 3, 2, dark, mid);
+  c.line(16, 16, 16, 12, mid, 4); // cou
+  c.triangle([12, 7], [9, 0], [14, 6], rgb('#e5dfca')); // cornes
+  c.triangle([20, 7], [23, 0], [18, 6], rgb('#e5dfca'));
+  c.ellipse(16, 9, 6, 4.5, dark, light);
+  c.ellipse(16, 12, 3.5, 2, mid, light); // museau
+  c.set(14.5, 12, BLACK);
+  c.set(17.5, 12, BLACK);
+  eyes(c, 16, 8, 2.8, 1.4, 1.3, rgb('#ffd24a'), BLACK);
+  c.ellipse(16, 15, 1.5, 1, rgb('#ff8a2a'), rgb('#ffd24a'), { shade: false }); // braise
+};
+
 export const MONSTER_ART = {
   salamander,
   undine,
@@ -215,8 +421,18 @@ export const MONSTER_ART = {
   flying_eye: flyingEye,
   slime,
   knight,
+  imp,
+  crab,
+  wolf,
+  wisp,
+  ghost,
+  golem,
+  siren,
+  treant,
+  griffin,
   demon,
   lich,
+  dragon,
 };
 
 /** Une espèce → une spritesheet de 2 images 64 × 64 (animation d'attente). */

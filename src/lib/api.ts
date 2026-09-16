@@ -30,6 +30,8 @@ export async function callApi<T>(name: string, body: Record<string, unknown> = {
 export const createRoom = () => callApi<{ roomId: string; code: string }>('rooms-create');
 export const joinRoom = (code: string) => callApi<{ roomId: string }>('rooms-join', { code });
 export const startMatch = (roomId: string) => callApi<{ matchId: string }>('match-start', { roomId });
+export const sendDraft = (matchId: string, picks: number[]) =>
+  callApi<{ status: 'waiting' | 'resolved' }>('match-draft', { matchId, picks });
 export const sendAction = (matchId: string, round: number, turn: number, action: Action) =>
   callApi<{ status: 'waiting' | 'resolved' }>('match-action', { matchId, round, turn, action });
 export const forfeitMatch = (matchId: string) => callApi<{ status: 'finished' }>('match-forfeit', { matchId });

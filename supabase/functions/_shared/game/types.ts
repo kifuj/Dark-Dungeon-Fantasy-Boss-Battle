@@ -52,6 +52,8 @@ export interface BattleState {
   round: number;
   turn: number;
   players: [PlayerState, PlayerState];
+  /** Phase `draft` (US-18) : espèces proposées à chaque siège ; `null` une fois le combat lancé. */
+  draftOffers?: [string[], string[]] | null;
 }
 
 export type Action =

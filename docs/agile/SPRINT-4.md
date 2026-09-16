@@ -41,6 +41,12 @@
 |---|---|---|---|---|
 | **US-09** Animations | 5 | File d'événements avec attente (`wait`, tweens de PV, flash, KO) | Mattéo | ☐ |
 | | | Textes d'efficacité et de critique | Mattéo | ☐ |
+| **US-18** Draft en duel | 5 | Moteur : offres de 6, validation des choix, construction des équipes + tests | Mattéo | ✅ Terminé |
+| | | Edge Function `match-draft` + `match-start` en phase `draft` + scénarios `test:multi` | Mattéo | ✅ Terminé |
+| | | Écran de draft (6 cartes, ordre d'entrée, attente de l'adversaire) + tests | Mattéo | ✅ Terminé |
+| **US-29** Bestiaire étendu | 3 | 10 espèces (dont 1 boss) et 8 compétences + sprites générés + tests | Mattéo | ✅ Terminé |
+
+> US-18 et US-29 ont été réalisées le **16/09 après la review du sprint 3**, hors créneau de sprint, à la demande de Mattéo : elles restent en **Réserve** dans le GitHub Project et ne comptent pas dans la vélocité. Estimations proposées (5 et 3), à rejouer en Planning Poker. Écart de DoD : PR fusionnée sans relecture d'un autre membre.
 
 📸 **Capture du board** : `![Sprint backlog sprint 4](./captures/sprint-4-backlog.png)`
 
@@ -50,7 +56,7 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 
 | Membre | Compte GitHub | US / tâches | Points |
 |---|---|---|---|
-| Mattéo | `kifuj` | Vidéo de secours + slides (+ US-09 en bonus) | hors US (+ 5 bonus) |
+| Mattéo | `kifuj` | Vidéo de secours + slides (+ US-09 en bonus ; US-18 et US-29 livrées en avance) | hors US (+ 13 bonus) |
 | Owen | `Owen-Cazaux` | US-12 | 5 |
 | Paul | `Paul-B-O` | US-21 + relecture des PR et test sur la production | 3 + hors US |
 | Donovan | `donovanmessager0-tech` | US-20, US-26 + README | 4 + hors US |
@@ -111,6 +117,8 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 | US-21 | ☐ | ☐ | |
 | US-20 | ☐ | ☐ | |
 | US-09 *(bonus)* | ☐ | ☐ | |
+| US-18 *(bonus, livrée le 16/09)* | ☐ | ☐ | |
+| US-29 *(bonus, livrée le 16/09)* | ☐ | ☐ | |
 | US-26 | ☐ | ☐ | |
 
 - **Points engagés** : 12 (+ 5 bonus) — **Points terminés** : __
