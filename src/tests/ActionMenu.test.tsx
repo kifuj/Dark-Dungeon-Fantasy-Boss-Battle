@@ -63,3 +63,40 @@ describe('US-08 — menu de choix d’action', () => {
     expect(onAction).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('US-04 — changer de monstre actif', () => {
+  it('liste les monstres en vie autres que le monstre actif (CA1)', async () => {
+    const user = userEvent.setup();
+    render(<ActionMenu state={state()} seat={0} busy={false} onAction={vi.fn()} />);
+    await user.click(screen.getByRole('button', { name: /^Changer/ }));
+    expect(screen.getByRole('button', { name: /Ondine/ })).toBeDefined();
+    expect(screen.getByRole('button', { name: /Champignon/ })).toBeDefined();
+    expect(screen.queryByRole('button', { name: /Salamandre/ })).toBeNull(); // le monstre actif n'est pas listé
+  });
+
+  it('envoie le changement demandé', async () => {
+    const onAction = vi.fn();
+    const user = userEvent.setup();
+    render(<ActionMenu state={state()} seat={0} busy={false} onAction={onAction} />);
+    await user.click(screen.getByRole('button', { name: /^Changer/ }));
+    await user.click(screen.getByRole('button', { name: /Champignon/ }));
+    expect(onAction).toHaveBeenCalledWith({ type: 'switch', toIndex: 2 });
+  });
+
+  it('grise un monstre KO (CA3)', async () => {
+    const s = state();
+    s.players[0].team[1].hp = 0;
+    const user = userEvent.setup();
+    render(<ActionMenu state={s} seat={0} busy={false} onAction={vi.fn()} />);
+    await user.click(screen.getByRole('button', { name: /^Changer/ }));
+    expect(screen.getByRole('button', { name: /Ondine/ })).toHaveProperty('disabled', true);
+    expect(screen.getByRole('button', { name: /Champignon/ })).toHaveProperty('disabled', false);
+  });
+
+  it('désactive « Changer » quand aucun remplaçant n’est disponible', () => {
+    const s = state();
+    s.players[0].team = [s.players[0].team[0]];
+    render(<ActionMenu state={s} seat={0} busy={false} onAction={vi.fn()} />);
+    expect(screen.getByRole('button', { name: /Changer/ })).toHaveProperty('disabled', true);
+  });
+});
