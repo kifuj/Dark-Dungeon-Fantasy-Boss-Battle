@@ -55,15 +55,16 @@ Une user story est terminée si :
 | US-21 | Multijoueur | Reprendre une partie après un rafraîchissement | Should | 3 | | 4 |
 | US-26 | Contenu | Écran des crédits | Must | 1 | | 4 |
 | US-14 | Solo | Score et classement | Should | 3 | | *backlog* |
-| US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | | *backlog* |
+| US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | | *backlog* (bonus S4, ✅ livré le 16/09) |
 | US-13 | Solo | Boss toutes les 5 vagues | Could | 3 | | *backlog* |
 | US-22 | Multijoueur | Duel en 3 manches avec récompenses | Could | 5 | | *backlog* |
 | US-25 | Contenu | Musique, sons et volume | Could | 3 | | *backlog* |
 | US-27 | Contenu | Jouable sur mobile | Could | 3 | | *backlog* |
 | US-28 | Moteur | Statuts (brûlure, poison) | Could | 5 | | *backlog* |
+| US-29 | Contenu | Bestiaire étendu (20 espèces) | Could | 3 | | *backlog* (bonus S4, ✅ livré le 16/09) |
 | — | — | Matchmaking automatique, chat, 3+ joueurs | Won't | — | — | — |
 
-**Total proposé** : 98 points, dont 56 en Must. Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
+**Total proposé** : 101 points, dont 56 en Must. Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
 
 ## 4. Planning Poker
 
@@ -328,3 +329,11 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 
 - **CA1** : Le canvas et le menu d'actions tiennent sur un écran de 390×844 en paysage.
 - **CA2** : Les boutons font au moins 44 px de haut.
+
+#### US-29 — Bestiaire étendu · Could · 3 pts
+**En tant que** joueur, **je veux** rencontrer plus de monstres différents **afin de** varier mes runs et mes équipes en duel.
+
+- **CA1** : Le bestiaire compte 20 espèces, chacune avec un sprite pixel-art généré par `npm run assets`.
+- **CA2** : Chaque élément compte au moins 2 espèces non-boss, pour que le draft (US-18) propose des choix variés.
+- **CA3** : Les nouvelles espèces communes et rares apparaissent dans les vagues solo ; les nouveaux boss restent réservés au solo.
+- **CA4** : Les nouvelles compétences n'utilisent que les effets existants (soin, drain, DEF+) et sont documentées dans [01 §4](../01-GAME-DESIGN.md#4-compétences).
