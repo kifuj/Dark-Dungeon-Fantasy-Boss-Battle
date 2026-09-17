@@ -10,13 +10,12 @@ import { isTurnExpired } from '../../shared/engine/online.js';
 import type { Action, MatchRow, Seat } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
+import { ANIMATION_TIMEOUT_MS } from '../game/timing.ts';
 import { ActionMenu } from '../components/ActionMenu.tsx';
 import { DraftPanel } from '../components/DraftPanel.tsx';
 
 type UiState = 'loading' | 'choosing' | 'waiting' | 'animating' | 'finished';
 
-/** Un tour animé dure moins de 4 s (US-09 CA4) : au-delà, on considère la scène en échec. */
-const ANIMATION_TIMEOUT_MS = 4500;
 /** Délai entre deux réclamations du timeout si le serveur répond TOO_EARLY (horloges décalées). */
 const TIMEOUT_RETRY_MS = 3000;
 /** En dessous, le compte à rebours passe en rouge. */

@@ -10,6 +10,7 @@ import type { RewardId } from '../../shared/data/rewards.js';
 import type { Action, BattleState, TurnResult } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
+import { ANIMATION_TIMEOUT_MS } from '../game/timing.ts';
 import { ActionMenu } from '../components/ActionMenu.tsx';
 import { RewardPanel } from '../components/RewardPanel.tsx';
 import { StarterSelect } from './StarterSelect.tsx';
@@ -36,6 +37,7 @@ export function SoloRun() {
   const battleRef = useRef<BattleState | null>(null);
   // Tour résolu en attente de la fin de l'animation Phaser (US-09) avant d'être appliqué à l'état React.
   const pendingRef = useRef<TurnResult | null>(null);
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // La scène prévient quand elle est prête : on lui envoie alors l'état courant.
   useEffect(() => {
@@ -47,6 +49,13 @@ export function SoloRun() {
       EventBus.off('scene-ready', onSceneReady);
     };
   }, []);
+
+  useEffect(
+    () => () => {
+      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     battleRef.current = battle;
@@ -61,6 +70,8 @@ export function SoloRun() {
   // seulement là qu'on applique le nouvel état et qu'on enchaîne (vague suivante / défaite).
   useEffect(() => {
     const onEventsPlayed = () => {
+      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
       const result = pendingRef.current;
       pendingRef.current = null;
       if (!result || !run) return;
@@ -102,6 +113,10 @@ export function SoloRun() {
       setLog(describeEvents(result.events, 0));
       pendingRef.current = result;
       EventBus.emit('play-events', result.events); // la scène applique `result` à la fin (`events-played`)
+      // Filet de sécurité : si la scène n'est pas encore chargée (réseau lent) ou ne rend jamais
+      // la main, on applique quand même le tour — sinon la run reste figée.
+      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = setTimeout(() => EventBus.emit('events-played'), ANIMATION_TIMEOUT_MS);
     },
     [battle, busy, run],
   );

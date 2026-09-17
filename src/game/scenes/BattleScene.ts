@@ -122,7 +122,12 @@ export class BattleScene extends Scene {
    * viennent directement de chaque événement (`hpAfter`/`maxHp`) — pas besoin du nouvel état.
    */
   private onPlayEvents(events: BattleEvent[]) {
-    if (!this.views || !this.state) return;
+    // Rien à animer tant que la scène n'a pas reçu d'état : on rend la main tout de suite,
+    // sinon la page attendrait `events-played` pour rien.
+    if (!this.views || !this.state) {
+      EventBus.emit('events-played');
+      return;
+    }
     const state = this.state;
     this.animating = true;
     let delay = 0;
