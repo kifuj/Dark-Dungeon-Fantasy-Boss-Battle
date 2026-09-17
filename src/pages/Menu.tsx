@@ -6,6 +6,7 @@ import { useProfile } from '../lib/profile.tsx';
 const ENTRIES = [
   { to: '/solo', label: 'Solo' },
   { to: '/multi', label: 'Multijoueur' },
+  { to: '/guide', label: 'Guide' },
   { to: '/classement', label: 'Classement' },
   { to: '/credits', label: 'Crédits' },
 ];

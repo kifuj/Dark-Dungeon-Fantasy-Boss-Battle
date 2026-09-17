@@ -51,7 +51,7 @@ describe('US-21 — reprendre une partie depuis le menu (CA3)', () => {
   it('n’affiche pas le bouton sans match en cours', async () => {
     await renderMenu({ id: 'host', username: 'Paul' }, null);
     expect(screen.queryByRole('link', { name: /Reprendre la partie/ })).toBeNull();
-    expect(screen.getAllByRole('link')).toHaveLength(4); // Solo, Multijoueur, Classement, Crédits
+    expect(screen.getAllByRole('link')).toHaveLength(5); // Solo, Multijoueur, Guide, Classement, Crédits
   });
 
   it('ne cherche rien pour un visiteur sans pseudo', async () => {
