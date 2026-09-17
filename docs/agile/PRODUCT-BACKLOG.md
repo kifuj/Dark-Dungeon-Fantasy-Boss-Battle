@@ -54,7 +54,7 @@ Une user story est terminée si :
 | US-20 | Multijoueur | Timeout de tour | Should | 3 | **3** | 4 |
 | US-21 | Multijoueur | Reprendre une partie après un rafraîchissement | Should | 3 | **3** | 4 |
 | US-26 | Contenu | Écran des crédits | Must | 1 | **1** | 4 |
-| US-14 | Solo | Score et classement | Should | 3 | | *backlog* |
+| US-14 | Solo | Score et classement | Should | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
 | US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | **5** | *backlog* (bonus S4, ✅ livré le 16/09) |
 | US-13 | Solo | Boss toutes les 5 vagues, avec butin de boss | Could | 3 | *3 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
 | US-22 | Multijoueur | Duel en 3 manches avec récompenses | Could | 5 | | *backlog* |
@@ -276,6 +276,8 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 
 - **CA1** : En fin de run, le score est calculé et enregistré dans `solo_runs`.
 - **CA2** : La page Classement affiche le meilleur score et la meilleure vague de chaque pseudo, triés par score.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint (jalon `Réserve`). Score = `vague atteinte × 100 + PV restants` ([01 §6.3](../01-GAME-DESIGN.md#63-score)) ; il n'est enregistré que si le joueur a un pseudo, et la page Classement demande de se connecter (la RLS réserve la lecture aux joueurs connectés).
 
 ---
 

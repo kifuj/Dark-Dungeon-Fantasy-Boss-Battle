@@ -7,11 +7,13 @@ import { createTurnRng } from '../../shared/engine/rng.js';
 import { needsReplacement, resolveReplacement } from '../../shared/engine/replace.js';
 import { applyReward, drawRewards } from '../../shared/engine/rewards.js';
 import { battleForWave, createRun, isBossWave, nextWave, type RunState } from '../../shared/engine/run.js';
+import { runScore } from '../../shared/engine/score.js';
 import type { RewardId } from '../../shared/data/rewards.js';
-import type { Action, BattleState, TurnResult } from '../../shared/types.js';
+import type { Action, BattleState, MonsterInstance, TurnResult } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
 import { ANIMATION_TIMEOUT_MS } from '../game/timing.ts';
+import { saveSoloRun, type SaveRunResult } from '../lib/leaderboard.ts';
 import { ActionMenu } from '../components/ActionMenu.tsx';
 import { RewardPanel } from '../components/RewardPanel.tsx';
 import { StarterSelect } from './StarterSelect.tsx';
@@ -24,6 +26,21 @@ interface PendingReward {
   choices: RewardId[];
 }
 
+/** Fin de run : vague atteinte, score (US-14) et état de son enregistrement. */
+interface RunOver {
+  wave: number;
+  forfeited: boolean;
+  score: number;
+  save: SaveRunResult | 'saving';
+}
+
+const SAVE_MESSAGES: Record<RunOver['save'], string> = {
+  saving: 'Enregistrement du score…',
+  saved: 'Score enregistré dans le classement.',
+  guest: 'Connecte-toi avec un pseudo pour enregistrer tes prochains scores.',
+  error: 'Le score n’a pas pu être enregistré.',
+};
+
 /**
  * Mode solo (US-10, US-11, US-12, US-13) : choix du starter, puis vagues contre l'IA (un boss toutes les 5 vagues),
  * avec une récompense entre deux vagues. Quand un monstre tombe KO, le joueur choisit son remplaçant.
@@ -34,13 +51,26 @@ export function SoloRun() {
   const [battle, setBattle] = useState<BattleState | null>(null);
   const [log, setLog] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
-  const [over, setOver] = useState<{ wave: number; forfeited: boolean } | null>(null);
+  const [over, setOver] = useState<RunOver | null>(null);
   const [confirmingForfeit, setConfirmingForfeit] = useState(false);
   const [reward, setReward] = useState<PendingReward | null>(null);
   const battleRef = useRef<BattleState | null>(null);
   // Tour résolu en attente de la fin de l'animation Phaser (US-09) avant d'être appliqué à l'état React.
   const pendingRef = useRef<TurnResult | null>(null);
   const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Numéro de la run affichée : une réponse d'enregistrement arrivée après « Nouvelle run » est ignorée.
+  const runIdRef = useRef(0);
+
+  /** Termine la run et enregistre son score une seule fois (US-14 CA1). */
+  const endRun = useCallback((wave: number, team: MonsterInstance[], forfeited: boolean) => {
+    const runId = runIdRef.current;
+    const score = runScore(wave, team);
+    setOver({ wave, forfeited, score, save: 'saving' });
+    void saveSoloRun(wave, score, team).then((save) => {
+      if (runIdRef.current === runId) setOver((current) => current && { ...current, save });
+    });
+  }, []);
 
   // La scène prévient quand elle est prête : on lui envoie alors l'état courant.
   useEffect(() => {
@@ -86,7 +116,7 @@ export function SoloRun() {
         setBattle({ ...result.state, players: [{ ...me, team: next.team }, foe] }); // le soin est visible pendant le choix
         setReward({ wonWave: run.wave, next, choices: drawRewards(run.seed, run.wave) });
       } else if (result.winnerSeat === 1) {
-        setOver({ wave: run.wave, forfeited: false }); // fin de run (US-11 CA4)
+        endRun(run.wave, result.state.players[0].team, false); // fin de run (US-11 CA4)
       }
       setBusy(false);
     };
@@ -94,11 +124,12 @@ export function SoloRun() {
     return () => {
       EventBus.off('events-played', onEventsPlayed);
     };
-  }, [run]);
+  }, [endRun, run]);
 
   const start = useCallback((starterId: string) => {
     const seed = Math.floor(Math.random() * 2 ** 31); // seed tirée une seule fois, hors de shared/
     const fresh = createRun(starterId, seed);
+    runIdRef.current += 1;
     const first = battleForWave(fresh);
     setRun(fresh);
     setBattle(first);
@@ -142,11 +173,11 @@ export function SoloRun() {
   );
 
   const forfeit = useCallback(() => {
-    if (!run) return;
+    if (!run || !battle) return;
     setConfirmingForfeit(false);
-    setOver({ wave: run.wave, forfeited: true });
+    endRun(run.wave, battle.players[0].team, true);
     setLog(['Vous abandonnez la run.']);
-  }, [run]);
+  }, [battle, endRun, run]);
 
   const chooseReward = useCallback(
     (id: RewardId, targetUid?: string) => {
@@ -192,11 +223,21 @@ export function SoloRun() {
           <p>
             Vague atteinte : <strong>{over.wave}</strong>
           </p>
+          <p>
+            Score : <strong>{over.score}</strong>
+          </p>
+          <p className="run-save" role="status">
+            {SAVE_MESSAGES[over.save]}
+          </p>
           <div className="run-over-actions">
             <button type="button" className="button" onClick={() => setRun(null)}>
               <span>Nouvelle run</span>
               <span className="button-arrow" aria-hidden="true">↻</span>
             </button>
+            <Link to="/classement" className="button">
+              <span>Classement</span>
+              <span className="button-arrow" aria-hidden="true">♛</span>
+            </Link>
             <Link to="/menu" className="button">
               <span>Retour au menu</span>
               <span className="button-arrow" aria-hidden="true">↩</span>

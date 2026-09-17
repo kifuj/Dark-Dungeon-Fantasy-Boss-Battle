@@ -20,12 +20,18 @@ vi.mock('../game/EventBus.ts', () => {
   };
 });
 
+// Enregistrement du score (US-14) : pas de réseau dans les tests.
+const { saveSoloRun } = vi.hoisted(() => ({ saveSoloRun: vi.fn() }));
+vi.mock('../lib/leaderboard.ts', () => ({ saveSoloRun }));
+
 beforeEach(() => {
+  saveSoloRun.mockResolvedValue('saved');
   vi.useFakeTimers({ shouldAdvanceTime: true });
 });
 
 afterEach(() => {
   cleanup();
+  vi.clearAllMocks();
   vi.useRealTimers();
 });
 
@@ -83,6 +89,29 @@ describe('Solo — abandon et boss', () => {
     expect(screen.getByRole('heading', { name: 'Run abandonnée' })).toBeTruthy();
     expect(screen.getByLabelText('Fin de run').textContent).toContain('1');
     expect(screen.getByRole('button', { name: /Nouvelle run/ })).toBeTruthy();
+  });
+
+  it('calcule le score de la run et l’enregistre une seule fois (US-14 CA1)', async () => {
+    const user = await startRun();
+    await user.click(screen.getByRole('button', { name: /Abandonner/ }));
+    await user.click(screen.getByRole('button', { name: /Confirmer l’abandon/ }));
+
+    // Vague 1 × 100 + PV du starter, intact au premier tour.
+    expect(saveSoloRun).toHaveBeenCalledTimes(1);
+    const [wave, score, team] = saveSoloRun.mock.calls[0];
+    expect(wave).toBe(1);
+    expect(score).toBe(100 + team[0].hp);
+    const summary = screen.getByLabelText('Fin de run').textContent;
+    expect(summary).toContain(`Score : ${score}`);
+    expect(await screen.findByText('Score enregistré dans le classement.')).toBeTruthy();
+  });
+
+  it('invite à prendre un pseudo quand le joueur joue sans compte', async () => {
+    saveSoloRun.mockResolvedValue('guest');
+    const user = await startRun();
+    await user.click(screen.getByRole('button', { name: /Abandonner/ }));
+    await user.click(screen.getByRole('button', { name: /Confirmer l’abandon/ }));
+    expect(await screen.findByText(/Connecte-toi avec un pseudo/)).toBeTruthy();
   });
 
   it('annonce la vague sans mention de boss à la vague 1', async () => {

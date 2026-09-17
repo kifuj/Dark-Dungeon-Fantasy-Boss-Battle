@@ -28,7 +28,7 @@
 - Draft d'équipe en duel, format en 3 manches (BO3), récompenses entre les manches.
 - Timeout de tour, reconnexion après un rafraîchissement, abandon (duel et solo).
 - Boss et raretés des monstres *(livrés en bonus au sprint 4)*, choix du remplaçant après un KO *(livré en bonus au sprint 4)*.
-- Classement, statuts (brûlure, poison), sons, version mobile.
+- Classement *(US-14, ajouté après le rendu, hors sprint)*, statuts (brûlure, poison), sons, version mobile.
 
 ### ❌ Hors périmètre
 - Matchmaking automatique, chat, comptes avec e-mail et mot de passe, boutique, plus de 2 joueurs.
