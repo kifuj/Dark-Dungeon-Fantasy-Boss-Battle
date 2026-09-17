@@ -2,8 +2,19 @@ import { SPECIES, speciesAtLevel } from '../data/monsters.js';
 import { createMonster } from './stats.js';
 import type { BattleEvent, MonsterInstance, TurnResult } from '../types.js';
 
-/** Niveaux gagnés par le monstre du joueur pour chaque ennemi qu'il met K.O. (solo). */
-export const KILL_LEVELS = 1;
+/**
+ * K.O. à enchaîner pour gagner un niveau (solo) : 2, puis 3, puis 2… soit un niveau tous les
+ * 2,5 K.O. en moyenne, pour que les niveaux ne montent pas trop vite.
+ */
+export const KILLS_PER_LEVEL = [2, 3] as const;
+const KILLS_PER_CYCLE = KILLS_PER_LEVEL[0] + KILLS_PER_LEVEL[1];
+
+/** Niveaux gagnés au total par un monstre qui a mis `kills` ennemis K.O. (paliers 2, 5, 7, 10…). */
+export function levelsFromKills(kills: number): number {
+  const cycles = Math.floor(kills / KILLS_PER_CYCLE);
+  const rest = kills % KILLS_PER_CYCLE;
+  return cycles * 2 + (rest >= KILLS_PER_LEVEL[0] ? 1 : 0);
+}
 
 /**
  * Gain de niveaux (solo) : stats recalculées depuis l'espèce, PV gagnés ajoutés aux PV actuels
@@ -25,9 +36,10 @@ export function levelUpMessage(before: MonsterInstance, after: MonsterInstance):
 }
 
 /**
- * Expérience de combat (solo, joueur au siège 0) : chaque ennemi mis K.O. pendant le tour fait
- * gagner un niveau au monstre du joueur qui l'a abattu. Le monstre actif en fin de tour est le
- * tireur : un joueur ne change jamais de monstre après avoir attaqué dans le même tour.
+ * Expérience de combat (solo, joueur au siège 0) : chaque ennemi mis K.O. pendant le tour compte
+ * pour le monstre du joueur qui l'a abattu, qui gagne un niveau à chaque palier (`KILLS_PER_LEVEL`).
+ * Le monstre actif en fin de tour est le tireur : un joueur ne change jamais de monstre après avoir
+ * attaqué dans le même tour.
  */
 export function grantKillLevels(result: TurnResult): TurnResult {
   const kills = result.events.filter((event) => event.type === 'faint' && event.seat === 1).length;
@@ -37,7 +49,16 @@ export function grantKillLevels(result: TurnResult): TurnResult {
   const killer = player.team[player.activeIndex];
   if (!killer || killer.hp <= 0) return result;
 
-  const leveled = levelUp(killer, kills * KILL_LEVELS);
+  const before = killer.kills ?? 0;
+  const after = before + kills;
+  const levels = levelsFromKills(after) - levelsFromKills(before);
+  const counted = { ...killer, kills: after };
+  if (levels === 0) {
+    player.team[player.activeIndex] = counted;
+    return { ...result, state };
+  }
+
+  const leveled = levelUp(counted, levels);
   player.team[player.activeIndex] = leveled;
   const event: BattleEvent = {
     type: 'level_up',

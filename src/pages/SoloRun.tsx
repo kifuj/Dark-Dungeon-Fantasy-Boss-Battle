@@ -164,7 +164,7 @@ export function SoloRun() {
       }
       const rng = createTurnRng(run.seed, run.wave, battle.turn);
       const aiAction = chooseAiAction(battle, 1, rng);
-      // Chaque ennemi mis K.O. fait gagner un niveau au monstre du joueur (solo uniquement).
+      // Les ennemis mis K.O. font monter de niveau le monstre du joueur (tous les 2 puis 3 K.O., solo uniquement).
       let result = grantKillLevels(resolveTurn(battle, [action, aiAction], rng));
       // Le monstre de l'IA est tombé : elle choisit tout de suite son remplaçant.
       if (result.winnerSeat === null && needsReplacement(result.state, 1)) {

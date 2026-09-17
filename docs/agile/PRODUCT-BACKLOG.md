@@ -320,11 +320,11 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 #### US-36 — Gagner un niveau en mettant un ennemi KO · Should · 3 pts
 **En tant que** joueur solo, **je veux** que mes monstres montent de niveau en combattant **afin de** ne plus avoir à choisir entre me soigner et progresser.
 
-- **CA1** : Quand mon monstre met un ennemi KO, il gagne 1 niveau (stats et PV max recalculés, PV perdus conservés) ; le texte « X passe au niveau N ! » s'affiche pendant le combat et reste lisible sur l'écran de récompense.
+- **CA1** : Mon monstre gagne 1 niveau tous les 2 puis 3 ennemis mis KO, en alternance (stats et PV max recalculés, PV perdus conservés) ; le texte « X passe au niveau N ! » s'affiche pendant le combat et reste lisible sur l'écran de récompense.
 - **CA2** : Les ennemis ne gagnent jamais de niveau, et le duel en ligne n'est pas concerné.
 - **CA3** : Les récompenses de niveaux sont réduites : Entraînement +1, Entraînement intensif +2, Camp d'entraînement +1, Relique +2.
 
-> ✅ Livrée le 17/09 après le rendu, hors sprint.
+> ✅ Livrée le 17/09 après le rendu, hors sprint. Rééquilibrée le même jour : 1 niveau par KO faisait monter les niveaux trop vite.
 
 #### US-37 — Parchemin : choisir la compétence oubliée · Should · 2 pts
 **En tant que** joueur solo, **je veux** voir la compétence qu'apprend le parchemin et choisir celle qu'il remplace **afin de** ne pas perdre ma meilleure attaque au hasard.

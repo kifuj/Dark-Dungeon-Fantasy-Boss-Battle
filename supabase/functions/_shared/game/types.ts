@@ -46,6 +46,8 @@ export interface MonsterInstance {
   skills: { id: string; ppLeft: number | null }[];
   /** `atkMult` est absent des duels enregistrés avant l'ajout des boosts d'attaque : lire `atkMult ?? 1`. */
   modifiers: { defMult: number; atkMult?: number };
+  /** Ennemis mis K.O. par ce monstre depuis le début de la run (solo) ; absent = 0. */
+  kills?: number;
 }
 
 export interface PlayerState {
