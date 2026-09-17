@@ -14,9 +14,10 @@
 ### 2.1 Solo : « La Descente »
 1. Le joueur choisit **1 starter parmi 3**.
 2. Il enchaîne des **vagues** d'ennemis contrôlés par l'IA.
-3. Après chaque vague gagnée, il choisit **1 récompense parmi 3**.
-4. Toutes les 5 vagues, un **boss** apparaît *(Could)*.
-5. Si toute l'équipe est KO, la run est terminée. Le score est enregistré.
+3. Après chaque vague gagnée, il choisit **1 récompense parmi 3**. Plus l'ennemi vaincu est rare, meilleur est le butin (§6.2).
+4. Toutes les 5 vagues, un **boss** apparaît (US-13), avec un butin de boss.
+5. L'équipe compte **4 monstres au maximum**.
+6. Si toute l'équipe est KO, la run est terminée. Le joueur peut aussi **abandonner** la run à tout moment pendant un combat (bouton « Abandonner », avec confirmation).
 
 ### 2.2 Multijoueur : « Duel Rogue » (1v1 en ligne)
 1. Le joueur A crée un **salon** et reçoit un **code à 6 caractères**. Le joueur B le rejoint avec ce code.
@@ -30,13 +31,15 @@
 1. Chaque joueur choisit **une action** pour son monstre actif :
    - **Compétence** : utiliser l'une de ses compétences (dans la limite de ses PP).
    - **Changer** : remplacer le monstre actif par un monstre de l'équipe encore en vie.
-   - **Abandonner** (multijoueur).
+   - **Abandonner** : en duel, l'adversaire gagne ; en solo, la run s'arrête à la vague en cours.
 2. **Ordre de résolution** :
    1. les abandons ;
    2. les changements de monstre ;
    3. les compétences, par **priorité** décroissante, puis par **VIT** décroissante, puis au hasard en cas d'égalité.
 3. Un monstre mis KO avant d'avoir agi **n'agit pas**.
-4. En fin de tour, chaque monstre actif KO est **remplacé automatiquement** par le premier monstre en vie de l'équipe *(MVP ; laisser le joueur choisir = Could)*.
+4. Quand un monstre actif tombe KO, son joueur **choisit le monstre qui le remplace** parmi ceux encore en vie. Ce choix ne coûte pas de tour :
+   - en solo, le menu n'affiche plus que la liste de l'équipe (« X est K.O. ! Choisissez le monstre qui prend sa place. »), sans retour possible ; l'IA choisit le sien tout de suite (le monstre qui a l'avantage d'élément) ;
+   - en duel, le combat passe par une **phase de remplacement** : seul le joueur concerné joue, l'adversaire voit « l'adversaire choisit son remplaçant… ». Sans réponse avant la fin du compte à rebours, le premier monstre en vie entre en combat.
 5. Un joueur dont tous les monstres sont KO **perd**.
 
 ### 3.2 Statistiques
@@ -114,32 +117,51 @@ Un triangle (comme Feu / Plante / Eau) plus un duo opposé :
 
 ## 5. Bestiaire
 
-Les sprites proposés sont indicatifs : **adapter selon le pack choisi** (voir [CREDITS](CREDITS.md)).
+Les sprites sont dessinés par le code de `tools/art/monsters.mjs` (voir [CREDITS](CREDITS.md)). Le tableau est trié par rareté puis par puissance.
 
-| id | Nom | Élément | PV | ATQ | DEF | VIT | Compétences | Rôle |
-|---|---|---|---|---|---|---|---|---|
-| `salamander` | Salamandre | Feu | 55 | 70 | 45 | 60 | fireball, inferno, strike | **Starter** |
-| `undine` | Ondine | Eau | 60 | 60 | 55 | 55 | water_jet, deluge, strike | **Starter** |
-| `mushroom` | Champignon | Nature | 65 | 55 | 60 | 40 | vine, regrowth, strike | **Starter** |
-| `goblin` | Gobelin | Neutre | 45 | 55 | 40 | 70 | strike, quick_strike, shadow_claw | Commun |
-| `skeleton` | Squelette | Ombre | 50 | 55 | 55 | 40 | shadow_claw, life_drain, strike | Commun |
-| `flying_eye` | Œil volant | Ombre | 40 | 60 | 35 | 75 | shadow_claw, quick_strike, life_drain | Commun |
-| `slime` | Slime | Nature | 65 | 40 | 50 | 30 | vine, regrowth, strike | Commun |
-| `imp` | Diablotin | Feu | 45 | 65 | 35 | 70 | fireball, quick_strike, shadow_claw | Commun |
-| `crab` | Crabe des abysses | Eau | 55 | 60 | 70 | 25 | water_jet, shell_guard, strike | Commun |
-| `wolf` | Loup sylvestre | Nature | 55 | 65 | 40 | 65 | vine, bite, quick_strike | Commun |
-| `wisp` | Feu follet | Lumière | 40 | 60 | 35 | 80 | holy_ray, quick_strike, blessing | Commun |
-| `ghost` | Spectre | Ombre | 45 | 60 | 45 | 60 | soul_leech, shadow_claw, quick_strike | Commun |
-| `knight` | Chevalier déchu | Lumière | 65 | 55 | 65 | 35 | holy_ray, blessing, strike | Rare |
-| `golem` | Golem de pierre | Neutre | 80 | 60 | 75 | 20 | rock_throw, harden, strike | Rare |
-| `siren` | Sirène | Eau | 60 | 60 | 50 | 60 | deluge, water_jet, soothing_song | Rare |
-| `treant` | Tréant | Nature | 75 | 60 | 65 | 25 | thorn_storm, vine, regrowth | Rare |
-| `griffin` | Griffon | Lumière | 60 | 65 | 50 | 65 | sunburst, holy_ray, bite | Rare |
-| `demon` | Démon mineur | Feu | 90 | 70 | 60 | 50 | inferno, fireball, shadow_claw | **Boss** |
-| `lich` | Liche | Ombre | 85 | 75 | 55 | 55 | life_drain, shadow_claw, holy_ray | **Boss** |
-| `dragon` | Dragon ancien | Feu | 95 | 75 | 65 | 45 | inferno, bite, rock_throw | **Boss** |
+| id | Nom | Élément | PV | ATQ | DEF | VIT | Puissance | Rareté | Compétences | Rôle en solo |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `slime` | Slime | Nature | 65 | 40 | 50 | 30 | **185** | Commun | vine, regrowth, strike | Vagues dès la 1re |
+| `skeleton` | Squelette | Ombre | 50 | 55 | 55 | 40 | **200** | Commun | shadow_claw, life_drain, strike | Vagues dès la 1re |
+| `bat` | Chauve-souris vampire | Ombre | 40 | 55 | 35 | 75 | **205** | Commun | life_drain, bite, quick_strike | Vagues dès la 1re |
+| `goblin` | Gobelin | Neutre | 45 | 55 | 40 | 70 | **210** | Commun | strike, quick_strike, shadow_claw | Vagues dès la 1re |
+| `flying_eye` | Œil volant | Ombre | 40 | 60 | 35 | 75 | **210** | Commun | shadow_claw, quick_strike, life_drain | Vagues dès la 1re |
+| `crab` | Crabe des abysses | Eau | 55 | 60 | 70 | 25 | **210** | Commun | water_jet, shell_guard, strike | Vagues dès la 1re |
+| `ghost` | Spectre | Ombre | 45 | 60 | 45 | 60 | **210** | Commun | soul_leech, shadow_claw, quick_strike | Vagues dès la 1re |
+| `imp` | Diablotin | Feu | 45 | 65 | 35 | 70 | **215** | Peu commun | fireball, quick_strike, shadow_claw | Vagues dès la 3e |
+| `wisp` | Feu follet | Lumière | 40 | 60 | 35 | 80 | **215** | Peu commun | holy_ray, quick_strike, blessing | Vagues dès la 3e |
+| `mushroom` | Champignon | Nature | 65 | 55 | 60 | 40 | **220** | Peu commun | vine, regrowth, strike | **Starter** |
+| `knight` | Chevalier déchu | Lumière | 65 | 55 | 65 | 35 | **220** | Peu commun | holy_ray, blessing, strike | Vagues dès la 3e |
+| `wolf` | Loup sylvestre | Nature | 55 | 65 | 40 | 65 | **225** | Peu commun | vine, bite, quick_strike | Vagues dès la 3e |
+| `treant` | Tréant | Nature | 75 | 60 | 65 | 25 | **225** | Peu commun | thorn_storm, vine, regrowth | Vagues dès la 3e |
+| `salamander` | Salamandre | Feu | 55 | 70 | 45 | 60 | **230** | Rare | fireball, inferno, strike | **Starter** |
+| `undine` | Ondine | Eau | 60 | 60 | 55 | 55 | **230** | Rare | water_jet, deluge, strike | **Starter** |
+| `siren` | Sirène | Eau | 60 | 60 | 50 | 60 | **230** | Rare | deluge, water_jet, soothing_song | Vagues dès la 5e |
+| `unicorn` | Licorne | Lumière | 60 | 55 | 55 | 62 | **232** | Rare | holy_ray, blessing, quick_strike | Vagues dès la 5e |
+| `golem` | Golem de pierre | Neutre | 80 | 60 | 75 | 20 | **235** | Rare | rock_throw, harden, strike | Vagues dès la 5e |
+| `griffin` | Griffon | Lumière | 60 | 65 | 50 | 65 | **240** | Rare | sunburst, holy_ray, bite | Vagues dès la 5e |
+| `kraken` | Kraken | Eau | 80 | 70 | 60 | 40 | **250** | Épique | deluge, water_jet, bite | Vagues dès la 8e |
+| `phoenix` | Phénix | Feu | 65 | 75 | 50 | 65 | **255** | Épique | inferno, fireball, regrowth | Vagues dès la 8e |
+| `demon` | Démon mineur | Feu | 90 | 70 | 60 | 50 | **270** | Boss | inferno, fireball, shadow_claw | **Boss** (vagues 5, 10…) |
+| `lich` | Liche | Ombre | 85 | 75 | 55 | 55 | **270** | Boss | life_drain, shadow_claw, holy_ray | **Boss** (vagues 5, 10…) |
+| `hydra` | Hydre | Nature | 100 | 70 | 65 | 40 | **275** | Boss | thorn_storm, vine, regrowth | **Boss** (vagues 5, 10…) |
+| `dragon` | Dragon ancien | Feu | 95 | 75 | 65 | 45 | **280** | Boss | inferno, bite, rock_throw | **Boss** (vagues 5, 10…) |
 
-> 20 espèces (US-29). Chaque élément compte au moins 2 espèces non-boss, pour que le draft du duel (US-18) offre toujours des choix variés. Les boss restent réservés au solo.
+> 25 espèces (US-29, puis 5 nouvelles au sprint 4 : Chauve-souris vampire, Licorne, Kraken, Phénix, Hydre). Chaque élément compte au moins 2 espèces non-boss, pour que le draft du duel (US-18) offre toujours des choix variés. Les boss restent réservés au solo ; les starters n'apparaissent pas dans les vagues.
+
+### 5.1 Raretés
+
+La rareté n'est pas saisie à la main : elle se déduit de la **puissance** de l'espèce, la somme de ses 4 stats de base (`shared/data/rarities.ts`). Un monstre rééquilibré change donc de rareté tout seul.
+
+| Rareté | Puissance | Apparaît dans les vagues | Poids du tirage | Niveau de butin |
+|---|---|---|---|---|
+| Commun | moins de 215 | dès la vague 1 | 50 | 0 |
+| Peu commun | 215 à 229 | dès la vague 3 | 30 | 1 |
+| Rare | 230 à 244 | dès la vague 5 | 20 | 2 |
+| Épique | 245 à 264 | dès la vague 8 | 12 | 3 |
+| Boss | 265 et plus | seulement les vagues 5, 10, 15… | — | 4 |
+
+Pour chaque ennemi d'une vague normale, on tire d'abord une rareté parmi celles déjà débloquées (selon les poids), puis une espèce de cette rareté. Répartition mesurée sur 2 000 seeds : vague 3 → 63 % communs, 37 % peu communs ; vague 8 → 45 % communs, 27 % peu communs, 17 % rares, 11 % épiques.
 
 ## 6. Boucle roguelike (solo)
 
@@ -147,23 +169,32 @@ Les sprites proposés sont indicatifs : **adapter selon le pack choisi** (voir [
 
 | Vague | Ennemis | Niveau ennemi |
 |---|---|---|
-| 1 – 4 | 1 monstre commun | `vague` (niveau 1 à la vague 1) |
-| 5, 10, 15… | 1 boss *(Could, sinon 2 communs)* | `vague + 1` |
-| 6 et + | 2 monstres (communs ou rares) | `vague` |
+| 1 – 4 | 1 monstre (communs, puis peu communs dès la vague 3) | `vague` (niveau 1 à la vague 1) |
+| 5, 10, 15… | **1 boss** seul, bannière « Vague N · BOSS » | `vague + 1` |
+| 6 et + | 2 monstres, raretés débloquées selon §5.1 | `vague` |
 
 - Entre deux vagues : **+20 % des PV max** pour toute l'équipe.
-- Taille d'équipe maximale : **4**.
+- **Ordre de l'équipe** : il ne change jamais. Le monstre qui termine une vague sur le terrain commence la suivante (s'il est KO, c'est le premier monstre en vie).
+- Taille d'équipe maximale : **4 monstres**. Au-delà, un Recrutement demande quel monstre remplacer.
 - Le tirage des ennemis et des récompenses utilise la **seed de la run** (voir [06](06-MOTEUR-DE-COMBAT.md#3-aléatoire-déterministe)).
 
 ### 6.2 Récompenses (1 au choix parmi 3)
 
-| Récompense | Effet | Poids du tirage |
-|---|---|---|
-| 🧪 Potion | Soigne 50 % des PV max de toute l'équipe | 30 |
-| ✨ Élixir | Recharge tous les PP | 15 |
-| 🗡️ Entraînement | +2 niveaux pour un monstre au choix | 25 |
-| 🐾 Recrutement | Ajoute à l'équipe un monstre de l'espèce vaincue (remplace un monstre si l'équipe est pleine) | 20 |
-| 📜 Parchemin | Remplace une compétence par une compétence tirée au hasard | 10 |
+Le **niveau de butin** d'une vague est celui de l'ennemi le plus rare qu'elle contient (§5.1). Une récompense n'est proposée que si le niveau de butin atteint son minimum ; au-dessus de ce minimum, son poids est multiplié par `1 + niveau de butin − minimum`. Les cartes de butin rare sont encadrées de la couleur de leur rareté.
+
+| Récompense | Effet | Poids du tirage | Butin minimal |
+|---|---|---|---|
+| 🧪 Potion | Soigne 50 % des PV max de toute l'équipe, KO compris | 30 | 0 |
+| ✨ Élixir | Recharge tous les PP | 15 | 0 |
+| 🗡️ Entraînement | +2 niveaux pour un monstre au choix | 25 | 0 |
+| 🐾 Recrutement | Le monstre vaincu rejoint l'équipe (remplace un monstre si l'équipe compte déjà 4 monstres) | 20 | 0 |
+| 📜 Parchemin | Remplace une compétence par une compétence tirée au hasard | 10 | 0 |
+| 💖 Potion royale | Soigne tous les PV et recharge tous les PP de l'équipe, KO compris | 14 | 1 (peu commun) |
+| ⚔️ Entraînement intensif | +4 niveaux pour un monstre au choix | 12 | 2 (rare) |
+| 🏕️ Camp d'entraînement | +2 niveaux pour toute l'équipe (un KO reste KO) | 10 | 3 (épique) |
+| 👑 Relique du boss | +3 niveaux pour toute l'équipe, entièrement soignée | garantie | 4 (boss) |
+
+**Butin de boss** : après un boss, la Relique est toujours proposée, et les 2 autres cartes sont tirées parmi les butins rares et le Recrutement (qui fait alors rejoindre le **boss** à l'équipe). Les récompenses ordinaires (Potion, Élixir, Entraînement, Parchemin) ne sortent pas.
 
 ### 6.3 Score
 `score = vague atteinte × 100 + PV restants en fin de run`
@@ -175,7 +206,7 @@ flowchart LR
   T[Écran titre] --> P[Choix du pseudo]
   P --> M[Menu principal]
   M --> S1[Choix du starter] --> C[Combat] --> R[Récompense] --> C
-  C -->|équipe KO| F[Fin de run + score]
+  C -->|équipe KO ou abandon| F[Fin de run + score]
   M --> L[Multijoueur]
   L --> L1[Créer un salon] --> SA[Salon + code]
   L --> L2[Rejoindre avec un code] --> SA

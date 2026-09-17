@@ -1,7 +1,7 @@
 # 🗡️ Dark Dungeon Fantasy Boss battle
 
 Jeu **roguelike pixel-art médiéval-fantasy au tour par tour**, jouable dans le navigateur.
-On peut jouer **en solo** contre des vagues de monstres contrôlés par l'IA, avec une récompense à choisir après chaque vague, ou **en duel multijoueur en ligne** contre un ami : draft des équipes, tours de 60 s, reprise de la partie après un rafraîchissement.
+On peut jouer **en solo** contre des vagues de monstres contrôlés par l'IA (25 espèces classées par rareté, un boss toutes les 5 vagues, une équipe de 4 monstres au maximum), avec une récompense à choisir après chaque vague, ou **en duel multijoueur en ligne** contre un ami : draft des équipes, tours de 60 s, choix du remplaçant après un KO, reprise de la partie après un rafraîchissement.
 Inspiré de *PokeRogue*.
 
 > Projet étudiant réalisé dans le cadre du TP Agile (BTS2). Aucun usage commercial.
