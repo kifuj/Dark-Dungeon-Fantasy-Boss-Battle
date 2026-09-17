@@ -1,10 +1,8 @@
 import { supabaseAdmin } from './supabaseAdmin.ts';
 import { resolveTurn } from './game/engine/battle.ts';
 import { createTurnRng } from './game/engine/rng.ts';
-import { startBattleFromDrafts } from './game/engine/online.ts';
+import { startBattleFromDrafts, TURN_DURATION_MS } from './game/engine/online.ts';
 import type { Action, BattleState } from './game/types.ts';
-
-export const TURN_DURATION_MS = 60_000;
 
 /**
  * Résout le tour courant si les 2 actions sont présentes (docs/04-MULTIJOUEUR.md §5).

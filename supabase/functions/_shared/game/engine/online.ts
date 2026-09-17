@@ -2,7 +2,8 @@
 import { SPECIES } from '../data/monsters.ts';
 import { mulberry32 } from './rng.ts';
 import { createMonster } from './stats.ts';
-import type { BattleState, MonsterInstance, Seat } from '../types.ts';
+import { validateAction } from './validate.ts';
+import type { Action, BattleState, MonsterInstance, Seat } from '../types.ts';
 
 /** Duel en ligne (US-19) : 3 monstres de niveau 10 par joueur, tirés avec la seed du match. */
 export const ONLINE_TEAM_SIZE = 3;
@@ -90,4 +91,26 @@ export function startBattleFromDrafts(state: BattleState, picks: [number[], numb
     ],
     draftOffers: null,
   };
+}
+
+/** Durée d'un tour et marge laissée aux horloges des clients avant de réclamer le timeout (US-20). */
+export const TURN_DURATION_MS = 60_000;
+export const TIMEOUT_GRACE_MS = 2_000;
+
+/**
+ * Action jouée pour un joueur absent (US-20 CA2, docs/04-MULTIJOUEUR.md §7) : la première
+ * compétence qui a encore des PP. `strike` a des PP illimités, il y en a donc toujours une.
+ */
+export function defaultAction(state: BattleState, seat: Seat): Action {
+  const player = state.players[seat];
+  const slot = player.team[player.activeIndex].skills.find((s) => validateAction(state, seat, { type: 'skill', skillId: s.id }).ok);
+  return { type: 'skill', skillId: (slot ?? player.team[player.activeIndex].skills[0]).id };
+}
+
+/** Draft d'un joueur absent : les 3 premières propositions, dans l'ordre. */
+export const DEFAULT_DRAFT_PICKS: readonly number[] = Array.from({ length: ONLINE_TEAM_SIZE }, (_, i) => i);
+
+/** Vrai quand la deadline du tour, marge comprise, est dépassée (US-20 CA3). */
+export function isTurnExpired(turnDeadline: string | null, now: number): boolean {
+  return turnDeadline !== null && now > Date.parse(turnDeadline) + TIMEOUT_GRACE_MS;
 }

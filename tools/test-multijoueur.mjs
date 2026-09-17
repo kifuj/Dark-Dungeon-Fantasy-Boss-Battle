@@ -1,7 +1,9 @@
 // Scénarios de test du multijoueur (docs/04-MULTIJOUEUR.md §11) joués contre le vrai
-// projet Supabase : trois sessions anonymes, un salon, un draft, un duel complet, un abandon.
+// projet Supabase : trois sessions anonymes, un salon, un draft, un duel complet, un abandon,
+// un timeout de tour.
 // Usage : `npm run test:multi` (lit VITE_SUPABASE_URL et VITE_SUPABASE_PUBLISHABLE_KEY
-// dans .env / .env.local ou dans l'environnement).
+// dans .env / .env.local ou dans l'environnement). Avec SUPABASE_ACCESS_TOKEN, la deadline
+// du tour est avancée en SQL pour tester le timeout tout de suite ; sans, on attend 62 s.
 import { readFileSync } from 'node:fs';
 
 function loadEnv() {
@@ -155,6 +157,53 @@ check('US-23 CA2 abandon → match terminé', (await fn('match-forfeit', B, { ma
 const forfeited = await readMatch(A, match2);
 check('US-23 CA2 la victoire revient à l’adversaire', [forfeited.winner_id === A.id, forfeited.last_events.map((e) => e.type)], [true, ['forfeit', 'battle_end']]);
 check('US-23 abandonner deux fois est sans effet', (await fn('match-forfeit', B, { matchId: match2 })).body.status, 'finished');
+
+// --- Timeout de tour (US-20, M3) ---
+const PROJECT_REF = new URL(BASE).hostname.split('.')[0];
+/** Fait comme si la deadline du tour était passée depuis 5 s (API de gestion Supabase), sinon attend 62 s. */
+async function expireDeadline(id) {
+  const token = process.env.SUPABASE_ACCESS_TOKEN;
+  if (!token) {
+    console.log('   (pas de SUPABASE_ACCESS_TOKEN : attente réelle de 62 s)');
+    await new Promise((resolve) => setTimeout(resolve, 62_000));
+    return;
+  }
+  const response = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `update public.matches set turn_deadline = now() - interval '5 seconds' where id = '${id}'` }),
+  });
+  if (!response.ok) throw new Error(`deadline non modifiable (${response.status})`);
+}
+
+const room3 = (await fn('rooms-create', A)).body;
+await fn('rooms-join', B, { code: room3.code });
+const match3 = (await fn('match-start', A, { roomId: room3.roomId })).body.matchId;
+check('US-20 CA3 timeout réclamé avant la deadline → TOO_EARLY', (await fn('match-timeout', A, { matchId: match3 })).body.error, 'TOO_EARLY');
+check('US-20 timeout réclamé par un tiers → NOT_A_PLAYER', (await fn('match-timeout', C, { matchId: match3 })).body.error, 'NOT_A_PLAYER');
+await fn('match-draft', A, { matchId: match3, picks: [2, 1, 0] });
+await expireDeadline(match3);
+check('US-20 draft absent : le timeout lance le combat', (await fn('match-timeout', A, { matchId: match3 })).body.status, 'resolved');
+row = await readMatch(A, match3);
+const offers3 = row.state.players.map((p) => p.team.map((m) => m.speciesId));
+check('US-20 draft absent : l’invité reçoit ses 3 premières propositions', [row.phase, offers3[0].length, offers3[1].length], ['battle', 3, 3]);
+check('US-20 CA1 une nouvelle deadline d’environ 60 s est fixée', Math.round((Date.parse(row.turn_deadline) - Date.now()) / 10_000), 6);
+
+const skillA = firstUsableSkill(row, 0);
+await fn('match-action', A, { matchId: match3, round: row.round, turn: row.turn, action: { type: 'skill', skillId: skillA } });
+check('US-20 CA3 tour pas encore expiré → TOO_EARLY', (await fn('match-timeout', A, { matchId: match3 })).body.error, 'TOO_EARLY');
+await expireDeadline(match3);
+check('US-20 CA2 à 0, le tour est résolu pour le joueur absent', (await fn('match-timeout', A, { matchId: match3 })).body.status, 'resolved');
+const timedOut = await readMatch(A, match3);
+check('US-20 CA2 le tour avance', [timedOut.turn, timedOut.version], [row.turn + 1, row.version + 1]);
+const guestUsed = timedOut.last_events.find((e) => e.type === 'skill_used' && e.seat === 1)?.skillId;
+check('US-20 CA2 l’invité a joué sa première compétence disponible', guestUsed, firstUsableSkill(row, 1));
+check('US-20 l’action de l’hôte a été gardée', timedOut.last_events.find((e) => e.type === 'skill_used' && e.seat === 0)?.skillId, skillA);
+const autoFlags = (await call(`/rest/v1/match_actions?match_id=eq.${match3}&phase=eq.battle&select=is_auto`, { token: B.token })).body;
+check('US-20 l’action de l’invité est marquée is_auto', autoFlags, [{ is_auto: true }]);
+check('US-20 un second appel ne rejoue pas le tour', (await fn('match-timeout', B, { matchId: match3 })).body.error, 'TOO_EARLY');
+await fn('match-forfeit', A, { matchId: match3 });
+check('US-20 timeout après la fin du duel → nothing_to_do', (await fn('match-timeout', B, { matchId: match3 })).body.status, 'nothing_to_do');
 
 console.log(`\n${failures === 0 ? 'Tous les scénarios passent.' : `${failures} scénario(s) en échec.`}`);
 process.exit(failures === 0 ? 0 : 1);

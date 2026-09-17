@@ -34,6 +34,8 @@ export const sendDraft = (matchId: string, picks: number[]) =>
   callApi<{ status: 'waiting' | 'resolved' }>('match-draft', { matchId, picks });
 export const sendAction = (matchId: string, round: number, turn: number, action: Action) =>
   callApi<{ status: 'waiting' | 'resolved' }>('match-action', { matchId, round, turn, action });
+export const claimTimeout = (matchId: string) =>
+  callApi<{ status: 'resolved' | 'nothing_to_do' }>('match-timeout', { matchId });
 export const forfeitMatch = (matchId: string) => callApi<{ status: 'finished' }>('match-forfeit', { matchId });
 
 /** Messages affichés au joueur (docs/05-API.md §5). */
