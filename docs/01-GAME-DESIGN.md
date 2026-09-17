@@ -145,12 +145,12 @@ Les sprites sont dessinés par le code de `tools/art/monsters.mjs` (voir [CREDIT
 | `imp` | Diablotin | Feu | 45 | 65 | 35 | 70 | **215** | Peu commun | fireball, shadow_claw, kindle, strike | Vagues dès la 3e |
 | `wisp` | Feu follet | Lumière | 40 | 60 | 35 | 80 | **215** | Peu commun | holy_ray, quick_strike, blessing, strike | Vagues dès la 3e |
 | `golem` | Golem de pierre | Neutre | 80 | 60 | 55 | 20 | **215** | Peu commun | rock_throw, harden, rumble, strike | Vagues dès la 3e |
-| `mushroom` | Champignon | Nature | 65 | 55 | 60 | 40 | **220** | Peu commun | vine, regrowth, growth, strike | **Starter** · évolue en Myconide (niv. 12) |
+| `mushroom` | Champignon | Nature | 65 | 55 | 60 | 40 | **220** | Peu commun | vine, regrowth, growth, strike | **Starter** · évolue en Myconide (niv. 24) |
 | `knight` | Chevalier déchu | Lumière | 65 | 55 | 65 | 35 | **220** | Peu commun | holy_ray, blessing, holy_zeal, strike | Vagues dès la 3e |
 | `wolf` | Loup sylvestre | Nature | 55 | 65 | 40 | 65 | **225** | Peu commun | vine, bite, howl, strike | Vagues dès la 3e |
 | `treant` | Tréant | Nature | 75 | 60 | 65 | 25 | **225** | Peu commun | thorn_storm, vine, regrowth, strike | Vagues dès la 3e |
-| `salamander` | Salamandre | Feu | 55 | 70 | 45 | 60 | **230** | Rare | fireball, inferno, kindle, strike | **Starter** · évolue en Drakéide (niv. 12) |
-| `undine` | Ondine | Eau | 60 | 60 | 55 | 55 | **230** | Rare | water_jet, deluge, rising_tide, strike | **Starter** · évolue en Naïade (niv. 12) |
+| `salamander` | Salamandre | Feu | 55 | 70 | 45 | 60 | **230** | Rare | fireball, inferno, kindle, strike | **Starter** · évolue en Drakéide (niv. 24) |
+| `undine` | Ondine | Eau | 60 | 60 | 55 | 55 | **230** | Rare | water_jet, deluge, rising_tide, strike | **Starter** · évolue en Naïade (niv. 24) |
 | `siren` | Sirène | Eau | 60 | 60 | 50 | 60 | **230** | Rare | deluge, water_jet, soothing_song, strike | Vagues dès la 5e |
 | `unicorn` | Licorne | Lumière | 60 | 55 | 55 | 62 | **232** | Rare | holy_ray, blessing, holy_zeal, strike | Vagues dès la 5e |
 | `slime_king` | Roi slime | Nature | 88 | 52 | 62 | 30 | **232** | Rare | vine, regrowth, growth, strike | Évolution de Slime (niv. 10) |
@@ -163,9 +163,9 @@ Les sprites sont dessinés par le code de `tools/art/monsters.mjs` (voir [CREDIT
 | `vampire_lord` | Seigneur vampire | Ombre | 55 | 70 | 45 | 77 | **247** | Épique | soul_leech, bite, quick_strike, strike | Évolution de Chauve-souris vampire (niv. 10) |
 | `kraken` | Kraken | Eau | 80 | 70 | 60 | 40 | **250** | Épique | deluge, bite, rising_tide, strike | Vagues dès la 8e |
 | `phoenix` | Phénix | Feu | 65 | 75 | 50 | 65 | **255** | Épique | inferno, fireball, regrowth, strike | Vagues dès la 8e |
-| `myconid` | Myconide | Nature | 75 | 65 | 70 | 45 | **255** | Épique | thorn_storm, vine, growth, strike | Évolution de Champignon (niv. 12) |
-| `drakeid` | Drakéide | Feu | 65 | 80 | 50 | 65 | **260** | Épique | inferno, fireball, kindle, strike | Évolution de Salamandre (niv. 12) |
-| `naiad` | Naïade | Eau | 70 | 70 | 60 | 60 | **260** | Épique | deluge, water_jet, rising_tide, strike | Évolution de Ondine (niv. 12) |
+| `myconid` | Myconide | Nature | 75 | 65 | 70 | 45 | **255** | Épique | thorn_storm, vine, growth, strike | Évolution de Champignon (niv. 24) |
+| `drakeid` | Drakéide | Feu | 65 | 80 | 50 | 65 | **260** | Épique | inferno, fireball, kindle, strike | Évolution de Salamandre (niv. 24) |
+| `naiad` | Naïade | Eau | 70 | 70 | 60 | 60 | **260** | Épique | deluge, water_jet, rising_tide, strike | Évolution de Ondine (niv. 24) |
 | `demon` | Démon mineur | Feu | 90 | 70 | 60 | 50 | **270** | Boss | inferno, shadow_claw, kindle, strike | **Boss** (vagues 5, 10…) |
 | `lich` | Liche | Ombre | 85 | 75 | 55 | 55 | **270** | Boss | life_drain, shadow_claw, dark_pact, strike | **Boss** (vagues 5, 10…) |
 | `hydra` | Hydre | Nature | 100 | 70 | 65 | 40 | **275** | Boss | thorn_storm, vine, regrowth, strike | **Boss** (vagues 5, 10…) |
@@ -174,7 +174,7 @@ Les sprites sont dessinés par le code de `tools/art/monsters.mjs` (voir [CREDIT
 > 35 espèces : 25 de base (US-29, puis 5 nouvelles au sprint 4 : Chauve-souris vampire, Licorne, Kraken, Phénix, Hydre) et **10 évolutions** (US-41).
 > Le Golem de pierre, neutre et donc faible à rien, a vu sa DEF passer de 75 à 55 (US-38).
 >
-> **Évolutions (solo uniquement)** : les 3 starters évoluent au niveau 12, les 7 monstres communs au niveau 10. Une évolution garde l'élément, les compétences, les PP et les PV perdus du monstre. Les évolutions ne sont jamais tirées directement : un ennemi commun tiré à un niveau suffisant arrive déjà évolué (donc à partir de la vague 11). Elles ne sont pas proposées au draft du duel.
+> **Évolutions (solo uniquement)** : les 3 starters évoluent au niveau 24, les 7 monstres communs au niveau 10. Une évolution garde l'élément, les compétences, les PP et les PV perdus du monstre. Les évolutions ne sont jamais tirées directement : un ennemi commun tiré à un niveau suffisant arrive déjà évolué (donc à partir de la vague 11). Elles ne sont pas proposées au draft du duel.
 > Chaque élément compte au moins 2 espèces non-boss, pour que le draft du duel (US-18) offre toujours des choix variés. Les boss restent réservés au solo ; les starters n'apparaissent pas dans les vagues.
 
 ### 5.1 Raretés
