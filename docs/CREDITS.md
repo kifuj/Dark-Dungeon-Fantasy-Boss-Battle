@@ -18,15 +18,11 @@ Dark Dungeon Fantasy Boss battle est un projet étudiant non commercial. Merci a
 
 ## Polices
 
-| Police | Auteur | Lien | Licence |
-|---|---|---|---|
-| *ex. Press Start 2P* | CodeMan38 | https://fonts.google.com/specimen/Press+Start+2P | SIL Open Font License 1.1 |
+Aucune police n'est téléchargée : le jeu utilise les polices déjà installées sur l'appareil (Georgia pour les titres, une police à chasse fixe pour les chiffres), et Phaser dessine les textes de combat avec la police `monospace` du navigateur.
 
 ## Sons et musiques
 
-| Fichier | Auteur | Lien | Licence |
-|---|---|---|---|
-| | | | |
+Le jeu n'a pas encore de son : l'US-25 (musique et effets sonores) est restée dans la réserve du Product Backlog.
 
 ## Bibliothèques
 
@@ -34,6 +30,7 @@ Dark Dungeon Fantasy Boss battle est un projet étudiant non commercial. Merci a
 |---|---|
 | Phaser | MIT |
 | React | MIT |
+| React Router | MIT |
 | @supabase/supabase-js | MIT |
 | Vite | MIT |
 | Vitest | MIT |

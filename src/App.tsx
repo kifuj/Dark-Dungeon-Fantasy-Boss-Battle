@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ProfileProvider, RequireProfile } from './lib/profile.tsx';
+import { Credits } from './pages/Credits.tsx';
 import { Login } from './pages/Login.tsx';
 import { Menu } from './pages/Menu.tsx';
 import { Multiplayer } from './pages/Multiplayer.tsx';
@@ -42,7 +43,7 @@ export default function App() {
           }
         />
         <Route path="/classement" element={<Placeholder title="Classement" />} />
-        <Route path="/credits" element={<Placeholder title="Crédits" />} />
+        <Route path="/credits" element={<Credits />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </ProfileProvider>
