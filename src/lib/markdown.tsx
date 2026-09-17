@@ -13,7 +13,7 @@ const resolveHref = (href: string) => (/^[a-z]+:/i.test(href) || href.startsWith
 
 const INLINE = /(\[[^\]]+\]\([^)]+\)|`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|https?:\/\/[^\s|)]+)/g;
 
-export function renderInline(text: string, keyPrefix = 'i'): ReactNode[] {
+function renderInline(text: string, keyPrefix = 'i'): ReactNode[] {
   return text.split(INLINE).map((part, i) => {
     const key = `${keyPrefix}-${i}`;
     const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(part);
