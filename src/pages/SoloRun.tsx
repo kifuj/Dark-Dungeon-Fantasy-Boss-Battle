@@ -4,15 +4,26 @@ import { resolveTurn } from '../../shared/engine/battle.js';
 import { chooseAiAction } from '../../shared/engine/ai.js';
 import { describeEvents } from '../../shared/engine/log.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
+import { applyReward, drawRewards } from '../../shared/engine/rewards.js';
 import { battleForWave, createRun, nextWave, type RunState } from '../../shared/engine/run.js';
+import type { RewardId } from '../../shared/data/rewards.js';
 import type { Action, BattleState, TurnResult } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
 import { ActionMenu } from '../components/ActionMenu.tsx';
+import { RewardPanel } from '../components/RewardPanel.tsx';
 import { StarterSelect } from './StarterSelect.tsx';
 
+/** Vague gagnée en attente du choix de la récompense (US-12). */
+interface PendingReward {
+  wonWave: number;
+  /** Run de la vague suivante, déjà soignée de 20 %, avant la récompense. */
+  next: RunState;
+  choices: RewardId[];
+}
+
 /**
- * Mode solo (US-10, US-11) : choix du starter, puis enchaînement des vagues contre l'IA.
+ * Mode solo (US-10, US-11, US-12) : choix du starter, puis vagues contre l'IA, avec une récompense entre deux vagues.
  * React garde l'état du combat ; Phaser ne fait que l'afficher (docs/02-ARCHITECTURE.md §5).
  */
 export function SoloRun() {
@@ -21,6 +32,7 @@ export function SoloRun() {
   const [log, setLog] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState<{ wave: number } | null>(null);
+  const [reward, setReward] = useState<PendingReward | null>(null);
   const battleRef = useRef<BattleState | null>(null);
   // Tour résolu en attente de la fin de l'animation Phaser (US-09) avant d'être appliqué à l'état React.
   const pendingRef = useRef<TurnResult | null>(null);
@@ -54,11 +66,10 @@ export function SoloRun() {
       if (!result || !run) return;
       setBattle(result.state);
       if (result.winnerSeat === 0) {
-        const advanced = nextWave(run, result.state.players[0].team); // +20 % de PV max (US-11 CA3)
-        const next = battleForWave(advanced);
-        setRun(advanced);
-        setBattle(next);
-        setLog((lines) => [...lines, `Vague ${advanced.wave} : ${next.players[1].team.map((m) => m.name).join(' et ')} apparaît !`]);
+        const next = nextWave(run, result.state.players[0].team); // +20 % de PV max (US-11 CA3)
+        const [me, foe] = result.state.players;
+        setBattle({ ...result.state, players: [{ ...me, team: next.team }, foe] }); // le soin est visible pendant le choix
+        setReward({ wonWave: run.wave, next, choices: drawRewards(run.seed, run.wave) });
       } else if (result.winnerSeat === 1) {
         setOver({ wave: run.wave }); // fin de run (US-11 CA4)
       }
@@ -77,6 +88,7 @@ export function SoloRun() {
     setRun(fresh);
     setBattle(first);
     setOver(null);
+    setReward(null);
     setLog([`Vague 1 : ${first.players[1].team.map((m) => m.name).join(' et ')} apparaît !`]);
   }, []);
 
@@ -92,6 +104,21 @@ export function SoloRun() {
       EventBus.emit('play-events', result.events); // la scène applique `result` à la fin (`events-played`)
     },
     [battle, busy, run],
+  );
+
+  const chooseReward = useCallback(
+    (id: RewardId, targetUid?: string) => {
+      if (!reward) return;
+      const { next, wonWave } = reward;
+      const outcome = applyReward(next.team, id, { seed: next.seed, wave: wonWave, targetUid });
+      const advanced = { ...next, team: outcome.team };
+      const fight = battleForWave(advanced);
+      setReward(null);
+      setRun(advanced);
+      setBattle(fight);
+      setLog([outcome.message, `Vague ${advanced.wave} : ${fight.players[1].team.map((m) => m.name).join(' et ')} apparaît !`]);
+    },
+    [reward],
   );
 
   if (!run || !battle) {
@@ -133,6 +160,8 @@ export function SoloRun() {
             </Link>
           </div>
         </section>
+      ) : reward ? (
+        <RewardPanel wave={reward.wonWave} seed={reward.next.seed} choices={reward.choices} team={reward.next.team} onChoose={chooseReward} />
       ) : (
         <>
           <ActionMenu state={battle} seat={0} busy={busy} onAction={play} />
