@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom';
 const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const NEXT_KEYS = ['ArrowDown', 'ArrowRight'];
 const PREVIOUS_KEYS = ['ArrowUp', 'ArrowLeft'];
+// Rangée des chiffres d'un clavier AZERTY sans Maj : « & » vaut « 1 », « é » vaut « 2 », etc.
+const AZERTY_DIGITS: Record<string, string> = { '&': '1', 'é': '2', '"': '3', "'": '4', '(': '5', '-': '6', 'è': '7', '_': '8', 'ç': '9', 'à': '0' };
 
 const isVisible = (element: HTMLElement) => element.getClientRects().length > 0 && !element.closest('[aria-hidden="true"]');
 
@@ -21,6 +23,7 @@ const isTextField = (element: Element | null) =>
  * - flèches : passer d'un bouton ou d'un lien à l'autre (Tab marche aussi) ; Entrée ou Espace : valider ;
  * - Échap : bouton « retour » de la page (`data-shortcut="back"`), s'il y en a un ;
  * - une touche indiquée par `data-key` sur un bouton (ex. « 1 » à « 4 » en combat) le déclenche ;
+ *   les chiffres marchent aussi sans Maj sur un clavier AZERTY (« & », « é », « " »…) ;
  * - à chaque changement de page, le premier bouton ou lien reçoit le focus (si rien ne l'a déjà pris).
  * Un composant qui gère lui-même une touche appelle `preventDefault()` : ce raccourci global s'efface.
  */
@@ -52,8 +55,9 @@ export function useKeyboardNavigation() {
       }
 
       if (!typing && event.key.length === 1) {
+        const key = (AZERTY_DIGITS[event.key] ?? event.key).toLowerCase();
         const target = [...document.querySelectorAll<HTMLElement>('[data-key]')].find(
-          (element) => element.dataset.key?.toLowerCase() === event.key.toLowerCase() && isVisible(element) && !(element as HTMLButtonElement).disabled,
+          (element) => element.dataset.key?.toLowerCase() === key && isVisible(element) && !(element as HTMLButtonElement).disabled,
         );
         if (target) {
           event.preventDefault();
