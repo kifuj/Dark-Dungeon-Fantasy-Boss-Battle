@@ -225,13 +225,16 @@ Aucun serveur ne tourne en continu : Render sert des fichiers statiques et les E
 1. `matches.turn_deadline` est fixé à chaque nouveau tour (maintenant + 60 s).
 2. Le client qui attend affiche le compte à rebours. Une fois la deadline dépassée, il appelle la fonction `match-timeout`.
 3. L'API vérifie `now() > turn_deadline + 2 s de marge`, insère une **action par défaut** (`is_auto = true`) pour chaque joueur qui n'a pas joué, puis appelle `tryResolveBattleTurn`.
-4. Action par défaut : première compétence qui a encore des PP (`strike` a des PP infinis, donc il y en a toujours une).
-5. *(Could)* Après 3 timeouts consécutifs du même joueur → défaite par abandon.
+4. Action par défaut (`defaultAction` dans `shared/engine/online.ts`) : première compétence qui a encore des PP. Toutes les espèces n'ont pas `strike` : sans PP, on change de monstre si c'est possible, sinon on frappe quand même avec la première compétence (le moteur la résout). Un duel ne reste donc jamais bloqué.
+5. Pendant le **draft**, un joueur absent reçoit ses 3 premières propositions.
+6. *(Could, non fait)* Après 3 timeouts consécutifs du même joueur → défaite par abandon.
+
+> ✅ **Livré au sprint 4 (US-20).** Le compte à rebours s'affiche pendant le choix et l'attente, et passe en rouge sous 10 s. Le client réclame le timeout une seule fois par tour, puis réessaie toutes les 3 s si le serveur répond `TOO_EARLY` (horloge du PC en avance). Mesure sur la production : tour résolu ~9 s après la deadline avancée de 55 s (5 s restantes + 2 s de marge + relecture périodique + animation).
 
 ## 8. Reconnexion (Should)
 
 - La session Supabase est stockée dans le `localStorage` : un rafraîchissement garde le même utilisateur anonyme.
-- Au lancement, le menu cherche un match `phase <> 'finished'` du joueur (requête dans [03](03-BASE-DE-DONNEES.md#5-requêtes-côté-client-exemples)) et propose « Reprendre la partie ».
+- Au lancement, le menu cherche un match `phase <> 'finished'` du joueur (requête dans [03](03-BASE-DE-DONNEES.md#5-requêtes-côté-client-exemples), `fetchOngoingMatchId` dans `src/lib/matches.ts`) et propose « Reprendre la partie » en tête du menu (US-21, sprint 4).
 - La page du match relit la ligne, affiche l'état **sans rejouer** d'animation, puis vérifie si le joueur a déjà joué ce tour :
 
 ```ts
@@ -276,9 +279,10 @@ Le reste (API, BDD, moteur) ne change pas. **Tester le Realtime sur le réseau d
 ### Scénarios de test manuels
 
 > **Automatisés depuis le sprint 3** : `npm run test:multi` ouvre trois sessions anonymes et rejoue
-> M1, M2, M5, M6, M7 (plus la RLS, l'historique `match_turns` et l'abandon) contre le vrai projet
-> Supabase — 26 vérifications en une vingtaine de secondes. M3 (timeout) et M4 (rafraîchissement)
-> restent manuels tant que l'US-20 et l'US-21 ne sont pas faites.
+> M1, M2, M3, M5, M6, M7 (plus la RLS, l'historique `match_turns`, le draft et l'abandon) contre le vrai
+> projet Supabase : 55 vérifications en une trentaine de secondes. Pour M3, la deadline est avancée par l'API
+> de gestion Supabase si `SUPABASE_ACCESS_TOKEN` est défini ; sinon le script attend vraiment 62 s.
+> M4 est couvert par les tests de composant et a été joué sur deux navigateurs au sprint 4.
 
 | # | Scénario | Résultat attendu |
 |---|---|---|

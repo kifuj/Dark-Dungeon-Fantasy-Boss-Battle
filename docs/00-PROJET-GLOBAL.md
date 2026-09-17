@@ -70,7 +70,7 @@
 | 1 ⚠️ | Mar. 15/09 après-midi | Le squelette est en ligne sur Render et un combat 1v1 se résout correctement dans les tests — **partiellement atteint** (Supabase non configuré) | [SPRINT-1](agile/SPRINT-1.md) |
 | 2 ✅ | Mer. 16/09 matin | Un joueur peut faire un combat solo contre l'IA dans le navigateur, avec de vrais sprites — **atteint** | [SPRINT-2](agile/SPRINT-2.md) |
 | 3 ✅ | Mer. 16/09 après-midi | Deux joueurs sur deux navigateurs peuvent s'affronter en ligne jusqu'à la victoire — **atteint**, vérifié sur la production (Supabase en ligne, 5 Edge Functions déployées) | [SPRINT-3](agile/SPRINT-3.md) |
-| 4 | Jeu. 17/09 matin, **gel du code à 13h** | La boucle roguelike est complète et le jeu est présentable (US-09 en bonus) | [SPRINT-4](agile/SPRINT-4.md) |
+| 4 ✅ | Jeu. 17/09 matin, **gel du code à 13h** | La boucle roguelike est complète, le duel résiste aux rafraîchissements et aux absences, le jeu est présentable — **atteint**, vérifié sur la production (US-09 livrée en bonus) | [SPRINT-4](agile/SPRINT-4.md) |
 | — | Jeu. 17/09 13h30 | 📧 Rendu : lien GitHub + fichiers `.md` | |
 | — | Jeu. 17/09 après-midi | 🎤 Présentation | |
 
@@ -93,9 +93,11 @@
 | 1 | 18 | **12** | US-01 et US-02 non terminées : elles dépendaient de comptes externes (Render, Supabase) plutôt que de code |
 | 2 | 18 | **18** | Sprint Goal atteint ; mode solo jouable en ligne. Les 2 US du sprint 1 restent ouvertes |
 | 3 | 18 | **18** (+ 3 pts d'US-02 récupérés du sprint 1) | Sprint Goal atteint : duel en ligne complet entre deux navigateurs. US-01 reste ouverte (configuration Render) |
-| 4 | 12 | | Engagement réduit : sprint court (gel du code + rendu), US-09 en bonus |
+| 4 | 12 | **12** (+ 5 pts bonus avec US-09) | Sprint Goal atteint : récompenses, timeout, reprise, crédits. Un bug bloquant du solo, trouvé en jouant sur la production, est corrigé. US-01 reste ouverte (accès Render et réglages du dépôt) |
 
-**Vélocité moyenne après 3 sprints : 16 points** (12, 18, 18). L'équipe livre bien ce qu'elle engage en développement ; ce qui traîne depuis le sprint 1, c'est uniquement la **configuration des services externes** (US-01 : règle de réécriture Render, variables d'environnement, protection de `main`). D'où l'action de la rétro du sprint 3 : les 30 premières minutes du sprint 4 y sont consacrées, avant toute nouvelle US. L'engagement du sprint 4 reste à **12 points** : le créneau est amputé par la préparation du rendu de 13h30.
+**Vélocité moyenne sur les 4 sprints : 15 points** (12, 18, 18, 12), soit **60 points terminés sur 66 engagés**, plus 3 points récupérés du sprint 1 (US-02) et 5 points bonus (US-09). Hors sprint, US-18 et US-29 (8 points proposés) ont été livrées le 16/09.
+
+L'équipe livre ce qu'elle engage en développement depuis le sprint 2. Ce qui traîne depuis le sprint 1, c'est uniquement la **configuration des services externes** (US-01 : règle de réécriture du dashboard Render, protection de `main`). Ces tâches demandent des accès, pas du code, et le poste de développement ne les avait pas. Le jeu fonctionne quand même en production grâce au repli `404.html`.
 
 ## 8. Risques
 
@@ -106,7 +108,8 @@
 | Assets de styles ou de tailles hétérogènes | Moyenne | Moyen | Choisir **un** pack de base au sprint 1 et fixer une taille de sprite |
 | Variables d'environnement oubliées sur Render, ou Edge Functions non redéployées | Moyenne | Haut | Checklist de déploiement (doc 07 §6). Au sprint 3, les clés Supabase de Render étaient bien en place et le duel a été vérifié sur la production ; ce qui manque encore, c'est la règle de réécriture du dashboard (US-01) |
 | Projet Supabase en pause le jour J | Faible | Haut | Ouvrir le dashboard la veille et le matin |
-| Sprint 4 trop court pour tout finir | Haute | Haut | Engagement réduit à 12 pts, US-09 en objectif bonus, gel du code à 13h |
+| ~~Sprint 4 trop court pour tout finir~~ | — | — | **Levé** : les 12 pts engagés et US-09 (bonus) sont fusionnés et vérifiés sur la production avant 10h |
+| Réseau lent pendant la démo | Moyenne | Haut | Corrigé au sprint 4 : la run solo ne se fige plus si les sprites arrivent tard (filet de 4,5 s, comme le duel) |
 | Démo qui plante en direct | Moyenne | Haut | Vidéo de secours enregistrée au sprint 4, deux navigateurs préparés |
 
 ## 9. Plan de la présentation (≈ 30 min)
