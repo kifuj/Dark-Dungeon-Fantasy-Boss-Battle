@@ -9,7 +9,7 @@ export default defineConfig({
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   test: {
     // Moteur (`shared/`) + composants React (`src/tests/`, rendus dans jsdom).
-    include: ['shared/tests/**/*.test.ts', 'src/tests/**/*.test.tsx'],
+    include: ['shared/tests/**/*.test.ts', 'src/tests/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
   },
 });

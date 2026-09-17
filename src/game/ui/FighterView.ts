@@ -59,6 +59,8 @@ export class FighterView {
       this.sprite.destroy();
       this.sprite = undefined;
     }
+    // Un fondu de KO peut encore tourner sur ce sprite (remplacement par la même espèce) : on l'arrête.
+    if (this.sprite) this.scene.tweens.killTweensOf(this.sprite);
     if (!this.sprite) {
       this.sprite = this.scene.add
         .sprite(this.layout.sprite.x, this.layout.sprite.y, textureKey, 0)
@@ -79,7 +81,7 @@ export class FighterView {
   update(monster: MonsterInstance) {
     this.displayedHp = { hp: monster.hp, maxHp: monster.maxHp };
     this.applyHp(this.displayedHp);
-    this.sprite?.setAlpha(monster.hp > 0 ? 1 : 0.35);
+    this.sprite?.setAlpha(monster.hp > 0 ? 1 : 0); // un monstre KO a disparu (US-09 CA3), y compris après rechargement
   }
 
   private applyHp({ hp, maxHp }: { hp: number; maxHp: number }) {
@@ -115,17 +117,22 @@ export class FighterView {
     this.scene.time.delayedCall(180, () => this.sprite?.clearTint());
   }
 
-  /** Texte flottant au-dessus de l'encadré : efficacité / critique (US-09 CA2). */
-  popText(text: string) {
+  /**
+   * Texte flottant près de l'encadré : efficacité / critique (US-09 CA2). `row` empile les textes
+   * d'un même coup. L'encadré ennemi touche le haut du canvas : ses textes passent en dessous.
+   */
+  popText(text: string, row = 0) {
+    const { x, y } = this.layout.box;
+    const above = y > 40;
     const t = this.scene.add
-      .text(this.layout.box.x + FighterView.BOX_WIDTH / 2, this.layout.box.y - 6, text, {
+      .text(x + FighterView.BOX_WIDTH / 2, above ? y - 6 - row * 16 : y + 50 + row * 16, text, {
         fontFamily: 'monospace',
         fontSize: '10px',
         color: '#F2D45C',
         backgroundColor: '#0D0D0FCC',
         padding: { x: 4, y: 2 },
       })
-      .setOrigin(0.5, 1)
+      .setOrigin(0.5, above ? 1 : 0)
       .setDepth(10);
     this.scene.tweens.add({ targets: t, y: t.y - 14, alpha: 0, duration: 700, delay: 300, onComplete: () => t.destroy() });
   }
