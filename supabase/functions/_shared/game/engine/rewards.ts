@@ -1,9 +1,10 @@
 // ⚠️ Fichier généré par `npm run functions:sync` — ne pas modifier : éditer shared/ puis relancer la commande.
+import { speciesAtLevel } from '../data/monsters.ts';
 import { REWARDS, type RewardId } from '../data/rewards.ts';
 import { SKILLS } from '../data/skills.ts';
 import { mulberry32, pick } from './rng.ts';
 import { levelUp, levelUpMessage } from './level.ts';
-import { enemiesForWave, isBossWave, lootLevelForWave } from './run.ts';
+import { enemiesForWave, isBossWave, lootLevelForWave, teamLevel } from './run.ts';
 import { createMonster } from './stats.ts';
 import type { MonsterInstance, Rng } from '../types.ts';
 
@@ -12,8 +13,8 @@ export const REWARD_CHOICES = 3;
 export const MAX_TEAM_SIZE = 4;
 export const POTION_HEAL = 0.5;
 export const TRAINING_LEVELS = 1;
-export const INTENSIVE_TRAINING_LEVELS = 2;
-export const WAR_CAMP_LEVELS = 1;
+export const INTENSIVE_TRAINING_LEVELS = 1;
+export const WAR_CAMP_LEVELS = 2;
 export const RELIC_LEVELS = 2;
 /** Le recrutement est proposé au moins une vague sur `RECRUIT_EVERY` : on ne peut plus ne jamais le voir. */
 export const RECRUIT_EVERY = 2;
@@ -55,15 +56,20 @@ export function drawRewards(seed: number, wave: number): RewardId[] {
   return drawn;
 }
 
-/** Monstre qui rejoint l'équipe avec « Recrutement » : le premier ennemi de la vague vaincue. */
-export function recruitFor(seed: number, wave: number): MonsterInstance {
-  const [enemy] = enemiesForWave(seed, wave);
-  return createMonster(enemy.speciesId, enemy.level, `${seed}-r${wave}`);
+/**
+ * Monstre qui rejoint l'équipe avec « Recrutement » : le premier ennemi de la vague vaincue, remonté
+ * au niveau de l'équipe (`teamLevel`) pour qu'il soit tout de suite utile. Il évolue si ce niveau le permet.
+ */
+export function recruitFor(seed: number, wave: number, team: MonsterInstance[]): MonsterInstance {
+  const level = teamLevel(team);
+  const [enemy] = enemiesForWave(seed, wave, level);
+  const recruitLevel = Math.max(enemy.level, level);
+  return createMonster(speciesAtLevel(enemy.speciesId, recruitLevel), recruitLevel, `${seed}-r${wave}`);
 }
 
 /** Vrai si le joueur doit désigner un monstre avant d'appliquer la récompense (CA3). */
 export function needsTarget(reward: RewardId, team: MonsterInstance[]): boolean {
-  if (reward === 'training' || reward === 'intensive_training' || reward === 'scroll') return true;
+  if (reward === 'training' || reward === 'scroll') return true;
   return reward === 'recruit' && team.length >= MAX_TEAM_SIZE;
 }
 
@@ -156,17 +162,15 @@ export function applyReward(
         team: team.map((m) => ({ ...m, hp: m.maxHp, skills: m.skills.map((s) => ({ id: s.id, ppLeft: SKILLS[s.id].pp })) })),
         message: 'L’équipe est entièrement soignée et ses PP sont rechargés.',
       };
-    case 'intensive_training': {
-      const trained = levelUp(target!, INTENSIVE_TRAINING_LEVELS);
+    case 'intensive_training':
       return {
-        team: team.map((m) => (m.uid === trained.uid ? trained : m)),
-        message: levelUpMessage(target!, trained),
+        team: team.map((m) => levelUp(m, INTENSIVE_TRAINING_LEVELS)),
+        message: `Toute l’équipe gagne ${INTENSIVE_TRAINING_LEVELS} niveau !${evolutions(team, INTENSIVE_TRAINING_LEVELS)}`,
       };
-    }
     case 'war_camp':
       return {
         team: team.map((m) => levelUp(m, WAR_CAMP_LEVELS)),
-        message: `Toute l’équipe gagne ${WAR_CAMP_LEVELS} niveau !${evolutions(team, WAR_CAMP_LEVELS)}`,
+        message: `Toute l’équipe gagne ${WAR_CAMP_LEVELS} niveaux !${evolutions(team, WAR_CAMP_LEVELS)}`,
       };
     case 'relic':
       return {
@@ -177,7 +181,7 @@ export function applyReward(
         message: `La relique donne ${RELIC_LEVELS} niveaux à toute l’équipe et la soigne entièrement !${evolutions(team, RELIC_LEVELS)}`,
       };
     case 'recruit': {
-      const recruit = recruitFor(seed, wave);
+      const recruit = recruitFor(seed, wave, team);
       if (!target) return { team: [...team, recruit], message: `${recruit.name} rejoint l’équipe !` };
       return {
         team: team.map((m) => (m.uid === target.uid ? recruit : m)),

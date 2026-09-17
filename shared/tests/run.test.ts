@@ -7,16 +7,23 @@ import {
   createRun,
   enemiesForWave,
   enemyForWave,
+  enemyLevelForWave,
+  FIRST_WAVE_POOL,
   healTeam,
   isBossWave,
   isRunOver,
   lootLevelForWave,
   nextWave,
   raritiesForWave,
+  LATE_WAVE,
   STARTER_IDS,
   STARTER_LEVEL,
+  TEAM_LEVEL_GAP,
+  teamLevel,
   WAVE_POOL,
 } from '../engine/run.js';
+import { elementMultiplier } from '../data/elements.js';
+import { createMonster } from '../engine/stats.js';
 
 describe('US-10 — départ de la run', () => {
   it('démarre avec le starter choisi au niveau 5', () => {
@@ -33,8 +40,33 @@ describe('US-10 — départ de la run', () => {
 });
 
 describe('US-11 — vagues', () => {
-  it('oppose un ennemi de niveau N (niveau 1 à la vague 1)', () => {
-    for (const wave of [1, 2, 4, 12]) expect(enemyForWave(1234, wave).level).toBe(wave);
+  it('fait monter les ennemis de 0,7 niveau par vague jusqu’à la vague 20, puis de 1,5', () => {
+    expect([1, 2, 4, 12, 19].map((wave) => enemyForWave(1234, wave).level)).toEqual([1, 2, 3, 9, 14]);
+    expect([21, 22, 29].map((wave) => enemyForWave(1234, wave).level)).toEqual([16, 17, 28]);
+    expect(LATE_WAVE).toBe(20);
+    expect(enemyLevelForWave(LATE_WAVE)).toBe(14); // calcul entier : pas d'erreur d'arrondi
+  });
+
+  it('ne laisse jamais les ennemis plus de 3 niveaux sous l’équipe (pas d’emballement)', () => {
+    expect(enemyLevelForWave(4, 40)).toBe(40 - TEAM_LEVEL_GAP);
+    expect(enemyLevelForWave(12, 5)).toBe(9); // équipe en retard : la vague décide
+    expect(enemyForWave(1234, 7, 30).level).toBe(27);
+    expect(teamLevel([createMonster('goblin', 10, 'a'), createMonster('slime', 5, 'b')])).toBe(8);
+    // Le combat prend le niveau de l'équipe du joueur.
+    const run = createRun('salamander', 7);
+    const veterans = { ...run, wave: 3, team: [createMonster('salamander', 20, 'v')] };
+    expect(battleForWave(veterans).players[1].team[0].level).toBe(17);
+  });
+
+  it('ne tire en vague 1 aucun ennemi avec un avantage ou une résistance face à un starter', () => {
+    expect(FIRST_WAVE_POOL.length).toBeGreaterThan(1);
+    for (let seed = 0; seed < 500; seed++) {
+      const [enemy] = enemiesForWave(seed, 1);
+      for (const starter of STARTER_IDS) {
+        expect(elementMultiplier(enemy.element, SPECIES[starter].element)).toBeLessThanOrEqual(1);
+        expect(elementMultiplier(SPECIES[starter].element, enemy.element)).toBeGreaterThanOrEqual(1);
+      }
+    }
   });
 
   it('tire toujours le même ennemi pour une seed et une vague données', () => {
@@ -69,8 +101,10 @@ describe('US-11 — vagues', () => {
         if (enemiesForWave(seed, wave).some((m) => EVOLVED_IDS.has(m.speciesId))) evolvedWaves.add(wave);
       }
     }
-    // Ennemis de niveau N à la vague N ; la vague 10 est une vague de boss.
-    expect(Math.min(...evolvedWaves)).toBe(COMMON_EVOLUTION_LEVEL + 1);
+    // Les ennemis atteignent le niveau 10 à la vague 13 (0,7 niveau par vague).
+    expect(Math.min(...evolvedWaves)).toBe(13);
+    expect(enemyLevelForWave(12)).toBe(COMMON_EVOLUTION_LEVEL - 1);
+    expect(enemyLevelForWave(13)).toBe(COMMON_EVOLUTION_LEVEL);
   });
 
   it('remet les boosts à zéro d’une vague à l’autre', () => {
@@ -82,7 +116,7 @@ describe('US-11 — vagues', () => {
   it('oppose 1 monstre jusqu’à la vague 5, puis 2 (game design §6.1)', () => {
     for (const wave of [1, 3, 4]) expect(enemiesForWave(99, wave)).toHaveLength(1);
     for (const wave of [6, 9]) expect(enemiesForWave(99, wave)).toHaveLength(2);
-    expect(enemiesForWave(99, 7).every((m) => m.level === 7)).toBe(true);
+    expect(enemiesForWave(99, 7).every((m) => m.level === enemyLevelForWave(7))).toBe(true);
   });
 
   it('garde le monstre actif et l’ordre de l’équipe d’une vague à l’autre', () => {
@@ -101,7 +135,8 @@ describe('US-11 — vagues', () => {
     const battle = battleForWave(createRun('salamander', 7));
     expect(battle.players[0].userId).toBe('solo');
     expect(battle.players[1].userId).toBeNull();
-    expect(battle.players[1].team[0].level).toBe(1);
+    // Le starter est niveau 5 : l'ennemi de la vague 1 est au plus 3 niveaux en dessous.
+    expect(battle.players[1].team[0].level).toBe(STARTER_LEVEL - TEAM_LEVEL_GAP);
   });
 
   it('rend 20 % des PV max après une vague gagnée, sans dépasser le maximum', () => {
@@ -129,13 +164,14 @@ describe('US-11 — vagues', () => {
 });
 
 describe('US-13 — boss et raretés', () => {
-  it('oppose un boss seul, un niveau au-dessus, toutes les 5 vagues', () => {
+  it('oppose un boss seul toutes les 5 vagues : un niveau au-dessus, sauf le premier, un niveau en dessous', () => {
     for (const wave of [5, 10, 15, 20]) {
       const enemies = enemiesForWave(42, wave);
       expect(enemies).toHaveLength(1);
       expect(BOSS_POOL).toContain(enemies[0].speciesId);
-      expect(enemies[0].level).toBe(wave + 1);
+      expect(enemies[0].level).toBe(enemyLevelForWave(wave) + (wave === 5 ? -1 : 1));
     }
+    expect(enemiesForWave(42, 5)[0].level).toBe(3);
     for (const wave of [4, 6, 11]) expect(isBossWave(wave)).toBe(false);
   });
 

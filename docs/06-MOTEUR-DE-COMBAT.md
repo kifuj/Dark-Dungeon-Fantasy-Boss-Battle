@@ -435,9 +435,9 @@ function onPlayerAction(action: Action) {
 }
 ```
 
-- **Vagues** (`shared/engine/run.ts`) : `enemiesForWave(seed, wave)` renvoie un boss seul si `isBossWave(wave)` (vagues 5, 10…), sinon tire la rareté de chaque ennemi parmi `raritiesForWave(wave)` puis l'espèce. `lootLevelForWave` donne le niveau de butin de la vague.
+- **Vagues** (`shared/engine/run.ts`) : `enemiesForWave(seed, wave, level)` renvoie un boss seul si `isBossWave(wave)` (vagues 5, 10…), sinon tire la rareté de chaque ennemi parmi `raritiesForWave(wave)` puis l'espèce (dans `FIRST_WAVE_POOL` à la vague 1). Le niveau vient de `enemyLevelForWave(wave, level)`, où `level` est `teamLevel(run.team)` : il ne change pas le tirage des espèces, qui ne dépend que de la seed. `lootLevelForWave` donne le niveau de butin de la vague.
 - **Ordre de l'équipe** : `RunState.activeIndex` garde le monstre actif d'une vague à l'autre ; `battleForWave` le remet en jeu s'il est en vie.
-- **Récompenses** (`shared/engine/rewards.ts`) : `rewardPool(seed, wave)` filtre les récompenses selon le niveau de butin ; `drawRewards` place la Relique en tête après un boss.
+- **Récompenses** (`shared/engine/rewards.ts`) : `rewardPool(seed, wave)` filtre les récompenses selon le niveau de butin ; `drawRewards` place la Relique en tête après un boss. `recruitFor(seed, wave, team)` crée la recrue au niveau de l'équipe.
 - **Abandon** : bouton « Abandonner » avec confirmation ; la run s'arrête sur l'écran « Run abandonnée » (pas d'appel serveur, le solo est local).
 
 ## 10. Tests (Vitest)

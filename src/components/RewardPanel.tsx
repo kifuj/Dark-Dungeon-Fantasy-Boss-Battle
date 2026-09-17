@@ -27,7 +27,7 @@ const TARGET_PROMPTS: Record<RewardId, string> = {
   potion: '',
   elixir: '',
   training: 'Quel monstre entraîner ?',
-  intensive_training: 'Quel monstre suit l’entraînement intensif ?',
+  intensive_training: '',
   royal_potion: '',
   war_camp: '',
   relic: '',
@@ -116,7 +116,7 @@ export function RewardPanel({ wave, seed, choices, team, onChoose }: RewardPanel
   }
 
   if (pending) {
-    const recruit = pending === 'recruit' ? recruitFor(seed, wave) : null;
+    const recruit = pending === 'recruit' ? recruitFor(seed, wave, team) : null;
     return (
       <section className="reward-panel" aria-label="Choix du monstre">
         <p className="eyebrow">

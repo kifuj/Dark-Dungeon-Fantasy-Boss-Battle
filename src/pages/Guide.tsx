@@ -9,7 +9,19 @@ import { CRIT_CHANCE } from '../../shared/engine/damage.js';
 import { DRAFT_OFFER_SIZE, ONLINE_LEVEL, ONLINE_TEAM_SIZE, TURN_DURATION_MS } from '../../shared/engine/online.js';
 import { KILLS_PER_LEVEL } from '../../shared/engine/level.js';
 import { MAX_TEAM_SIZE, RECRUIT_EVERY, REWARD_CHOICES } from '../../shared/engine/rewards.js';
-import { BOSS_LEVEL_BONUS, BOSS_WAVE_EVERY, STARTER_IDS, STARTER_LEVEL, WAVE_HEAL, WAVE_WITH_TWO_ENEMIES } from '../../shared/engine/run.js';
+import {
+  BOSS_LEVEL_BONUS,
+  BOSS_WAVE_EVERY,
+  EARLY_LEVELS_PER_10_WAVES,
+  FIRST_BOSS_LEVEL_BONUS,
+  LATE_LEVELS_PER_10_WAVES,
+  LATE_WAVE,
+  STARTER_IDS,
+  STARTER_LEVEL,
+  TEAM_LEVEL_GAP,
+  WAVE_HEAL,
+  WAVE_WITH_TWO_ENEMIES,
+} from '../../shared/engine/run.js';
 import type { SkillDef } from '../../shared/types.js';
 
 /**
@@ -151,11 +163,19 @@ export function Guide() {
           <h2>Solo : les vagues</h2>
           <ul>
             <li>Vous commencez avec un starter niveau {STARTER_LEVEL}.</li>
-            <li>Vague N : un ennemi niveau N. Sa rareté est tirée parmi les raretés déjà débloquées.</li>
+            <li>
+              Vague 1 : un ennemi commun qui n'a ni avantage ni résistance face aux starters. Sa rareté est ensuite tirée parmi les
+              raretés déjà débloquées.
+            </li>
+            <li>
+              Les ennemis gagnent {EARLY_LEVELS_PER_10_WAVES / 10} niveau par vague jusqu'à la vague {LATE_WAVE}, puis{' '}
+              {LATE_LEVELS_PER_10_WAVES / 10} : la fin de run se durcit. Ils ne restent jamais plus de {TEAM_LEVEL_GAP} niveaux sous
+              le niveau moyen de votre équipe.
+            </li>
             <li>À partir de la vague {WAVE_WITH_TWO_ENEMIES} : deux ennemis.</li>
             <li>
-              Toutes les {BOSS_WAVE_EVERY} vagues : un <strong>boss</strong> seul, niveau N + {BOSS_LEVEL_BONUS}. Le butin de boss
-              contient toujours la Relique.
+              Toutes les {BOSS_WAVE_EVERY} vagues : un <strong>boss</strong> seul, {BOSS_LEVEL_BONUS} niveau au-dessus des ennemis
+              de la vague (le premier, {-FIRST_BOSS_LEVEL_BONUS} niveau en dessous). Le butin de boss contient toujours la Relique.
             </li>
             <li>Le monstre sur le terrain à la fin d'une vague commence la suivante ; l'ordre de l'équipe ne change pas.</li>
             <li>Vous pouvez abandonner la run à tout moment pendant un combat.</li>
@@ -172,7 +192,7 @@ export function Guide() {
             </li>
             <li>
               Vous choisissez ensuite 1 récompense parmi {REWARD_CHOICES}. Équipe de {MAX_TEAM_SIZE} monstres maximum. Le recrutement
-              est proposé au moins une vague sur {RECRUIT_EVERY}.
+              est proposé au moins une vague sur {RECRUIT_EVERY}, et la recrue arrive au niveau moyen de votre équipe.
             </li>
             <li>Le parchemin montre la compétence apprise ; vous choisissez celle à oublier (jamais la Frappe).</li>
             <li>La partie s'arrête quand toute l'équipe est KO.</li>

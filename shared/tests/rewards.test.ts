@@ -13,7 +13,7 @@ import {
   scrollNeedsForget,
   scrollSkillFor,
 } from '../engine/rewards.js';
-import { COMMON_EVOLUTION_LEVEL } from '../data/monsters.js';
+import { COMMON_EVOLUTION_LEVEL, speciesAtLevel } from '../data/monsters.js';
 import { BOSS_POOL, createRun, enemiesForWave, lootLevelForWave } from '../engine/run.js';
 import { createMonster } from '../engine/stats.js';
 
@@ -99,13 +99,24 @@ describe('US-12 — effets des récompenses (CA2)', () => {
     expect(message).toBe(`Gobelin évolue en Chef gobelin ! Chef gobelin passe au niveau ${COMMON_EVOLUTION_LEVEL} !`);
   });
 
-  it('Recrutement : le monstre vaincu rejoint l’équipe à son niveau', () => {
-    const before = team();
+  it('Recrutement : le monstre vaincu rejoint l’équipe au niveau de celle-ci', () => {
+    const before = team(); // niveaux 6 et 5 : niveau d'équipe 6
     const [enemy] = enemiesForWave(SEED, 3);
     const { team: after, message } = applyReward(before, 'recruit', ctx());
     expect(after).toHaveLength(3);
-    expect(after[2]).toMatchObject({ speciesId: enemy.speciesId, level: enemy.level, hp: enemy.maxHp });
+    expect(after[2]).toMatchObject({ speciesId: enemy.speciesId, level: 6, hp: createMonster(enemy.speciesId, 6, 'x').maxHp });
     expect(message).toContain('rejoint');
+  });
+
+  it('Recrutement : la recrue garde le niveau de l’ennemi s’il dépasse celui de l’équipe, et évolue si elle peut', () => {
+    expect(recruitFor(SEED, 30, [createMonster('goblin', 1, 'g')]).level).toBe(enemiesForWave(SEED, 30, 1)[0].level);
+    const veterans = [createMonster('salamander', COMMON_EVOLUTION_LEVEL + 5, 'v')];
+    for (let seed = 0; seed < 50; seed++) {
+      const recruit = recruitFor(seed, 2, veterans);
+      expect(recruit.level).toBe(COMMON_EVOLUTION_LEVEL + 5);
+      expect(recruit.speciesId).toBe(speciesAtLevel(recruit.speciesId, recruit.level));
+      expect(recruit.kills ?? 0).toBe(0);
+    }
   });
 
   it('Parchemin : la compétence choisie par le joueur est oubliée, jamais la Frappe', () => {
@@ -160,7 +171,7 @@ describe('US-12 — équipe pleine (CA3)', () => {
   it('remplace le monstre désigné par la recrue, sans dépasser 4', () => {
     const { team: after, message } = applyReward(fullTeam(), 'recruit', ctx('m2'));
     expect(after).toHaveLength(MAX_TEAM_SIZE);
-    expect(after[2]).toEqual(recruitFor(SEED, 3));
+    expect(after[2]).toEqual(recruitFor(SEED, 3, fullTeam()));
     expect(after.map((m) => m.uid)).toEqual(['m0', 'm1', `${SEED}-r3`, 'm3']);
     expect(message).toContain('remplace Gobelin');
   });
@@ -208,7 +219,7 @@ describe('US-13 — butin selon la rareté et butin de boss', () => {
   });
 
   it('Recrutement après un boss : le boss rejoint l’équipe', () => {
-    expect(BOSS_POOL).toContain(recruitFor(SEED, 5).speciesId);
+    expect(BOSS_POOL).toContain(recruitFor(SEED, 5, team()).speciesId);
   });
 
   const team = () => [createMonster('salamander', 6, 'a'), { ...createMonster('goblin', 5, 'b'), hp: 0 }];
@@ -222,17 +233,19 @@ describe('US-13 — butin selon la rareté et butin de boss', () => {
     }
   });
 
-  it('Entraînement intensif : +2 niveaux pour le monstre choisi', () => {
-    const { team: after } = applyReward(team(), 'intensive_training', ctx('a'));
-    expect(after[0].level).toBe(8);
-    expect(after[1].level).toBe(5);
-    expect(needsTarget('intensive_training', team())).toBe(true);
+  it('Entraînement intensif : +1 niveau pour toute l’équipe, sans choisir de monstre', () => {
+    const { team: after, message } = applyReward(team(), 'intensive_training', ctx());
+    expect(after.map((m) => m.level)).toEqual([7, 6]);
+    expect(after[1].hp).toBe(0); // un KO reste KO
+    expect(needsTarget('intensive_training', team())).toBe(false);
+    expect(message).toBe('Toute l’équipe gagne 1 niveau !');
   });
 
-  it('Camp d’entraînement : +1 niveau pour toute l’équipe, un KO reste KO', () => {
-    const { team: after } = applyReward(team(), 'war_camp', ctx());
-    expect(after.map((m) => m.level)).toEqual([7, 6]);
+  it('Camp d’entraînement : +2 niveaux pour toute l’équipe, un KO reste KO', () => {
+    const { team: after, message } = applyReward(team(), 'war_camp', ctx());
+    expect(after.map((m) => m.level)).toEqual([8, 7]);
     expect(after[1].hp).toBe(0);
+    expect(message).toBe('Toute l’équipe gagne 2 niveaux !');
   });
 
   it('Relique : +2 niveaux et soin complet pour toute l’équipe', () => {
