@@ -2,19 +2,8 @@ import { Scene, type GameObjects } from 'phaser';
 import { EventBus } from '../EventBus.ts';
 import { GAME_HEIGHT, GAME_WIDTH } from '../config.ts';
 import { FighterView } from '../ui/FighterView.ts';
+import { EVENT_DURATION } from '../timing.ts';
 import type { BattleEvent, BattleState, Seat } from '../../../shared/types.js';
-
-/** Durée (ms) allouée à chaque type d'événement rejoué (US-09 CA1/CA4 : un tour < 4 s). */
-const EVENT_DURATION: Record<BattleEvent['type'], number> = {
-  skill_used: 550,
-  damage: 550,
-  heal: 500,
-  buff: 500,
-  faint: 550,
-  switch: 400,
-  forfeit: 0,
-  battle_end: 0,
-};
 
 export interface BattleInit {
   state: BattleState;
@@ -150,9 +139,12 @@ export class BattleScene extends Scene {
         const view = this.seatView(event.targetSeat);
         view.flash();
         view.animateHpTo({ hp: event.hpAfter, maxHp: event.maxHp }, EVENT_DURATION.damage);
-        if (event.crit) view.popText('Coup critique !');
-        else if (event.effectiveness > 1) view.popText("C'est super efficace !");
-        else if (event.effectiveness < 1) view.popText("Ce n'est pas très efficace…");
+        // Critique et efficacité peuvent se cumuler : les deux textes s'affichent, l'un au-dessus de l'autre (CA2).
+        const texts = [
+          event.crit ? 'Coup critique !' : null,
+          event.effectiveness > 1 ? "C'est super efficace !" : event.effectiveness < 1 ? "Ce n'est pas très efficace…" : null,
+        ].filter((text): text is string => text !== null);
+        texts.forEach((text, row) => view.popText(text, row));
         break;
       }
       case 'heal':
