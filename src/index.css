@@ -1083,3 +1083,42 @@ h2,
   font-weight: bold;
   letter-spacing: 0.2em;
 }
+
+/* ---------- Classement (US-14) ---------- */
+
+.leaderboard-panel { width: min(100%, 640px); gap: 0.4rem; }
+.leaderboard-panel > .button { width: min(100%, 320px); margin-top: 1.2rem; }
+.leaderboard-panel > .back-button { margin-top: 0.6rem; }
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid rgba(74, 71, 69, 0.7);
+  text-align: right;
+}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2) {
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.leaderboard-table th {
+  color: var(--bone);
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.leaderboard-table td:first-child { color: rgba(194, 181, 154, 0.65); }
+.leaderboard-table tbody tr:nth-child(-n + 3) td:first-child { color: var(--ember); font-weight: bold; }
+.leaderboard-me td { background: rgba(194, 181, 154, 0.08); color: var(--bone); }
+
+.run-save { margin: 0; font-size: 0.85rem; color: rgba(194, 181, 154, 0.72); }

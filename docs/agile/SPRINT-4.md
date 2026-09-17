@@ -273,7 +273,7 @@ Sprint Goal relu, board capturé (jalon `Sprint 4` à 0 %), US découpées en t�
 - **Points engagés** : 12 (+ 5 bonus) — **Points terminés** : **12** (+ 5 bonus avec US-09)
 - **Sprint Goal atteint ?** ☑ Oui ☐ Partiellement ☐ Non
 - **Écart de DoD assumé** : comme aux sprints 2 et 3, les PR ont un relecteur désigné mais sont fusionnées par le même compte. La protection de `main`, activée pendant ce sprint, impose désormais une PR, sans exiger encore d'approbation.
-- **Reste dans le Product Backlog (pistes pour la suite) :** US-01 (réglages Render et GitHub), US-14 (score et classement), US-22 (duel en 3 manches), US-25 (audio), US-27 (mobile), US-28 (statuts). Donner `strike` (ou une compétence à PP illimités) à toutes les espèces.
+- **Reste dans le Product Backlog (pistes pour la suite) :** US-01 (réglages Render et GitHub), US-14 (score et classement, livrée ensuite hors sprint le 17/09, voir le Product Backlog), US-22 (duel en 3 manches), US-25 (audio), US-27 (mobile), US-28 (statuts). Donner `strike` (ou une compétence à PP illimités) à toutes les espèces.
 
 📸 **Jalon `Sprint 4` en fin de sprint** (US-01 seule ouverte) :
 
