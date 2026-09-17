@@ -29,7 +29,7 @@
 - Timeout de tour, reconnexion après un rafraîchissement, abandon (duel et solo).
 - Boss et raretés des monstres *(livrés en bonus au sprint 4)*, choix du remplaçant après un KO *(livré en bonus au sprint 4)*.
 - Classement *(US-14, ajouté après le rendu, hors sprint)*, statuts (brûlure, poison), sons, version mobile.
-- *Ajoutés après le rendu, hors sprint (US-35 à US-44)* : Frappe pour tous, niveau gagné par KO, parchemin choisi, boosts d'attaque, évolutions, recrutement garanti, jeu au clavier, revanche en duel ; musique de combat (US-25, partielle).
+- *Ajoutés après le rendu, hors sprint (US-35 à US-45)* : Frappe pour tous, niveau gagné par KO, parchemin choisi, boosts d'attaque, évolutions, recrutement garanti, jeu au clavier, revanche en duel, difficulté solo rééquilibrée ; musique de combat (US-25, partielle).
 
 ### ❌ Hors périmètre
 - Matchmaking automatique, chat, comptes avec e-mail et mot de passe, boutique, plus de 2 joueurs.
@@ -97,7 +97,7 @@
 | 3 | 18 | **18** (+ 3 pts d'US-02 récupérés du sprint 1) | Sprint Goal atteint : duel en ligne complet entre deux navigateurs. US-01 reste ouverte (configuration Render) |
 | 4 | 12 | **12** (+ 5 pts bonus avec US-09, + 18 pts bonus ajoutés par le PO) | Sprint Goal atteint : récompenses, timeout, reprise, crédits. En bonus : choix du remplaçant après un KO (solo et duel), raretés et butins, boss, 5 nouveaux monstres, abandon en solo. Un bug bloquant du solo, trouvé en jouant sur la production, est corrigé. US-01 reste ouverte (accès Render et réglages du dépôt) |
 
-**Vélocité moyenne sur les 4 sprints : 15 points** (12, 18, 18, 12), soit **60 points terminés sur 66 engagés**, plus 3 points récupérés du sprint 1 (US-02) et 23 points bonus (US-09, puis US-13 et US-30 à US-34 ajoutées par le PO le 17/09, estimations à rejouer). Hors sprint, US-18 et US-29 (8 points proposés) ont été livrées le 16/09, puis US-14, US-35 à US-44 et une partie d'US-25 le 17/09 après le rendu : ces points ne comptent pas dans la vélocité.
+**Vélocité moyenne sur les 4 sprints : 15 points** (12, 18, 18, 12), soit **60 points terminés sur 66 engagés**, plus 3 points récupérés du sprint 1 (US-02) et 23 points bonus (US-09, puis US-13 et US-30 à US-34 ajoutées par le PO le 17/09, estimations à rejouer). Hors sprint, US-18 et US-29 (8 points proposés) ont été livrées le 16/09, puis US-14, US-35 à US-45 et une partie d'US-25 le 17/09 après le rendu : ces points ne comptent pas dans la vélocité.
 
 L'équipe livre ce qu'elle engage en développement depuis le sprint 2. Ce qui traîne depuis le sprint 1, c'est uniquement la **configuration des services externes** (US-01 : règle de réécriture du dashboard Render, protection de `main`). Ces tâches demandent des accès, pas du code. La protection de `main` a été activée au sprint 4 ; la règle de réécriture Render reste à faire depuis le dashboard. Le jeu fonctionne quand même en production grâce au repli `404.html`.
 

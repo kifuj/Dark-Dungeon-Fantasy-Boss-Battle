@@ -68,7 +68,7 @@ describe('US-12 — écran de récompense', () => {
     render(<RewardPanel wave={3} seed={SEED} choices={['recruit', 'potion', 'elixir']} team={fullTeam} onChoose={onChoose} />);
     await userEvent.click(screen.getByRole('button', { name: /Recrutement/ }));
     expect(screen.getByText('Votre équipe est pleine. Quel monstre remplacer ?')).toBeTruthy();
-    expect(screen.getByText(new RegExp(`${recruitFor(SEED, 3).name} \\(N\\.3\\) veut rejoindre`))).toBeTruthy();
+    expect(screen.getByText(new RegExp(`${recruitFor(SEED, 3, fullTeam).name} \\(N\\.5\\) veut rejoindre`))).toBeTruthy();
     await userEvent.click(screen.getByRole('button', { name: /Changer de récompense/ }));
     expect(screen.getByText('Choisissez une récompense')).toBeTruthy();
     await userEvent.click(screen.getByRole('button', { name: /Recrutement/ }));

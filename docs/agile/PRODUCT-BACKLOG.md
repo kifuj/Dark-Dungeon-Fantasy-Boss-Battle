@@ -77,9 +77,10 @@ Une user story est terminée si :
 | US-42 | Solo | Recrutement plus fréquent, garanti une vague sur deux | Should | 1 | *1 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
 | US-43 | Contenu | Jouer entièrement au clavier | Should | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
 | US-44 | Multijoueur | Revanche sans recréer de salon | Should | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-45 | Solo | Équilibrer la difficulté de la run solo | Should | 5 | *5 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
 | — | — | Matchmaking automatique, chat, 3+ joueurs | Won't | — | — | — |
 
-**Total proposé** : 140 points, dont 56 en Must (US-30 à US-34 ajoutées le 17/09 par le PO, 15 points ; US-35 à US-44 ajoutées le 17/09 après le rendu, 24 points, hors vélocité). Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
+**Total proposé** : 145 points, dont 56 en Must (US-30 à US-34 ajoutées le 17/09 par le PO, 15 points ; US-35 à US-45 ajoutées le 17/09 après le rendu, 29 points, hors vélocité). Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
 
 ## 4. Planning Poker
 
@@ -124,7 +125,7 @@ Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, 
 | US-09 Animations *(bonus)* | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | La file d'événements existe depuis le sprint 2, le calibrage reste à faire |
 | US-18 Draft *(rejouée après coup)* | 5 / 5 / 8 / 5 | 5 / 5 / 5 / 5 | **5** | L'Edge Function réutilise le verrou du sprint 3 |
 | US-29 Bestiaire *(rejouée après coup)* | 3 / 2 / 3 / 3 | — | **3** | Les sprites sont générés par le code existant |
-| US-35 à US-44, US-25 *(bonus hors sprint, 17/09 après le rendu)* | à voter | — | *2, 3, 2, 1, 1, 3, 5, 1, 3, 3 et 3 proposés* | Demandées par le PO après le rendu (liste `TODO.md`) ; estimation proposée, à rejouer en Planning Poker |
+| US-35 à US-45, US-25 *(bonus hors sprint, 17/09 après le rendu)* | à voter | — | *2, 3, 2, 1, 1, 3, 5, 1, 3, 3, 5 et 3 proposés* | Demandées par le PO après le rendu (liste `TODO.md`) ; estimation proposée, à rejouer en Planning Poker |
 | US-13, US-30 à US-34 *(bonus, ajoutées le 17/09)* | à voter | — | *3, 5, 5, 3, 1, 1 proposés* | Demandées par le PO pendant le sprint 4 et livrées en bonus ; estimation proposée, à rejouer en Planning Poker |
 Détail des séances : [Sprint 1 — Planning Poker](SPRINT-1.md#planning-poker), [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les votes du sprint 4 sont à reporter dans [Sprint 4 — Planning Poker](SPRINT-4.md#planning-poker).
 
@@ -322,7 +323,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 
 - **CA1** : Mon monstre gagne 1 niveau tous les 2 puis 3 ennemis mis KO, en alternance (stats et PV max recalculés, PV perdus conservés) ; le texte « X passe au niveau N ! » s'affiche pendant le combat et reste lisible sur l'écran de récompense.
 - **CA2** : Les ennemis ne gagnent jamais de niveau, et le duel en ligne n'est pas concerné.
-- **CA3** : Les récompenses de niveaux sont réduites : Entraînement +1, Entraînement intensif +2, Camp d'entraînement +1, Relique +2.
+- **CA3** : Les récompenses de niveaux sont réduites : Entraînement +1, Entraînement intensif +2, Camp d'entraînement +1, Relique +2 (Entraînement intensif et Camp modifiés par US-45).
 
 > ✅ Livrée le 17/09 après le rendu, hors sprint. Rééquilibrée le même jour : 1 niveau par KO faisait monter les niveaux trop vite.
 
@@ -342,6 +343,18 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA2** : Il est toujours proposé après les vagues paires, même quand le tirage ne l'a pas sorti.
 
 > ✅ Livrée le 17/09 après le rendu, hors sprint.
+
+#### US-45 — Équilibrer la difficulté de la run solo · Should · 5 pts
+**En tant que** joueur solo, **je veux** une run qui ne s'arrête ni sur un mauvais tirage en début de partie, ni jamais une fois bien lancée **afin que** chaque vague reste un vrai défi.
+
+- **CA1** : L'ennemi de la vague 1 n'a ni avantage ni résistance face à l'un des starters (ni feu, ni eau, ni nature).
+- **CA2** : Les ennemis ne restent jamais plus de 3 niveaux sous le niveau moyen de l'équipe (plus d'emballement).
+- **CA3** : Les ennemis gagnent 0,7 niveau par vague jusqu'à la vague 20, puis 1,5 ; le premier boss (vague 5) est un niveau sous la vague, les suivants un niveau au-dessus.
+- **CA4** : Une recrue rejoint l'équipe au niveau moyen de celle-ci (ou au sien s'il est plus haut), évoluée si ce niveau le permet.
+- **CA5** : L'Entraînement intensif donne +1 niveau à toute l'équipe (au lieu de +2 à un monstre) et le Camp d'entraînement +2 à toute l'équipe.
+- **CA6** : Le Guide et le game design décrivent ces règles.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint. Réglée avec 1 800 runs simulées sur le moteur : sur `main`, 86 à 100 % des runs d'un joueur attentif mouraient au boss de la vague 5 ; après réglage, la run médiane va de la vague 18 à 31 (maximum 67), aucune ne meurt à la vague 1 et presque aucune ne dépasse la vague 50.
 
 #### US-14 — Score et classement · Should · 3 pts
 **En tant que** joueur, **je veux** voir mon score et le top 20 **afin de** me comparer aux autres.

@@ -197,9 +197,17 @@ Pour chaque ennemi d'une vague normale, on tire d'abord une rareté parmi celles
 
 | Vague | Ennemis | Niveau ennemi |
 |---|---|---|
-| 1 – 4 | 1 monstre (communs, puis peu communs dès la vague 3) | `vague` (niveau 1 à la vague 1) |
-| 5, 10, 15… | **1 boss** seul, bannière « Vague N · BOSS » | `vague + 1` |
-| 6 et + | 2 monstres, raretés débloquées selon §5.1 | `vague` |
+| 1 | 1 monstre commun **sans avantage ni résistance face à un starter** (ni feu, ni eau, ni nature) | voir ci-dessous |
+| 2 – 4 | 1 monstre (communs, puis peu communs dès la vague 3) | voir ci-dessous |
+| 5 | **1 boss** seul, bannière « Vague N · BOSS » | niveau de la vague **− 1** (premier boss adouci) |
+| 10, 15, 20… | **1 boss** seul | niveau de la vague **+ 1** |
+| 6 et + | 2 monstres, raretés débloquées selon §5.1 | voir ci-dessous |
+
+**Niveau des ennemis** (US-45) : `max(montée de la vague, niveau d'équipe − 3)`.
+- **Montée de la vague** : +0,7 niveau par vague jusqu'à la vague 20 (niveau 14), puis **+1,5 par vague** : la fin de run se durcit nettement (niveau 16 à la vague 21, 29 à la vague 30). Arrondi au supérieur, calculé en entiers.
+- **Niveau d'équipe** : moyenne des niveaux de l'équipe (KO compris). Les ennemis ne restent jamais plus de 3 niveaux en dessous : une équipe très entraînée ne peut plus s'emballer. Le starter étant niveau 5, l'ennemi de la vague 1 est niveau 2.
+
+Réglage mesuré sur 300 runs par starter avec un joueur simulé attentif : la run médiane s'arrête entre la vague 18 et la vague 31 (maximum 67), presque plus aucune run ne dépasse la vague 50, et plus aucune ne meurt à la vague 1. Un joueur qui attaque au hasard s'arrête vers la vague 10.
 
 - Entre deux vagues : **+20 % des PV max** pour toute l'équipe.
 - **Expérience** (US-36) : chaque monstre du joueur compte les ennemis qu'il met KO et gagne **1 niveau tous les 2 puis 3 KO**, en alternance (paliers à 2, 5, 7, 10… KO), pour que les niveaux ne montent pas trop vite (jamais pour les ennemis, jamais en duel). Le gain et l'éventuelle évolution s'affichent pendant le combat.
@@ -216,14 +224,16 @@ Le **niveau de butin** d'une vague est celui de l'ennemi le plus rare qu'elle co
 | 🧪 Potion | Soigne 50 % des PV max de toute l'équipe, KO compris | 30 | 0 |
 | ✨ Élixir | Recharge tous les PP | 15 | 0 |
 | 🗡️ Entraînement | +1 niveau pour un monstre au choix | 20 | 0 |
-| 🐾 Recrutement | Le monstre vaincu rejoint l'équipe (remplace un monstre si l'équipe compte déjà 4 monstres). **Garanti les vagues paires** | 35 | 0 |
+| 🐾 Recrutement | Le monstre vaincu rejoint l'équipe **au niveau de l'équipe** (ou à son propre niveau s'il est plus haut), déjà évolué si ce niveau le permet. Il remplace un monstre si l'équipe compte déjà 4 monstres. **Garanti les vagues paires** | 35 | 0 |
 | 📜 Parchemin | Montre la compétence tirée au hasard ; le joueur choisit celle qu'elle remplace (jamais la Frappe) | 10 | 0 |
 | 💖 Potion royale | Soigne tous les PV et recharge tous les PP de l'équipe, KO compris | 14 | 1 (peu commun) |
-| ⚔️ Entraînement intensif | +2 niveaux pour un monstre au choix | 12 | 2 (rare) |
-| 🏕️ Camp d'entraînement | +1 niveau pour toute l'équipe (un KO reste KO) | 10 | 3 (épique) |
+| ⚔️ Entraînement intensif | +1 niveau pour toute l'équipe (un KO reste KO) | 12 | 2 (rare) |
+| 🏕️ Camp d'entraînement | +2 niveaux pour toute l'équipe (un KO reste KO) | 10 | 3 (épique) |
 | 👑 Relique du boss | +2 niveaux pour toute l'équipe, entièrement soignée | garantie | 4 (boss) |
 
 Les monstres gagnant maintenant leurs niveaux en combat, les récompenses d'entraînement ont été divisées par deux environ (US-36) : se soigner reste un vrai choix. Le Recrutement pèse 35 au lieu de 20 et il est **toujours proposé une vague sur deux** (US-42).
+
+Depuis US-45, les butins de niveaux rares profitent à toute l'équipe (Entraînement intensif +1, Camp +2) plutôt qu'à un seul monstre, et une recrue arrive au niveau de l'équipe : elle est utile tout de suite au lieu de tomber au premier coup.
 
 **Butin de boss** : après un boss, la Relique est toujours proposée, et les 2 autres cartes sont tirées parmi les butins rares et le Recrutement (qui fait alors rejoindre le **boss** à l'équipe). Les récompenses ordinaires (Potion, Élixir, Entraînement, Parchemin) ne sortent pas.
 
