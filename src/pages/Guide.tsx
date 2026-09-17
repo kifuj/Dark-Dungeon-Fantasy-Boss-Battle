@@ -7,7 +7,7 @@ import { SKILLS } from '../../shared/data/skills.js';
 import { ATK_UP_MULT, DEF_UP_MULT } from '../../shared/engine/battle.js';
 import { CRIT_CHANCE } from '../../shared/engine/damage.js';
 import { DRAFT_OFFER_SIZE, ONLINE_LEVEL, ONLINE_TEAM_SIZE, TURN_DURATION_MS } from '../../shared/engine/online.js';
-import { KILL_LEVELS } from '../../shared/engine/level.js';
+import { KILLS_PER_LEVEL } from '../../shared/engine/level.js';
 import { MAX_TEAM_SIZE, RECRUIT_EVERY, REWARD_CHOICES } from '../../shared/engine/rewards.js';
 import { BOSS_LEVEL_BONUS, BOSS_WAVE_EVERY, STARTER_IDS, STARTER_LEVEL, WAVE_HEAL, WAVE_WITH_TWO_ENEMIES } from '../../shared/engine/run.js';
 import type { SkillDef } from '../../shared/types.js';
@@ -159,7 +159,10 @@ export function Guide() {
             </li>
             <li>Le monstre sur le terrain à la fin d'une vague commence la suivante ; l'ordre de l'équipe ne change pas.</li>
             <li>Vous pouvez abandonner la run à tout moment pendant un combat.</li>
-            <li>Chaque ennemi mis KO fait gagner {KILL_LEVELS} niveau au monstre qui l'a abattu (en solo seulement).</li>
+            <li>
+              Un monstre gagne 1 niveau tous les {KILLS_PER_LEVEL[0]} puis {KILLS_PER_LEVEL[1]} ennemis mis KO (en alternance, en solo
+              seulement).
+            </li>
             <li>
               Évolutions : les starters évoluent au niveau {STARTER_EVOLUTION_LEVEL}, les monstres communs au niveau{' '}
               {COMMON_EVOLUTION_LEVEL}. Les ennemis communs de haut niveau arrivent déjà évolués.

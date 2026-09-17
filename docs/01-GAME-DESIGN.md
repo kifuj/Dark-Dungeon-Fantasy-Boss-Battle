@@ -202,7 +202,7 @@ Pour chaque ennemi d'une vague normale, on tire d'abord une rareté parmi celles
 | 6 et + | 2 monstres, raretés débloquées selon §5.1 | `vague` |
 
 - Entre deux vagues : **+20 % des PV max** pour toute l'équipe.
-- **Expérience** (US-36) : chaque ennemi mis KO fait gagner **1 niveau** au monstre du joueur qui l'a abattu (jamais aux ennemis, jamais en duel). Le gain et l'éventuelle évolution s'affichent pendant le combat.
+- **Expérience** (US-36) : chaque monstre du joueur compte les ennemis qu'il met KO et gagne **1 niveau tous les 2 puis 3 KO**, en alternance (paliers à 2, 5, 7, 10… KO), pour que les niveaux ne montent pas trop vite (jamais pour les ennemis, jamais en duel). Le gain et l'éventuelle évolution s'affichent pendant le combat.
 - **Ordre de l'équipe** : il ne change jamais. Le monstre qui termine une vague sur le terrain commence la suivante (s'il est KO, c'est le premier monstre en vie).
 - Taille d'équipe maximale : **4 monstres**. Au-delà, un Recrutement demande quel monstre remplacer.
 - Le tirage des ennemis et des récompenses utilise la **seed de la run** (voir [06](06-MOTEUR-DE-COMBAT.md#3-aléatoire-déterministe)).

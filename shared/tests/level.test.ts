@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { COMMON_EVOLUTION_LEVEL, STARTER_EVOLUTION_LEVEL } from '../data/monsters.js';
 import { resolveTurn } from '../engine/battle.js';
-import { grantKillLevels, KILL_LEVELS, levelUp } from '../engine/level.js';
+import { grantKillLevels, levelsFromKills, levelUp } from '../engine/level.js';
 import { createMonster } from '../engine/stats.js';
 import { fixedRng, makeBattle } from './helpers.js';
 import type { BattleState } from '../types.js';
@@ -13,12 +13,25 @@ function lethalTurn(state: BattleState) {
 }
 
 describe('Niveau gagné en mettant un ennemi K.O. (solo)', () => {
-  it('fait gagner un niveau au monstre du joueur qui abat un ennemi', () => {
+  it('gagne un niveau après 2 K.O., puis 3, puis 2…', () => {
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(levelsFromKills)).toEqual([0, 1, 1, 1, 2, 2, 3, 3, 3, 4]);
+  });
+
+  it('compte le premier K.O. sans monter de niveau', () => {
+    const state = makeBattle(['wolf'], ['slime', 'goblin'], 6);
+    state.players[0].team[0].stats.spd = 999;
+    const result = grantKillLevels(lethalTurn(state));
+    expect(result.state.players[0].team[0]).toMatchObject({ level: 6, kills: 1 });
+    expect(result.events.some((e) => e.type === 'level_up')).toBe(false);
+  });
+
+  it('fait gagner un niveau au monstre du joueur qui abat son 2e ennemi', () => {
     const state = makeBattle(['wolf'], ['slime', 'goblin'], 6);
     state.players[0].team[0].stats.spd = 999; // le joueur frappe en premier
+    state.players[0].team[0].kills = 1;
     const result = grantKillLevels(lethalTurn(state));
     const wolf = result.state.players[0].team[0];
-    expect(wolf.level).toBe(6 + KILL_LEVELS);
+    expect(wolf).toMatchObject({ level: 7, kills: 2 });
     expect(wolf.maxHp).toBe(createMonster('wolf', 7, 'x').maxHp);
     const types = result.events.map((e) => e.type);
     expect(types.indexOf('level_up')).toBe(types.indexOf('faint') + 1);
@@ -42,6 +55,7 @@ describe('Niveau gagné en mettant un ennemi K.O. (solo)', () => {
     const salamander = state.players[0].team[0];
     salamander.stats.spd = 999;
     salamander.hp -= 10;
+    salamander.kills = 4; // le 5e K.O. donne le 2e niveau
     const result = grantKillLevels(lethalTurn(state));
     const evolved = result.state.players[0].team[0];
     expect(evolved).toMatchObject({ speciesId: 'drakeid', name: 'Drakéide', level: STARTER_EVOLUTION_LEVEL, uid: salamander.uid });
