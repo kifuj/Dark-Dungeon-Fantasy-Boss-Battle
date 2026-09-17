@@ -21,13 +21,16 @@ export interface SkillDef {
   effect?: 'heal30' | 'drain50' | 'defUp';
 }
 
+/** Déduite de la puissance (somme des stats de base), voir §2 et 01-GAME-DESIGN §5.1. */
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'boss';
+
 export interface SpeciesDef {
   id: string;
   name: string;
   element: Element;
   base: BaseStats;
   skills: string[];
-  rarity: 'starter' | 'common' | 'rare' | 'boss';
+  rarity: Rarity;
   sprite: string;           // clé de texture Phaser
 }
 
@@ -121,16 +124,36 @@ export const SKILLS: Record<string, SkillDef> = {
 ```ts
 // shared/data/monsters.ts (extrait)
 import type { SpeciesDef } from '../types.js';
+import { rarityForPower, speciesPower } from './rarities.js';
 
-export const SPECIES: Record<string, SpeciesDef> = {
+const BESTIARY: Record<string, Omit<SpeciesDef, 'rarity'>> = {
   salamander: {
-    id: 'salamander', name: 'Salamandre', element: 'feu', rarity: 'starter',
-    base: { hp: 50, atk: 65, def: 40, spd: 55 },
+    id: 'salamander', name: 'Salamandre', element: 'feu',
+    base: { hp: 55, atk: 70, def: 45, spd: 60 },
     skills: ['fireball', 'inferno', 'strike'], sprite: 'salamander',
   },
   // …
 };
+
+// La rareté n'est jamais saisie : elle suit la puissance de l'espèce.
+export const SPECIES: Record<string, SpeciesDef> = Object.fromEntries(
+  Object.entries(BESTIARY).map(([id, species]) => [id, { ...species, rarity: rarityForPower(speciesPower(species.base)) }]),
+);
 ```
+
+```ts
+// shared/data/rarities.ts (extrait)
+export const RARITIES: Record<Rarity, RarityDef> = {
+  common:   { minPower: 0,   firstWave: 1, weight: 50, loot: 0, … },
+  uncommon: { minPower: 215, firstWave: 3, weight: 30, loot: 1, … },
+  rare:     { minPower: 230, firstWave: 5, weight: 20, loot: 2, … },
+  epic:     { minPower: 245, firstWave: 8, weight: 12, loot: 3, … },
+  boss:     { minPower: 265, firstWave: 5, weight: 0,  loot: 4, … }, // vagues de boss uniquement
+};
+export const speciesPower = (base: BaseStats) => base.hp + base.atk + base.def + base.spd;
+```
+
+Les starters sont désignés par `STARTER_IDS` (`shared/engine/run.ts`), pas par leur rareté : ils ont une rareté comme les autres, mais n'apparaissent jamais dans les vagues.
 
 ## 3. Aléatoire déterministe
 
@@ -302,20 +325,28 @@ export function resolveTurn(input: BattleState, actions: [Action, Action], rng: 
     }
   }
 
-  // Remplacement automatique des monstres KO
-  for (const seat of [0, 1] as const) {
-    const player = state.players[seat];
-    if (active(state, seat).hp > 0) continue;
-    const next = player.team.findIndex((m) => m.hp > 0);
-    const fromIndex = player.activeIndex;
-    player.activeIndex = next;
-    events.push({ type: 'switch', seat, fromIndex, toIndex: next, forced: true, name: player.team[next].name });
-  }
-
+  // Un monstre actif KO n'est pas remplacé ici : son joueur choisit le remplaçant
+  // pendant la phase de remplacement qui suit (§6.1).
   state.turn += 1;
   return { state, events, winnerSeat: null };
 }
 ```
+
+### 6.1 Phase de remplacement après un KO
+
+Depuis le sprint 4, le moteur ne choisit plus le remplaçant d'un monstre KO. Après un tour où un monstre actif tombe KO (et s'il reste un monstre en vie), l'état « attend » un choix :
+
+```ts
+// shared/engine/replace.ts
+export function needsReplacement(state: BattleState, seat: Seat): boolean;   // actif KO + un monstre en vie
+export const replacementSeats = (state: BattleState): Seat[] => …;          // sièges qui doivent choisir
+export function resolveReplacement(state: BattleState, choices: Partial<Record<Seat, number>>): TurnResult;
+```
+
+- Aucun champ n'est ajouté à `BattleState` : la phase se déduit de l'état (monstre actif à 0 PV).
+- `resolveReplacement` émet un `switch` avec `forced: true` par siège concerné et **avance `turn`** (en ligne, c'est le numéro de tour qui identifie les actions attendues). Un choix absent ou invalide retombe sur le premier monstre en vie : un duel ne peut pas rester bloqué.
+- Pendant cette phase, `validateAction` (§7) n'accepte qu'un `switch` du joueur concerné et refuse toute action de l'autre joueur.
+- Solo : le joueur choisit dans le menu ; l'IA choisit aussitôt avec `chooseAiReplacement` (§8). Duel : voir [04 §5](04-MULTIJOUEUR.md#5-résolution-côté-serveur).
 
 ## 7. Validation d'une action (serveur **et** client)
 
@@ -329,6 +360,11 @@ export function validateAction(state: BattleState, seat: Seat, action: unknown):
   const a = action as Record<string, unknown>;
   const player = state.players[seat];
   const current = player.team[player.activeIndex];
+
+  // Phase de remplacement (§6.1) : seuls les joueurs dont le monstre est KO jouent, et uniquement un changement.
+  const replacing = replacementSeats(state);
+  if (replacing.length > 0 && !replacing.includes(seat)) return { ok: false, reason: 'opponent_replacing' };
+  if (replacing.includes(seat) && a.type !== 'switch') return { ok: false, reason: 'must_replace' };
 
   if (a.type === 'skill') {
     const slot = current.skills.find((s) => s.id === a.skillId);
@@ -379,6 +415,8 @@ export function chooseAiAction(state: BattleState, seat: Seat, rng: Rng): Action
 }
 ```
 
+Quand son monstre tombe KO, l'IA appelle `chooseAiReplacement(state, seat)` : elle prend le monstre en vie qui a le meilleur rapport d'élément contre le monstre actif du joueur (le premier dans l'ordre de l'équipe en cas d'égalité).
+
 ## 9. Boucle solo (côté client)
 
 ```ts
@@ -386,15 +424,21 @@ export function chooseAiAction(state: BattleState, seat: Seat, rng: Rng): Action
 const runRng = mulberry32(runSeed);
 
 function onPlayerAction(action: Action) {
+  if (needsReplacement(battle, 0)) return animate(resolveReplacement(battle, { 0: action.toIndex })); // choix du remplaçant
   const rng = createTurnRng(runSeed, wave, battle.turn);
   const aiAction = chooseAiAction(battle, 1, rng);
-  const result = resolveTurn(battle, [action, aiAction], rng);
-  setBattle(result.state);
-  EventBus.emit('play-events', result.events);
-  if (result.winnerSeat === 0) goToRewards();       // tirage de 3 récompenses avec runRng
-  if (result.winnerSeat === 1) endRun();            // insertion dans solo_runs
+  let result = resolveTurn(battle, [action, aiAction], rng);
+  if (needsReplacement(result.state, 1)) result = merge(result, resolveReplacement(result.state, { 1: chooseAiReplacement(result.state, 1) }));
+  animate(result);                                   // l'état est appliqué à la fin de l'animation
+  if (result.winnerSeat === 0) goToRewards();        // nextWave(run, team, activeIndex) puis drawRewards(seed, wave)
+  if (result.winnerSeat === 1) endRun();
 }
 ```
+
+- **Vagues** (`shared/engine/run.ts`) : `enemiesForWave(seed, wave)` renvoie un boss seul si `isBossWave(wave)` (vagues 5, 10…), sinon tire la rareté de chaque ennemi parmi `raritiesForWave(wave)` puis l'espèce. `lootLevelForWave` donne le niveau de butin de la vague.
+- **Ordre de l'équipe** : `RunState.activeIndex` garde le monstre actif d'une vague à l'autre ; `battleForWave` le remet en jeu s'il est en vie.
+- **Récompenses** (`shared/engine/rewards.ts`) : `rewardPool(seed, wave)` filtre les récompenses selon le niveau de butin ; `drawRewards` place la Relique en tête après un boss.
+- **Abandon** : bouton « Abandonner » avec confirmation ; la run s'arrête sur l'écran « Run abandonnée » (pas d'appel serveur, le solo est local).
 
 ## 10. Tests (Vitest)
 
@@ -484,7 +528,7 @@ Script `package.json` : `"test": "vitest"` (en CI ou avant une PR : `npx vitest 
 - [ ] Immutabilité de l'entrée
 - [ ] Ordre : abandon > changement > priorité > vitesse
 - [ ] KO avant d'agir → pas d'action
-- [ ] Remplacement automatique après un KO
+- [ ] Pas de remplacement automatique : phase de remplacement au choix du joueur (`replace.test.ts`)
 - [ ] Victoire et défaite
 - [ ] Consommation des PP et refus à 0 PP
 - [ ] `validateAction` : chaque cas de refus

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { resolveTurn } from '../../shared/engine/battle.js';
-import { chooseAiAction } from '../../shared/engine/ai.js';
+import { chooseAiAction, chooseAiReplacement } from '../../shared/engine/ai.js';
 import { describeEvents } from '../../shared/engine/log.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
+import { needsReplacement, resolveReplacement } from '../../shared/engine/replace.js';
 import { applyReward, drawRewards } from '../../shared/engine/rewards.js';
-import { battleForWave, createRun, nextWave, type RunState } from '../../shared/engine/run.js';
+import { battleForWave, createRun, isBossWave, nextWave, type RunState } from '../../shared/engine/run.js';
 import type { RewardId } from '../../shared/data/rewards.js';
 import type { Action, BattleState, TurnResult } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
@@ -24,7 +25,8 @@ interface PendingReward {
 }
 
 /**
- * Mode solo (US-10, US-11, US-12) : choix du starter, puis vagues contre l'IA, avec une récompense entre deux vagues.
+ * Mode solo (US-10, US-11, US-12, US-13) : choix du starter, puis vagues contre l'IA (un boss toutes les 5 vagues),
+ * avec une récompense entre deux vagues. Quand un monstre tombe KO, le joueur choisit son remplaçant.
  * React garde l'état du combat ; Phaser ne fait que l'afficher (docs/02-ARCHITECTURE.md §5).
  */
 export function SoloRun() {
@@ -32,7 +34,8 @@ export function SoloRun() {
   const [battle, setBattle] = useState<BattleState | null>(null);
   const [log, setLog] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
-  const [over, setOver] = useState<{ wave: number } | null>(null);
+  const [over, setOver] = useState<{ wave: number; forfeited: boolean } | null>(null);
+  const [confirmingForfeit, setConfirmingForfeit] = useState(false);
   const [reward, setReward] = useState<PendingReward | null>(null);
   const battleRef = useRef<BattleState | null>(null);
   // Tour résolu en attente de la fin de l'animation Phaser (US-09) avant d'être appliqué à l'état React.
@@ -63,7 +66,7 @@ export function SoloRun() {
   }, [battle]);
 
   useEffect(() => {
-    if (run) EventBus.emit('battle-banner', `Vague ${run.wave}`);
+    if (run) EventBus.emit('battle-banner', isBossWave(run.wave) ? `Vague ${run.wave} · BOSS` : `Vague ${run.wave}`);
   }, [run]);
 
   // La scène prévient quand elle a fini de rejouer les événements du tour (US-09) : c'est
@@ -77,12 +80,13 @@ export function SoloRun() {
       if (!result || !run) return;
       setBattle(result.state);
       if (result.winnerSeat === 0) {
-        const next = nextWave(run, result.state.players[0].team); // +20 % de PV max (US-11 CA3)
+        // +20 % de PV max (US-11 CA3) ; le monstre sur le terrain ouvrira la vague suivante.
+        const next = nextWave(run, result.state.players[0].team, result.state.players[0].activeIndex);
         const [me, foe] = result.state.players;
         setBattle({ ...result.state, players: [{ ...me, team: next.team }, foe] }); // le soin est visible pendant le choix
         setReward({ wonWave: run.wave, next, choices: drawRewards(run.seed, run.wave) });
       } else if (result.winnerSeat === 1) {
-        setOver({ wave: run.wave }); // fin de run (US-11 CA4)
+        setOver({ wave: run.wave, forfeited: false }); // fin de run (US-11 CA4)
       }
       setBusy(false);
     };
@@ -100,26 +104,49 @@ export function SoloRun() {
     setBattle(first);
     setOver(null);
     setReward(null);
+    setConfirmingForfeit(false);
     setLog([`Vague 1 : ${first.players[1].team.map((m) => m.name).join(' et ')} apparaît !`]);
+  }, []);
+
+  /** Rejoue les événements d'un tour dans la scène ; `result` est appliqué à la fin (`events-played`). */
+  const animate = useCallback((result: TurnResult) => {
+    setBusy(true);
+    setLog(describeEvents(result.events, 0));
+    pendingRef.current = result;
+    EventBus.emit('play-events', result.events);
+    // Filet de sécurité : si la scène n'est pas encore chargée (réseau lent) ou ne rend jamais
+    // la main, on applique quand même le tour — sinon la run reste figée.
+    if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+    animationTimeoutRef.current = setTimeout(() => EventBus.emit('events-played'), ANIMATION_TIMEOUT_MS);
   }, []);
 
   const play = useCallback(
     (action: Action) => {
       if (!run || !battle || busy) return;
-      setBusy(true);
+      // Monstre KO : l'action est le choix de son remplaçant, l'IA ne joue pas.
+      if (needsReplacement(battle, 0)) {
+        if (action.type === 'switch') animate(resolveReplacement(battle, { 0: action.toIndex }));
+        return;
+      }
       const rng = createTurnRng(run.seed, run.wave, battle.turn);
       const aiAction = chooseAiAction(battle, 1, rng);
-      const result = resolveTurn(battle, [action, aiAction], rng);
-      setLog(describeEvents(result.events, 0));
-      pendingRef.current = result;
-      EventBus.emit('play-events', result.events); // la scène applique `result` à la fin (`events-played`)
-      // Filet de sécurité : si la scène n'est pas encore chargée (réseau lent) ou ne rend jamais
-      // la main, on applique quand même le tour — sinon la run reste figée.
-      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
-      animationTimeoutRef.current = setTimeout(() => EventBus.emit('events-played'), ANIMATION_TIMEOUT_MS);
+      let result = resolveTurn(battle, [action, aiAction], rng);
+      // Le monstre de l'IA est tombé : elle choisit tout de suite son remplaçant.
+      if (result.winnerSeat === null && needsReplacement(result.state, 1)) {
+        const replaced = resolveReplacement(result.state, { 1: chooseAiReplacement(result.state, 1) });
+        result = { ...replaced, events: [...result.events, ...replaced.events] };
+      }
+      animate(result);
     },
-    [battle, busy, run],
+    [animate, battle, busy, run],
   );
+
+  const forfeit = useCallback(() => {
+    if (!run) return;
+    setConfirmingForfeit(false);
+    setOver({ wave: run.wave, forfeited: true });
+    setLog(['Vous abandonnez la run.']);
+  }, [run]);
 
   const chooseReward = useCallback(
     (id: RewardId, targetUid?: string) => {
@@ -153,6 +180,7 @@ export function SoloRun() {
     <main className="page solo-page">
       <header className="run-header">
         <span className="run-wave">Vague {run.wave}</span>
+        {isBossWave(run.wave) && <span className="run-boss">BOSS</span>}
         <span className="run-enemy">contre {enemies.map((m) => `${m.name} N.${m.level}`).join(' et ')}</span>
       </header>
 
@@ -160,7 +188,7 @@ export function SoloRun() {
 
       {over ? (
         <section className="run-over" aria-label="Fin de run">
-          <h2>Fin de run</h2>
+          <h2>{over.forfeited ? 'Run abandonnée' : 'Fin de run'}</h2>
           <p>
             Vague atteinte : <strong>{over.wave}</strong>
           </p>
@@ -185,6 +213,26 @@ export function SoloRun() {
               <li key={`${line}-${i}`}>{line}</li>
             ))}
           </ul>
+          {confirmingForfeit ? (
+            <div className="forfeit-confirm" role="alertdialog" aria-label="Confirmer l’abandon">
+              <p>Abandonner la run ? Elle s’arrête à la vague {run.wave}.</p>
+              <div className="run-over-actions">
+                <button type="button" className="button" onClick={forfeit}>
+                  <span>Confirmer l’abandon</span>
+                  <span className="button-arrow" aria-hidden="true">⚑</span>
+                </button>
+                <button type="button" className="button" onClick={() => setConfirmingForfeit(false)}>
+                  <span>Continuer la run</span>
+                  <span className="button-arrow" aria-hidden="true">↩</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" className="button forfeit-button" disabled={busy} onClick={() => setConfirmingForfeit(true)}>
+              <span>Abandonner</span>
+              <span className="button-arrow" aria-hidden="true">⚑</span>
+            </button>
+          )}
         </>
       )}
     </main>

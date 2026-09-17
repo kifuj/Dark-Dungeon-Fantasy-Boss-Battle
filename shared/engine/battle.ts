@@ -87,16 +87,8 @@ export function resolveTurn(input: BattleState, actions: [Action, Action], rng: 
     }
   }
 
-  // Remplacement automatique des monstres KO par le premier monstre en vie (US-06 CA2)
-  for (const seat of [0, 1] as const) {
-    const player = state.players[seat];
-    if (active(state, seat).hp > 0) continue;
-    const next = player.team.findIndex((m) => m.hp > 0);
-    const fromIndex = player.activeIndex;
-    player.activeIndex = next;
-    events.push({ type: 'switch', seat, fromIndex, toIndex: next, forced: true, name: player.team[next].name });
-  }
-
+  // Un monstre actif KO n'est pas remplacé ici : son joueur choisit le remplaçant
+  // pendant la phase de remplacement qui suit (shared/engine/replace.ts).
   state.turn += 1;
   return { state, events, winnerSeat: null };
 }

@@ -16,12 +16,13 @@
 
 - **12 / 12 points engagés terminés** : US-12 (5), US-20 (3), US-21 (3), US-26 (1).
 - **+ 5 points bonus** : US-09 (animations et textes de combat) terminée pendant le sprint. Elle était en objectif bonus, hors engagement.
+- **+ 18 points bonus ajoutés par le PO en cours de sprint** (17/09 au matin), hors engagement comme US-09 : choix du remplaçant après un KO en solo **et en duel** (US-30), rareté des monstres selon leur puissance avec un meilleur butin (US-31), boss toutes les 5 vagues avec butin de boss (US-13), 5 nouveaux monstres (US-32), abandon d'une run solo (US-33), ordre de l'équipe conservé entre les vagues (US-34). La doc indique partout une équipe de 4 monstres au maximum. Voir [Ajouts du PO](#-ajouts-du-po-pendant-le-sprint-bonus).
 - **Bug bloquant trouvé en vérifiant la production, puis corrigé** : la run solo se figeait dès le premier tour sur Render (voir [Problèmes rencontrés](#-problèmes-rencontrés)).
 - **US-01 avance mais reste ouverte** : la protection de `main` est activée (PR obligatoire) ; il manque la règle de réécriture du dashboard Render, faute d'accès depuis le poste de développement (voir [Tâches non terminées](#-tâches-non-terminées)).
 - **Préparation du rendu faite** : vidéo de secours ([`docs/presentation/demo-secours.mp4`](../presentation/demo-secours.mp4)), diaporama ([`docs/presentation/soutenance.html`](../presentation/soutenance.html)), base Supabase remise à zéro pour la démo.
 - 6 pull requests : [#50](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/50) (US-12), [#51](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/51) (US-26), [#52](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/52) (US-21), [#53](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/53) (US-20), [#54](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/54) (correctif solo), [#55](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/55) (US-09).
-- Tests : **147 → 191** (Vitest). `npm run test:multi` passe de 42 à **55 vérifications** contre le vrai Supabase, avec le nouveau scénario M3 (timeout).
-- Nouvelle Edge Function déployée : `match-timeout` (6 fonctions en ligne en tout).
+- Tests : **147 → 224** (Vitest, dont 29 pour les ajouts du PO). `npm run test:multi` passe de 42 à **63 vérifications** contre le vrai Supabase, avec les scénarios M3 (timeout), M8 et M9 (remplacement après un KO).
+- Nouvelle Edge Function déployée : `match-timeout` (7 fonctions en ligne en tout). `match-action`, `match-timeout`, `match-draft` et `match-start` redéployées le 17/09 à 10h55 pour la phase de remplacement et le bestiaire à 25 espèces.
 
 ![Choix d'une récompense après la vague 1](./captures/sprint-4-recompense.png)
 
@@ -60,6 +61,28 @@
 | **US-18** Draft en duel | 5 | Moteur, Edge Function `match-draft`, écran de draft | Mattéo | ✅ Livrée le 16/09, hors sprint |
 | **US-29** Bestiaire étendu | 3 | 10 espèces (dont 1 boss) et 8 compétences + sprites générés + tests | Mattéo | ✅ Livrée le 16/09, hors sprint |
 
+#### ➕ Ajouts du PO pendant le sprint (bonus)
+
+Demandés par le PO le 17/09 au matin, après les 12 points engagés. Rangés dans le jalon `Sprint 4` en bonus, comme US-09 : ils ne changent pas l'engagement.
+
+| US | Points *(proposés)* | Tâche | Responsable | Statut |
+|---|---|---|---|---|
+| **US-30** Choix du remplaçant après un KO | 5 | Moteur : plus de remplacement automatique, phase de remplacement (`shared/engine/replace.ts`), validation, IA qui choisit son remplaçant + tests | Paul | ✅ Fait |
+| | | Menu « X est K.O. ! Choisissez le monstre qui prend sa place » (solo et duel) | Paul | ✅ Fait |
+| | | Duel : `tryResolveBattleTurn` et `match-timeout` n'attendent que le joueur KO, fonctions redéployées, scénarios M8 et M9 dans `test:multi` | Paul | ✅ Fait, déployé |
+| **US-31** Raretés | 5 | `shared/data/rarities.ts` : rareté calculée depuis la puissance, apparition par vague, niveau de butin + tests | Owen | ✅ Fait |
+| | | Butins rares (Potion royale, Entraînement intensif, Camp d'entraînement) et cartes colorées | Owen | ✅ Fait |
+| | | Guide : colonnes Rareté et Puissance, table des raretés | Owen | ✅ Fait |
+| **US-13** Boss | 3 | Boss seul aux vagues 5, 10, 15… (niveau N + 1), bannière « BOSS » | Donovan | ✅ Fait |
+| | | Butin de boss : Relique garantie, recrutement du boss | Donovan | ✅ Fait |
+| **US-33** Abandon en solo | 1 | Bouton « Abandonner » avec confirmation, écran « Run abandonnée » | Donovan | ✅ Fait |
+| **US-32** 5 nouveaux monstres | 3 | Chauve-souris vampire, Licorne, Kraken, Phénix, Hydre : données + sprites (`tools/art/monsters.mjs`) | Mattéo | ✅ Fait |
+| | | Doc : équipe de **4 monstres au maximum** en solo (01, README, Guide) | Mattéo | ✅ Fait |
+| **US-34** Ordre de l'équipe | 1 | `RunState.activeIndex` : le monstre actif en fin de vague ouvre la suivante | Mattéo | ✅ Fait |
+| | **18** | | | **18 points bonus terminés** |
+
+> Répartition proposée pour équilibrer les points (Paul 5, Owen 5, Donovan 4, Mattéo 4), reportée comme assignés sur les issues. Estimations proposées, **à rejouer en Planning Poker** ; US-13 (3 points) était déjà au backlog, les 15 autres points sont de nouvelles US.
+
 > US-09 a été commencée à 9h20, une fois les 4 US engagées fusionnées, soit bien plus d'1h avant le gel : la condition du bonus est remplie. Elle passe du jalon `Réserve` au jalon `Sprint 4` dans le GitHub Project et compte à part, en bonus.
 >
 > US-18 et US-29 ont été réalisées le **16/09 après la review du sprint 3**, hors créneau de sprint : elles restent en **Réserve** dans le GitHub Project et ne comptent pas dans la vélocité. Estimations proposées (5 et 3), à rejouer en Planning Poker. Écart de DoD : PR fusionnée sans relecture d'un autre membre.
@@ -83,8 +106,9 @@ Cartes : `1, 2, 3, 5, 8, 13, 21`. Référence : **US-05 = 2 points**.
 | US-09 Animations *(bonus)* | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | Owen comptait toute l'US, Donovan seulement les finitions ; la file d'événements existe depuis le sprint 2 mais le calibrage reste à faire |
 | US-18 Draft *(livrée le 16/09)* | 5 / 5 / 8 / 5 | 5 / 5 / 5 / 5 | **5** | Rejouée après coup : Paul comptait l'Edge Function, qui réutilise le verrou du sprint 3 |
 | US-29 Bestiaire *(livrée le 16/09)* | 3 / 2 / 3 / 3 | — | **3** | Les sprites sont générés par le code existant |
+| US-30, US-31, US-13, US-32, US-33, US-34 *(ajouts du PO)* | à voter | — | *5, 5, 3, 3, 1, 1 proposés* | Ajoutées pendant le sprint : estimation proposée, à rejouer |
 
-**Total engagé : 12 points** (+ 5 points bonus avec US-09).
+**Total engagé : 12 points** (+ 5 points bonus avec US-09, + 18 points bonus avec les ajouts du PO).
 
 #### Affectation
 
@@ -96,6 +120,7 @@ Tâches réparties entre les 4 membres du repo. Le responsable de chaque US est 
 | Owen | `Owen-Cazaux` | US-12 | 5 |
 | Paul | `Paul-B-O` | US-21 + relecture des PR et test sur la production | 3 + hors US |
 | Donovan | `donovanmessager0-tech` | US-20, US-26 + README | 4 + hors US |
+| *Ajouts du PO (bonus)* | | Paul : US-30 · Owen : US-31 · Donovan : US-13, US-33 · Mattéo : US-32, US-34 | +5 / +5 / +4 / +4 |
 
 > **Traçabilité des commits** : comme aux sprints 2 et 3, tout a été poussé depuis le poste de Mattéo (compte `kifuj`). Chaque commit porte un `Co-authored-by` pour le responsable de l'US décidé ici, et les issues GitHub ont les mêmes assignés.
 
@@ -108,6 +133,13 @@ Tâches réparties entre les 4 membres du repo. Le responsable de chaque US est 
 | **US-21** | CA1 état actuel affiché sans rejouer d'animation · CA2 « En attente de l'adversaire… » si déjà joué · CA3 bouton « Reprendre la partie » dans le menu | `src/tests/Menu.test.tsx` (4), `src/tests/OnlineMatch.test.tsx` (2), sur la production : l'invité rafraîchit en plein tour 1 et retrouve « Tour 1 », minuteur à 58 s ; le bouton du menu le ramène au bon match |
 | **US-26** | CA1 la page Crédits reprend tout `docs/CREDITS.md` | La page importe le fichier au build : une seule source. `src/tests/Credits.test.tsx` (4), [capture](./captures/sprint-4-credits.png) |
 | **US-09** *(bonus)* | CA1 texte, flash, PV progressifs · CA2 textes d'efficacité et de critique · CA3 KO en fondu + descente · CA4 un tour < 4 s | `src/tests/timing.test.ts` : pire tour théorique à 3,55 s, et 600 tours de vrais duels tous sous 4 s ; images prises pendant l'animation dans Chromium |
+
+| **US-30** *(bonus)* | CA1 menu réduit à l'équipe · CA2 le monstre choisi entre, l'adversaire ne joue pas · CA3 l'IA choisit son remplaçant · CA4 duel : attente affichée, actions refusées · CA5 timeout → premier monstre en vie | `shared/tests/replace.test.ts` (8), `ActionMenu.test.tsx` (2), `OnlineMatch.test.tsx` (2), `test:multi` M8 et M9 (8 vérifications, fonctions déployées), **duel à deux navigateurs** : l'hôte choisit la Chauve-souris au lieu du Squelette, l'invité voit « l'adversaire choisit son remplaçant… » |
+| **US-31** *(bonus)* | CA1 rareté calculée et affichée · CA2 raretés débloquées par vague · CA3 meilleur butin | `monsters.test.ts`, `run.test.ts`, `rewards.test.ts` (tirages sur 200 à 1 500 seeds), `Guide.test.tsx` ; « Butin peu commun » vu en jeu après un Chevalier déchu à la vague 3 |
+| **US-13** *(bonus)* | CA1 boss seul au niveau N + 1 · CA2 bannière · CA3 butin de boss | `run.test.ts`, `rewards.test.ts` ; 7 runs jouées par un robot dans Chromium : bannière « Vague 5 · BOSS », une run a battu 4 boss jusqu'à la vague 25, la Relique est toujours proposée |
+| **US-32** *(bonus)* | CA1 25 espèces avec sprite · CA2 toutes les raretés remplies, nouveaux monstres au draft · CA3 équipe de 4 dans la doc | `monsters.test.ts` ; Kraken et Phénix vus au draft du duel |
+| **US-33** *(bonus)* | CA1 bouton avec confirmation · CA2 écran « Run abandonnée » | `SoloRun.test.tsx` (2) |
+| **US-34** *(bonus)* | CA1 monstre actif conservé · CA2 premier en vie s'il est KO | `run.test.ts` ; en jeu, l'Œil volant qui finit la vague 4 ouvre la vague 5 |
 
 Hors sprint backlog : correctif de la run solo figée ([#54](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/54)), `docs/CREDITS.md` complété (polices réellement utilisées, pas de son), docs 04, 05 et README mis à jour.
 
@@ -125,13 +157,22 @@ Hors sprint backlog : correctif de la run solo figée ([#54](https://github.com/
 |---|---|
 | ![Draft](./captures/sprint-4-draft-minuteur.png) | ![Crédits](./captures/sprint-4-credits.png) |
 
+| Solo : choix du remplaçant (US-30) | Duel : le joueur KO choisit (US-30) | Duel : l'adversaire attend (US-30) |
+|---|---|---|
+| ![Remplaçant solo](./captures/sprint-4-solo-choix-remplacant.png) | ![Remplaçant duel](./captures/sprint-4-duel-choix-remplacant.png) | ![Attente duel](./captures/sprint-4-duel-attente-remplacant.png) |
+
+| Vague de boss (US-13) | Butin de boss (US-13) | Butin peu commun (US-31) |
+|---|---|---|
+| ![Boss](./captures/sprint-4-vague-boss.png) | ![Butin de boss](./captures/sprint-4-butin-boss.png) | ![Butin rare](./captures/sprint-4-butin-rare.png) |
+
 ## ⏳ Tâches non terminées
 
 | Élément | État | Décision |
 |---|---|---|
 | **US-01 CA3** (routes profondes sur Render) | ⚠️ Toujours contourné : `/menu`, `/solo`, `/match/<id>` répondent **404** au sens HTTP, mais `404.html` charge l'application. Le jeu fonctionne, vérifié sur la production. | À faire par Mattéo dans le dashboard Render : **Redirects/Rewrites → `/*` → `/index.html` (Rewrite)**. 2 minutes, aucun code. |
 | **US-01 CA2** (preview des PR) | Non vérifié : aucune URL de preview Render n'apparaît sur les PR #50 à #55. | À activer dans le dashboard Render si l'équipe le souhaite. Sans impact sur la démo. |
-| **Relance de `npm run test:multi`** | ⚠️ Le script crée des profils et des matchs de test. | Ne plus le lancer d'ici la démo, ou refaire la remise à zéro juste après. |
+| **Relance de `npm run test:multi`** | ⚠️ Le script crée des profils et des matchs de test. Relancé le 17/09 vers 10h55 pour valider US-30. | Données de test supprimées juste après (voir Décisions). Ne plus le lancer d'ici la démo. |
+| **Planning Poker des ajouts du PO** | Estimations proposées seulement (US-13, US-30 à US-34). | À rejouer par l'équipe. |
 
 ## ⚠️ Problèmes rencontrés
 
@@ -155,6 +196,10 @@ Hors sprint backlog : correctif de la run solo figée ([#54](https://github.com/
 | 9h20 | **US-09 démarre en bonus**. | Les 4 US engagées étaient fusionnées, il restait plus de 3h avant le gel. |
 | 9h58 | **Protection de `main` activée** : PR obligatoire, sans approbation exigée, administrateurs non bloqués. | Une approbation obligatoire aurait bloqué les fusions faites depuis un seul poste le jour du rendu. |
 | 9h59 | **Base Supabase remise à zéro** (profils, comptes anonymes, salons, matchs). | Démo sur une base propre ; l'équipe ressaisit ses pseudos. |
+| 10h20 | **Le PO ajoute 6 US en bonus** (US-13, US-30 à US-34) et la précision « équipe de 4 monstres max » dans la doc. Le choix du remplaçant vaut **aussi pour le duel**. | Retours de jeu sur la run solo : remplacement arbitraire après un KO, pas d'abandon, boss et raretés absents. Rangées dans le jalon `Sprint 4` en bonus, sans toucher à l'engagement. |
+| 10h25 | **La rareté est calculée depuis la puissance** (somme des stats de base), pas saisie à la main. | Un rééquilibrage de stats met la rareté à jour tout seul ; les starters restent désignés par leur identifiant. |
+| 10h40 | **Pas de nouveau champ dans `BattleState`** pour la phase de remplacement : elle se déduit d'un monstre actif à 0 PV. | Aucun changement de schéma en base ni de migration le jour du rendu ; les matchs en cours restent lisibles. |
+| 10h55 | **Edge Functions redéployées avant la fusion**, puis `test:multi` et un duel à deux navigateurs. | Le serveur doit accepter la phase de remplacement avant que le client de production la propose. |
 
 ## 🗣️ Comptes rendus de Daily Scrum
 
@@ -222,12 +267,13 @@ Sprint Goal relu, board capturé (jalon `Sprint 4` à 0 %), US découpées en t�
 | US-09 *(bonus)* | ✅ | ✅ | Critique et efficacité lisibles ensemble ; un tour tient sous les 4 s |
 | US-18 *(bonus, livrée le 16/09)* | ✅ (sauf relecture) | ✅ | Montrée dans la démo du duel |
 | US-29 *(bonus, livrée le 16/09)* | ✅ (sauf relecture) | ✅ | 20 espèces visibles dans le draft |
+| US-30, US-31, US-13, US-32, US-33, US-34 *(ajouts du PO, bonus)* | ✅ (sauf relecture) | à démontrer | Livrées le 17/09 au matin, vérifiées dans le navigateur et par `test:multi` |
 | US-01 | ❌ | — | Protection de `main` faite ; la règle de réécriture Render reste à régler |
 
 - **Points engagés** : 12 (+ 5 bonus) — **Points terminés** : **12** (+ 5 bonus avec US-09)
 - **Sprint Goal atteint ?** ☑ Oui ☐ Partiellement ☐ Non
 - **Écart de DoD assumé** : comme aux sprints 2 et 3, les PR ont un relecteur désigné mais sont fusionnées par le même compte. La protection de `main`, activée pendant ce sprint, impose désormais une PR, sans exiger encore d'approbation.
-- **Reste dans le Product Backlog (pistes pour la suite) :** US-01 (réglages Render et GitHub), US-13 (boss), US-14 (score et classement), US-22 (duel en 3 manches), US-25 (audio), US-27 (mobile), US-28 (statuts). Donner `strike` (ou une compétence à PP illimités) à toutes les espèces.
+- **Reste dans le Product Backlog (pistes pour la suite) :** US-01 (réglages Render et GitHub), US-14 (score et classement), US-22 (duel en 3 manches), US-25 (audio), US-27 (mobile), US-28 (statuts). Donner `strike` (ou une compétence à PP illimités) à toutes les espèces.
 
 📸 **Jalon `Sprint 4` en fin de sprint** (US-01 seule ouverte) :
 
@@ -268,8 +314,8 @@ Sprint Goal relu, board capturé (jalon `Sprint 4` à 0 %), US découpées en t�
 | 1 | 18 | 12 | Partiellement (Supabase et Render non configurés) |
 | 2 | 18 | 18 | Oui |
 | 3 | 18 | 18 (+3 d'US-02) | Oui |
-| 4 | 12 | 12 (+5 bonus avec US-09) | Oui |
-| **Total** | **66** | **60** (+3 récupérés, +5 bonus) | |
+| 4 | 12 | 12 (+5 bonus avec US-09, +18 bonus avec les ajouts du PO) | Oui |
+| **Total** | **66** | **60** (+3 récupérés, +23 bonus) | |
 
 Hors sprint : US-18 (draft) et US-29 (bestiaire), 8 points proposés, livrés le 16/09 après la review du sprint 3.
 

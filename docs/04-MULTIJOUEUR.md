@@ -120,10 +120,18 @@ export async function tryResolveBattleTurn(matchId: string): Promise<boolean> {
 
   const a1 = actions?.find((a) => a.player_id === match.player1_id)?.payload as Action | undefined;
   const a2 = actions?.find((a) => a.player_id === match.player2_id)?.payload as Action | undefined;
-  if (!a1 || !a2) return false; // on attend l'autre joueur
-
-  const rng = createTurnRng(match.seed, match.round, match.turn);
-  const { state, events, winnerSeat } = resolveTurn(match.state as BattleState, [a1, a2], rng);
+  // Phase de remplacement (sprint 4) : seuls les joueurs dont le monstre est KO jouent.
+  const current = match.state as BattleState;
+  const replacing = replacementSeats(current);
+  let result: TurnResult;
+  if (replacing.length > 0) {
+    if (replacing.some((seat) => ![a1, a2][seat])) return false; // on attend le choix du remplaçant
+    result = resolveReplacement(current, { /* siège → toIndex du switch reçu */ });
+  } else {
+    if (!a1 || !a2) return false; // on attend l'autre joueur
+    result = resolveTurn(current, [a1, a2], createTurnRng(match.seed, match.round, match.turn));
+  }
+  const { state, events, winnerSeat } = result;
   const finished = winnerSeat !== null;
 
   // Verrou optimiste : si un autre appel a déjà résolu ce tour, 0 ligne n'est modifiée
@@ -154,6 +162,15 @@ export async function tryResolveBattleTurn(matchId: string): Promise<boolean> {
   return true;
 }
 ```
+
+### Phase de remplacement après un KO
+
+Quand un monstre actif tombe KO (et que son équipe a encore un monstre en vie), le tour suivant est un **tour de remplacement** ([06 §6.1](06-MOTEUR-DE-COMBAT.md#61-phase-de-remplacement-après-un-ko)) :
+
+1. `match-action` n'accepte qu'un `switch` vers un monstre en vie, et **seulement** du joueur concerné. Une compétence de ce joueur ou toute action de l'adversaire est refusée (`400 INVALID_ACTION`, raison `must_replace` ou `opponent_replacing`).
+2. Dès que le choix est reçu, `tryResolveBattleTurn` appelle `resolveReplacement` sans attendre l'adversaire : un seul événement `switch` avec `forced: true`, `turn` + 1, nouvelle deadline de 60 s.
+3. Côté client, le joueur KO voit « X est K.O. ! Choisissez le monstre qui prend sa place. » et la liste de son équipe ; l'adversaire voit « Le monstre adverse est K.O. : l'adversaire choisit son remplaçant… », menu masqué, compte à rebours visible.
+4. Si le joueur KO ne répond pas, `match-timeout` ne joue l'action par défaut **que pour lui** : le premier monstre en vie.
 
 ### Pourquoi c'est sûr en cas d'actions simultanées
 
@@ -213,8 +230,8 @@ useEffect(() => subscribeToMatch(matchId, (row) => {
 
 | État | Affichage |
 |---|---|
-| `choosing` | Menu d'actions actif + compte à rebours |
-| `waiting` | « En attente de l'adversaire… » (action envoyée) |
+| `choosing` | Menu d'actions actif + compte à rebours (seulement la liste de l'équipe si le monstre actif est KO) |
+| `waiting` | « En attente de l'adversaire… » (action envoyée), ou « l'adversaire choisit son remplaçant… » pendant sa phase de remplacement |
 | `animating` | Menu masqué, Phaser rejoue `last_events` |
 | `finished` | Écran Victoire / Défaite + retour au menu |
 
@@ -224,8 +241,8 @@ Aucun serveur ne tourne en continu : Render sert des fichiers statiques et les E
 
 1. `matches.turn_deadline` est fixé à chaque nouveau tour (maintenant + 60 s).
 2. Le client qui attend affiche le compte à rebours. Une fois la deadline dépassée, il appelle la fonction `match-timeout`.
-3. L'API vérifie `now() > turn_deadline + 2 s de marge`, insère une **action par défaut** (`is_auto = true`) pour chaque joueur qui n'a pas joué, puis appelle `tryResolveBattleTurn`.
-4. Action par défaut (`defaultAction` dans `shared/engine/online.ts`) : première compétence qui a encore des PP. Toutes les espèces n'ont pas `strike` : sans PP, on change de monstre si c'est possible, sinon on frappe quand même avec la première compétence (le moteur la résout). Un duel ne reste donc jamais bloqué.
+3. L'API vérifie `now() > turn_deadline + 2 s de marge`, insère une **action par défaut** (`is_auto = true`) pour chaque joueur qui n'a pas joué (pendant une phase de remplacement : seulement pour le joueur dont le monstre est KO), puis appelle `tryResolveBattleTurn`.
+4. Action par défaut (`defaultAction` dans `shared/engine/online.ts`) : première compétence qui a encore des PP ; si le monstre actif est KO, changement vers le premier monstre en vie. Toutes les espèces n'ont pas `strike` : sans PP, on change de monstre si c'est possible, sinon on frappe quand même avec la première compétence (le moteur la résout). Un duel ne reste donc jamais bloqué.
 5. Pendant le **draft**, un joueur absent reçoit ses 3 premières propositions.
 6. *(Could, non fait)* Après 3 timeouts consécutifs du même joueur → défaite par abandon.
 
@@ -283,6 +300,7 @@ Le reste (API, BDD, moteur) ne change pas. **Tester le Realtime sur le réseau d
 > projet Supabase : 55 vérifications en une trentaine de secondes. Pour M3, la deadline est avancée par l'API
 > de gestion Supabase si `SUPABASE_ACCESS_TOKEN` est défini ; sinon le script attend vraiment 62 s.
 > M4 est couvert par les tests de composant et a été joué sur deux navigateurs au sprint 4.
+> Depuis le 17/09, le script vérifie aussi M8 et M9 (phase de remplacement) : 63 vérifications.
 
 | # | Scénario | Résultat attendu |
 |---|---|---|
@@ -293,3 +311,5 @@ Le reste (API, BDD, moteur) ne change pas. **Tester le Realtime sur le réseau d
 | M5 | A met KO le dernier monstre de B | Victoire affichée chez A, défaite chez B, salon `finished` |
 | M6 | C essaie d'envoyer une action sur le match de A et B | `403 NOT_A_PLAYER` |
 | M7 | Envoi d'un `skillId` absent de la liste du monstre (via la console) | `400 INVALID_ACTION` |
+| M8 | Le monstre de B tombe KO | B choisit son remplaçant (pas forcément le premier) ; A attend, et ses actions sont refusées ; le tour se résout dès le choix de B |
+| M9 | Le monstre de B tombe KO et B ne répond pas | Au timeout, seul B joue : son premier monstre en vie entre en combat |

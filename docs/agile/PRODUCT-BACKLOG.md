@@ -56,15 +56,20 @@ Une user story est terminée si :
 | US-26 | Contenu | Écran des crédits | Must | 1 | **1** | 4 |
 | US-14 | Solo | Score et classement | Should | 3 | | *backlog* |
 | US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | **5** | *backlog* (bonus S4, ✅ livré le 16/09) |
-| US-13 | Solo | Boss toutes les 5 vagues | Could | 3 | | *backlog* |
+| US-13 | Solo | Boss toutes les 5 vagues, avec butin de boss | Could | 3 | *3 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
 | US-22 | Multijoueur | Duel en 3 manches avec récompenses | Could | 5 | | *backlog* |
 | US-25 | Contenu | Musique, sons et volume | Could | 3 | | *backlog* |
 | US-27 | Contenu | Jouable sur mobile | Could | 3 | | *backlog* |
 | US-28 | Moteur | Statuts (brûlure, poison) | Could | 5 | | *backlog* |
 | US-29 | Contenu | Bestiaire étendu (20 espèces) | Could | 3 | **3** | *backlog* (bonus S4, ✅ livré le 16/09) |
+| US-30 | Moteur | Choisir le monstre qui remplace un KO (solo et duel) | Should | 5 | *5 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
+| US-31 | Solo | Rareté des monstres selon leur puissance (apparition et butin) | Should | 5 | *5 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
+| US-32 | Contenu | 5 nouveaux monstres (25 espèces) | Could | 3 | *3 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
+| US-33 | Solo | Abandonner une run solo | Should | 1 | *1 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
+| US-34 | Solo | Garder l'ordre de l'équipe d'une vague à l'autre | Should | 1 | *1 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
 | — | — | Matchmaking automatique, chat, 3+ joueurs | Won't | — | — | — |
 
-**Total proposé** : 101 points, dont 56 en Must. Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
+**Total proposé** : 116 points, dont 56 en Must (US-30 à US-34 ajoutées le 17/09 par le PO, 15 points). Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
 
 ## 4. Planning Poker
 
@@ -109,6 +114,7 @@ Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, 
 | US-09 Animations *(bonus)* | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | La file d'événements existe depuis le sprint 2, le calibrage reste à faire |
 | US-18 Draft *(rejouée après coup)* | 5 / 5 / 8 / 5 | 5 / 5 / 5 / 5 | **5** | L'Edge Function réutilise le verrou du sprint 3 |
 | US-29 Bestiaire *(rejouée après coup)* | 3 / 2 / 3 / 3 | — | **3** | Les sprites sont générés par le code existant |
+| US-13, US-30 à US-34 *(bonus, ajoutées le 17/09)* | à voter | — | *3, 5, 5, 3, 1, 1 proposés* | Demandées par le PO pendant le sprint 4 et livrées en bonus ; estimation proposée, à rejouer en Planning Poker |
 Détail des séances : [Sprint 1 — Planning Poker](SPRINT-1.md#planning-poker), [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les votes du sprint 4 sont à reporter dans [Sprint 4 — Planning Poker](SPRINT-4.md#planning-poker).
 
 ## 5. User stories détaillées
@@ -159,7 +165,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 **En tant que** joueur, **je veux** que mes monstres KO soient remplacés et que le combat se termine quand une équipe est vaincue **afin de** savoir clairement qui a gagné chaque combat.
 
 - **CA1** : Étant donné un monstre à 0 PV, alors un événement `faint` est émis.
-- **CA2** : En fin de tour, le monstre actif KO est remplacé par le premier monstre en vie (`switch` avec `forced: true`).
+- **CA2** : En fin de tour, le monstre actif KO est remplacé par le premier monstre en vie (`switch` avec `forced: true`). *Remplacé le 17/09 par US-30 : le joueur choisit le remplaçant.*
 - **CA3** : Quand tous les monstres d'une équipe sont KO, alors `winnerSeat` désigne l'autre joueur et un événement `battle_end` termine la liste.
 
 #### US-04 — Changer de monstre · Should · 3 pts
@@ -168,6 +174,15 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA1** : Le bouton « Changer » liste les monstres en vie autres que le monstre actif.
 - **CA2** : Le changement a lieu avant les compétences de l'adversaire, qui touchent donc le nouveau monstre.
 - **CA3** : Un changement vers un monstre KO ou déjà actif est refusé.
+
+#### US-30 — Choisir le remplaçant d'un monstre KO · Should · 5 pts
+**En tant que** joueur, **je veux** choisir quel monstre remplace mon monstre KO **afin de** garder le contrôle de ma stratégie au lieu de subir un choix arbitraire.
+
+- **CA1** : Étant donné que mon monstre actif tombe KO et qu'il me reste un monstre en vie, alors le menu n'affiche plus que mon équipe (« X est K.O. ! Choisissez le monstre qui prend sa place. »), sans compétence ni retour possible.
+- **CA2** : Quand je choisis un monstre, alors c'est lui qui entre en combat (pas forcément le premier de la liste), sans que l'adversaire joue pendant ce choix.
+- **CA3** : En solo, l'IA choisit elle-même son remplaçant (le monstre qui a l'avantage d'élément).
+- **CA4** : En duel, l'adversaire voit « l'adversaire choisit son remplaçant… » et ses actions sont refusées par le serveur ; une compétence du joueur KO est refusée aussi (`400 INVALID_ACTION`).
+- **CA5** : En duel, si le joueur KO ne choisit pas avant la fin du compte à rebours, son premier monstre en vie entre en combat.
 
 #### US-28 — Statuts · Could · 5 pts
 **En tant que** joueur, **je veux** des effets de statut (brûlure, poison) **afin d'**avoir plus de profondeur tactique.
@@ -233,8 +248,28 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 #### US-13 — Boss · Could · 3 pts
 **En tant que** joueur solo, **je veux** affronter un boss toutes les 5 vagues **afin d'**avoir des moments forts dans la run.
 
-- **CA1** : Aux vagues 5, 10, 15…, l'ennemi est un Démon mineur ou une Liche, au niveau `4 + N`.
+- **CA1** : Aux vagues 5, 10, 15…, l'ennemi est un boss seul (Démon mineur, Liche, Hydre ou Dragon ancien), au niveau `N + 1`. *(Précisé le 17/09 : les ennemis sont désormais au niveau `N`, plus `4 + N`.)*
 - **CA2** : Une bannière « BOSS » s'affiche avant le combat.
+- **CA3** : Après un boss, le butin est meilleur : la Relique du boss (+3 niveaux et soin complet pour l'équipe) est toujours proposée, les 2 autres cartes sont des butins rares ou le recrutement du boss.
+
+#### US-31 — Rareté des monstres · Should · 5 pts
+**En tant que** joueur solo, **je veux** que les monstres aient une rareté liée à leur puissance **afin de** rencontrer des adversaires plus forts au fil de la run et d'être mieux récompensé quand je les bats.
+
+- **CA1** : Chaque espèce a une rareté (Commun, Peu commun, Rare, Épique, Boss) calculée depuis sa puissance (somme des stats de base), affichée dans le Guide.
+- **CA2** : Les raretés se débloquent au fil des vagues (peu commun dès la 3, rare dès la 5, épique dès la 8) ; une même seed donne les mêmes ennemis.
+- **CA3** : Battre un monstre plus rare débloque de meilleures récompenses (Potion royale, Entraînement intensif, Camp d'entraînement), mises en valeur par la couleur de leur rareté.
+
+#### US-33 — Abandonner une run · Should · 1 pt
+**En tant que** joueur solo, **je veux** pouvoir abandonner ma run **afin de** recommencer sans attendre que mon équipe soit KO.
+
+- **CA1** : Un bouton « Abandonner » est visible pendant un combat solo et demande une confirmation.
+- **CA2** : Après confirmation, l'écran « Run abandonnée » affiche la vague atteinte et propose une nouvelle run ou le retour au menu.
+
+#### US-34 — Ordre de l'équipe entre les vagues · Should · 1 pt
+**En tant que** joueur solo, **je veux** que mon équipe garde son ordre et son monstre actif d'une vague à l'autre **afin de** ne pas voir mon monstre remplacé sans l'avoir décidé.
+
+- **CA1** : Le monstre sur le terrain à la fin d'une vague commence la vague suivante ; l'ordre de l'équipe ne change pas.
+- **CA2** : S'il est KO, le premier monstre en vie commence.
 
 #### US-14 — Score et classement · Should · 3 pts
 **En tant que** joueur, **je veux** voir mon score et le top 20 **afin de** me comparer aux autres.
@@ -351,3 +386,10 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA2** : Chaque élément compte au moins 2 espèces non-boss, pour que le draft (US-18) propose des choix variés.
 - **CA3** : Les nouvelles espèces communes et rares apparaissent dans les vagues solo ; les nouveaux boss restent réservés au solo.
 - **CA4** : Les nouvelles compétences n'utilisent que les effets existants (soin, drain, DEF+) et sont documentées dans [01 §4](../01-GAME-DESIGN.md#4-compétences).
+
+#### US-32 — 5 nouveaux monstres · Could · 3 pts
+**En tant que** joueur, **je veux** 5 monstres de plus **afin de** remplir toutes les raretés et varier encore les runs et les drafts.
+
+- **CA1** : Le bestiaire compte 25 espèces : Chauve-souris vampire (commune), Licorne (rare), Kraken et Phénix (épiques), Hydre (boss), chacune avec son sprite généré par `npm run assets`.
+- **CA2** : Chaque rareté compte au moins une espèce ; les nouveaux non-boss sont proposés au draft du duel.
+- **CA3** : Documentation : la doc indique partout une équipe de **4 monstres au maximum** en solo.

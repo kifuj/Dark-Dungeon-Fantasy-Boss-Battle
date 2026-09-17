@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { ELEMENT_LABELS } from '../../shared/data/elements.js';
+import { RARITIES, RARITY_ORDER } from '../../shared/data/rarities.js';
 import { REWARDS, type RewardId } from '../../shared/data/rewards.js';
 import { needsTarget, recruitFor } from '../../shared/engine/rewards.js';
+import { isBossWave } from '../../shared/engine/run.js';
 import type { MonsterInstance } from '../../shared/types.js';
 import { MonsterSprite } from './MonsterSprite.tsx';
 
@@ -17,9 +19,16 @@ const TARGET_PROMPTS: Record<RewardId, string> = {
   potion: '',
   elixir: '',
   training: 'Quel monstre entraîner ?',
+  intensive_training: 'Quel monstre suit l’entraînement intensif ?',
+  royal_potion: '',
+  war_camp: '',
+  relic: '',
   scroll: 'Quel monstre lit le parchemin ?',
   recruit: 'Votre équipe est pleine. Quel monstre remplacer ?',
 };
+
+/** Couleur d'une récompense rare : celle de la rareté qui la débloque. */
+const lootColor = (reward: RewardId) => RARITIES[RARITY_ORDER[REWARDS[reward].minLoot]].color;
 
 /**
  * Récompense de fin de vague (US-12) : 3 cartes au choix, puis le monstre visé
@@ -72,11 +81,19 @@ export function RewardPanel({ wave, seed, choices, team, onChoose }: RewardPanel
 
   return (
     <section className="reward-panel" aria-label="Récompense">
-      <p className="eyebrow">Vague {wave} remportée</p>
+      <p className="eyebrow">{isBossWave(wave) ? `Boss vaincu à la vague ${wave} : butin de boss` : `Vague ${wave} remportée`}</p>
       <h2 className="reward-title">Choisissez une récompense</h2>
       <div className="reward-grid">
         {choices.map((id, index) => (
-          <button key={id} type="button" className="starter-card reward-card" onClick={() => pick(id)} autoFocus={index === 0}>
+          <button
+            key={id}
+            type="button"
+            className={`starter-card reward-card ${REWARDS[id].minLoot > 0 ? 'reward-card-rare' : ''}`}
+            style={REWARDS[id].minLoot > 0 ? ({ '--loot': lootColor(id) } as React.CSSProperties) : undefined}
+            onClick={() => pick(id)}
+            autoFocus={index === 0}
+          >
+            {REWARDS[id].minLoot > 0 && <span className="loot-badge">Butin {RARITIES[RARITY_ORDER[REWARDS[id].minLoot]].label.toLowerCase()}</span>}
             <span className="reward-icon" aria-hidden="true">
               {REWARDS[id].icon}
             </span>

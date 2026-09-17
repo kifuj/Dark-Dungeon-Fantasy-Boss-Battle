@@ -14,7 +14,7 @@
 | HTTP | Code | Signification |
 |---|---|---|
 | 400 | `INVALID_BODY` | Champ manquant ou mal typé |
-| 400 | `INVALID_ACTION` | Action impossible (compétence inconnue, plus de PP, changement vers un monstre KO…) |
+| 400 | `INVALID_ACTION` | Action impossible (compétence inconnue, plus de PP, changement vers un monstre KO, compétence alors que son monstre est KO, action pendant le remplacement adverse…). Le champ `message` donne la raison de `validateAction` |
 | 401 | `UNAUTHENTICATED` | JWT absent ou invalide (peut aussi venir de la passerelle Supabase, avec un autre corps) |
 | 403 | `NOT_A_PLAYER` | L'utilisateur ne participe pas à ce salon ou à ce match |
 | 403 | `NOT_HOST` | Seul l'hôte peut lancer le match |
@@ -91,6 +91,8 @@ type Action =
 
 Règles : voir l'implémentation ci-dessous. Erreurs : `WRONG_PHASE`, `STALE_TURN`, `INVALID_ACTION`, `ALREADY_PLAYED`, `NOT_A_PLAYER`.
 
+**Phase de remplacement** (monstre actif KO, [04 §5](04-MULTIJOUEUR.md#phase-de-remplacement-après-un-ko)) : seul le joueur concerné envoie une action, obligatoirement `{ type: 'switch', toIndex }` vers un monstre en vie ; la réponse est alors directement `resolved`. Raisons de refus : `must_replace` (le joueur KO envoie une compétence), `opponent_replacing` (l'autre joueur tente de jouer).
+
 ---
 
 ### `match-timeout` *(Should — livrée au sprint 4)*
@@ -99,7 +101,7 @@ Règles : voir l'implémentation ci-dessous. Erreurs : `WRONG_PHASE`, `STALE_TUR
 |---|---|
 | `{ "matchId": "uuid" }` | `{ "status": "resolved" \| "nothing_to_do" }` |
 
-Règles : l'appelant est un joueur du match et `now > turn_deadline + 2 s` (`isTurnExpired`). Insère l'action par défaut pour chaque joueur absent (`is_auto = true`, conflits ignorés : si le joueur envoie son action au même moment, c'est la sienne qui compte), puis résout le tour (`tryResolveBattleTurn`) ou le draft (`tryResolveDraft`). Match terminé → `200 nothing_to_do`. Erreurs : `TOO_EARLY`, `NOT_A_PLAYER`, `MATCH_NOT_FOUND`.
+Règles : l'appelant est un joueur du match et `now > turn_deadline + 2 s` (`isTurnExpired`). Insère l'action par défaut pour chaque joueur absent (pendant une phase de remplacement, seulement pour le joueur dont le monstre est KO) (`is_auto = true`, conflits ignorés : si le joueur envoie son action au même moment, c'est la sienne qui compte), puis résout le tour (`tryResolveBattleTurn`) ou le draft (`tryResolveDraft`). Match terminé → `200 nothing_to_do`. Erreurs : `TOO_EARLY`, `NOT_A_PLAYER`, `MATCH_NOT_FOUND`.
 
 ---
 

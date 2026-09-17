@@ -1,22 +1,28 @@
 import { Link } from 'react-router-dom';
 import { ELEMENT_LABELS } from '../../shared/data/elements.js';
 import { SPECIES } from '../../shared/data/monsters.js';
+import { RARITIES, RARITY_ORDER, speciesPower } from '../../shared/data/rarities.js';
 import { REWARDS } from '../../shared/data/rewards.js';
 import { SKILLS } from '../../shared/data/skills.js';
 import { DEF_UP_MULT } from '../../shared/engine/battle.js';
 import { CRIT_CHANCE } from '../../shared/engine/damage.js';
 import { DRAFT_OFFER_SIZE, ONLINE_LEVEL, ONLINE_TEAM_SIZE, TURN_DURATION_MS } from '../../shared/engine/online.js';
 import { MAX_TEAM_SIZE, REWARD_CHOICES } from '../../shared/engine/rewards.js';
-import { STARTER_LEVEL, WAVE_HEAL, WAVE_WITH_TWO_ENEMIES } from '../../shared/engine/run.js';
-import type { SkillDef, SpeciesDef } from '../../shared/types.js';
+import { BOSS_LEVEL_BONUS, BOSS_WAVE_EVERY, STARTER_IDS, STARTER_LEVEL, WAVE_HEAL, WAVE_WITH_TWO_ENEMIES } from '../../shared/engine/run.js';
+import type { SkillDef } from '../../shared/types.js';
 
 /**
  * Guide du jeu : les tableaux sont générés depuis `shared/data`, ils suivent donc
- * automatiquement les réglages du moteur. Les boss ne sont pas listés : ils n'apparaissent pas en jeu.
+ * automatiquement les réglages du moteur, bestiaire et raretés compris.
  */
 
-const RARITY_LABELS: Record<SpeciesDef['rarity'], string> = { starter: 'Starter', common: 'Commun', rare: 'Rare', boss: 'Boss' };
-const RARITY_ORDER: SpeciesDef['rarity'][] = ['starter', 'common', 'rare'];
+const isStarter = (id: string) => (STARTER_IDS as readonly string[]).includes(id);
+
+const appearance = (id: string, rarity: keyof typeof RARITIES) => {
+  if (isStarter(id)) return 'Starter';
+  if (rarity === 'boss') return `Boss (vagues ${BOSS_WAVE_EVERY}, ${BOSS_WAVE_EVERY * 2}…)`;
+  return `Dès la vague ${RARITIES[rarity].firstWave}`;
+};
 
 const EFFECT_LABELS: Record<NonNullable<SkillDef['effect']>, string> = {
   heal30: 'Soigne 30 % des PV max',
@@ -29,9 +35,9 @@ const skillEffect = (skill: SkillDef) =>
 
 const percent = (value: number) => `${Math.round(value * 100)} %`;
 
-const monsters = Object.values(SPECIES)
-  .filter((s) => s.rarity !== 'boss')
-  .sort((a, b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity));
+const monsters = Object.values(SPECIES).sort(
+  (a, b) => RARITY_ORDER.indexOf(a.rarity) - RARITY_ORDER.indexOf(b.rarity) || speciesPower(a.base) - speciesPower(b.base),
+);
 
 function Table({ head, rows }: { head: string[]; rows: (string | number)[][] }) {
   return (
@@ -64,7 +70,10 @@ export function Guide() {
               Ordre : <strong>abandon</strong>, puis <strong>changement de monstre</strong>, puis les attaques
               prioritaires (<em>Frappe rapide</em>), puis la <strong>vitesse (VIT)</strong> la plus haute. Égalité : pile ou face.
             </li>
-            <li>Un monstre mis KO avant d'agir perd son action. Il est remplacé par le premier monstre en vie.</li>
+            <li>
+              Un monstre mis KO avant d'agir perd son action. Son joueur <strong>choisit</strong> ensuite le monstre qui le remplace,
+              avant le tour suivant.
+            </li>
             <li>Chaque attaque a des <strong>PP</strong> (utilisations). À 0, elle n'est plus utilisable.</li>
           </ul>
 
@@ -93,13 +102,18 @@ export function Guide() {
           />
 
           <h2>Monstres</h2>
-          <p>Stats de base. Chaque niveau au-dessus du 1 ajoute 8 % à toutes les stats.</p>
+          <p>
+            Stats de base. Chaque niveau au-dessus du 1 ajoute 8 % à toutes les stats. La <strong>puissance</strong> est la somme
+            des 4 stats : elle donne la rareté du monstre.
+          </p>
           <Table
-            head={['Monstre', 'Élément', 'Rang', 'PV', 'ATK', 'DEF', 'VIT', 'Attaques']}
+            head={['Monstre', 'Élément', 'Rareté', 'Puissance', 'Solo', 'PV', 'ATK', 'DEF', 'VIT', 'Attaques']}
             rows={monsters.map((m) => [
               m.name,
               ELEMENT_LABELS[m.element],
-              RARITY_LABELS[m.rarity],
+              RARITIES[m.rarity].label,
+              speciesPower(m.base),
+              appearance(m.id, m.rarity),
               m.base.hp,
               m.base.atk,
               m.base.def,
@@ -108,23 +122,53 @@ export function Guide() {
             ])}
           />
 
+          <h2>Raretés</h2>
+          <p>Plus un monstre est rare, plus il apparaît tard et meilleur est le butin quand on le bat.</p>
+          <Table
+            head={['Rareté', 'Puissance', 'Apparition', 'Chance relative', 'Butin débloqué']}
+            rows={RARITY_ORDER.map((id) => [
+              RARITIES[id].label,
+              `${RARITIES[id].minPower} et plus`,
+              id === 'boss' ? `Toutes les ${BOSS_WAVE_EVERY} vagues` : `Dès la vague ${RARITIES[id].firstWave}`,
+              id === 'boss' ? '—' : RARITIES[id].weight,
+              Object.values(REWARDS)
+                .filter((r) => r.minLoot === RARITIES[id].loot)
+                .map((r) => r.name)
+                .join(', ') || '—',
+            ])}
+          />
+
           <h2>Solo : les vagues</h2>
           <ul>
             <li>Vous commencez avec un starter niveau {STARTER_LEVEL}.</li>
-            <li>Vague N : un ennemi niveau N, tiré parmi les monstres communs et rares.</li>
+            <li>Vague N : un ennemi niveau N. Sa rareté est tirée parmi les raretés déjà débloquées.</li>
             <li>À partir de la vague {WAVE_WITH_TWO_ENEMIES} : deux ennemis.</li>
+            <li>
+              Toutes les {BOSS_WAVE_EVERY} vagues : un <strong>boss</strong> seul, niveau N + {BOSS_LEVEL_BONUS}. Le butin de boss
+              contient toujours la Relique.
+            </li>
+            <li>Le monstre sur le terrain à la fin d'une vague commence la suivante ; l'ordre de l'équipe ne change pas.</li>
+            <li>Vous pouvez abandonner la run à tout moment pendant un combat.</li>
             <li>
               Après une victoire : PV et PP sont conservés, l'équipe récupère {percent(WAVE_HEAL)} de ses PV max (les KO restent KO).
             </li>
             <li>Vous choisissez ensuite 1 récompense parmi {REWARD_CHOICES}. Équipe de {MAX_TEAM_SIZE} monstres maximum.</li>
             <li>La partie s'arrête quand toute l'équipe est KO.</li>
           </ul>
-          <Table head={['Récompense', 'Effet']} rows={Object.values(REWARDS).map((r) => [`${r.icon} ${r.name}`, r.description])} />
+          <Table
+            head={['Récompense', 'Effet', 'Après un monstre']}
+            rows={Object.values(REWARDS).map((r) => [
+              `${r.icon} ${r.name}`,
+              r.description,
+              r.minLoot === 0 ? 'Tous' : `${RARITIES[RARITY_ORDER[r.minLoot]].label} ou plus`,
+            ])}
+          />
 
           <h2>Multijoueur</h2>
           <ul>
             <li>Chaque joueur choisit {ONLINE_TEAM_SIZE} monstres parmi {DRAFT_OFFER_SIZE} ; le premier choisi entre en combat.</li>
-            <li>Tous les monstres sont niveau {ONLINE_LEVEL}.</li>
+            <li>Tous les monstres sont niveau {ONLINE_LEVEL}. Les boss ne sont pas proposés.</li>
+            <li>Quand un monstre tombe KO, son joueur choisit le remplaçant ; l'adversaire attend ce choix.</li>
             <li>{TURN_DURATION_MS / 1000} s par tour : sans réponse, une action est jouée automatiquement.</li>
             <li>Le premier joueur dont toute l'équipe est KO (ou qui abandonne) perd.</li>
           </ul>

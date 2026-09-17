@@ -1,8 +1,9 @@
 // ⚠️ Fichier généré par `npm run functions:sync` — ne pas modifier : éditer shared/ puis relancer la commande.
 import { SPECIES } from '../data/monsters.ts';
+import { RARITIES, RARITY_ORDER } from '../data/rarities.ts';
 import { mulberry32, pick } from './rng.ts';
 import { createMonster } from './stats.ts';
-import type { BattleState, MonsterInstance } from '../types.ts';
+import type { BattleState, MonsterInstance, Rarity, Rng } from '../types.ts';
 
 /** Run solo (US-10 et US-11, docs/01-GAME-DESIGN.md §6). */
 export interface RunState {
@@ -10,22 +11,37 @@ export interface RunState {
   /** Numéro de la vague en cours, à partir de 1. */
   wave: number;
   team: MonsterInstance[];
+  /** Monstre sur le terrain à la fin de la vague précédente : il ouvre la suivante (l'ordre de l'équipe ne bouge pas). */
+  activeIndex: number;
 }
 
 export const STARTER_IDS = ['salamander', 'undine', 'mushroom'] as const;
 export const STARTER_LEVEL = 5;
 /** Part des PV max récupérée après chaque vague gagnée (US-11 CA3). */
 export const WAVE_HEAL = 0.2;
+/** Un boss toutes les 5 vagues (US-13), un niveau au-dessus des ennemis de la vague. */
+export const BOSS_WAVE_EVERY = 5;
+export const BOSS_LEVEL_BONUS = 1;
 
-/** Espèces pouvant apparaître dans une vague : ni starters, ni boss (les boss sont l'US-13). */
+const isStarter = (id: string) => (STARTER_IDS as readonly string[]).includes(id);
+
+/** Espèces pouvant apparaître dans une vague normale : ni starters, ni boss. */
 export const WAVE_POOL = Object.values(SPECIES)
-  .filter((s) => s.rarity === 'common' || s.rarity === 'rare')
+  .filter((s) => s.rarity !== 'boss' && !isStarter(s.id))
   .map((s) => s.id)
   .sort();
 
+/** Boss des vagues 5, 10, 15… (US-13). */
+export const BOSS_POOL = Object.values(SPECIES)
+  .filter((s) => s.rarity === 'boss')
+  .map((s) => s.id)
+  .sort();
+
+export const isBossWave = (wave: number) => wave % BOSS_WAVE_EVERY === 0;
+
 export function createRun(starterId: string, seed: number): RunState {
-  if (!STARTER_IDS.includes(starterId as (typeof STARTER_IDS)[number])) throw new Error(`Starter inconnu : ${starterId}`);
-  return { seed, wave: 1, team: [createMonster(starterId, STARTER_LEVEL, `${seed}-p0`)] };
+  if (!isStarter(starterId)) throw new Error(`Starter inconnu : ${starterId}`);
+  return { seed, wave: 1, team: [createMonster(starterId, STARTER_LEVEL, `${seed}-p0`)], activeIndex: 0 };
 }
 
 /** RNG propre à une vague : même seed de run + même vague = même ennemi. */
@@ -42,21 +58,45 @@ export function enemyForWave(seed: number, wave: number): MonsterInstance {
 /** À partir de la vague 6, la vague compte 2 monstres (docs/01-GAME-DESIGN.md §6.1). */
 export const WAVE_WITH_TWO_ENEMIES = 6;
 
+/** Raretés pouvant sortir à la vague N : les plus rares se débloquent plus tard (§5.1). */
+export const raritiesForWave = (wave: number): Rarity[] =>
+  RARITY_ORDER.filter((id) => RARITIES[id].weight > 0 && RARITIES[id].firstWave <= wave && WAVE_POOL.some((s) => SPECIES[s].rarity === id));
+
+/** Tirage d'une espèce : d'abord la rareté (selon les poids), puis l'espèce au hasard dans cette rareté. */
+function drawSpecies(rng: Rng, wave: number): string {
+  const rarities = raritiesForWave(wave);
+  let roll = rng() * rarities.reduce((sum, id) => sum + RARITIES[id].weight, 0);
+  const rarity = rarities.find((id) => (roll -= RARITIES[id].weight) < 0) ?? rarities[rarities.length - 1];
+  return pick(rng, WAVE_POOL.filter((id) => SPECIES[id].rarity === rarity));
+}
+
 export function enemiesForWave(seed: number, wave: number): MonsterInstance[] {
   const rng = waveRng(seed, wave);
+  if (isBossWave(wave)) {
+    return [createMonster(pick(rng, BOSS_POOL), enemyLevelForWave(wave) + BOSS_LEVEL_BONUS, `${seed}-e${wave}-0`)];
+  }
   const count = wave >= WAVE_WITH_TWO_ENEMIES ? 2 : 1;
-  return Array.from({ length: count }, (_, i) => createMonster(pick(rng, WAVE_POOL), enemyLevelForWave(wave), `${seed}-e${wave}-${i}`));
+  return Array.from({ length: count }, (_, i) => createMonster(drawSpecies(rng, wave), enemyLevelForWave(wave), `${seed}-e${wave}-${i}`));
+}
+
+/** Niveau de butin d'une vague : celui de l'ennemi le plus rare (docs/01-GAME-DESIGN.md §6.2). */
+export const lootLevelForWave = (seed: number, wave: number) =>
+  Math.max(...enemiesForWave(seed, wave).map((m) => RARITIES[SPECIES[m.speciesId].rarity].loot));
+
+/** Premier monstre en vie à partir de `preferred` : le monstre actif reste le même s'il tient encore debout. */
+function aliveIndex(team: MonsterInstance[], preferred: number): number {
+  if (team[preferred]?.hp > 0) return preferred;
+  return Math.max(0, team.findIndex((m) => m.hp > 0));
 }
 
 /** Combat de la vague en cours : le joueur occupe le siège 0, l'IA le siège 1. */
 export function battleForWave(run: RunState): BattleState {
   const team = structuredClone(run.team);
-  const activeIndex = Math.max(0, team.findIndex((m) => m.hp > 0));
   return {
     round: run.wave,
     turn: 1,
     players: [
-      { userId: 'solo', team, activeIndex },
+      { userId: 'solo', team, activeIndex: aliveIndex(team, run.activeIndex) },
       { userId: null, team: enemiesForWave(run.seed, run.wave), activeIndex: 0 },
     ],
   };
@@ -67,9 +107,12 @@ export function healTeam(team: MonsterInstance[], fraction = WAVE_HEAL): Monster
   return team.map((m) => (m.hp <= 0 ? m : { ...m, hp: Math.min(m.maxHp, m.hp + Math.floor(m.maxHp * fraction)) }));
 }
 
-/** Vague suivante : on garde les PV et les PP du combat, puis on soigne (US-11 CA3). */
-export function nextWave(run: RunState, teamAfterBattle: MonsterInstance[]): RunState {
-  return { seed: run.seed, wave: run.wave + 1, team: healTeam(teamAfterBattle) };
+/**
+ * Vague suivante : on garde les PV et les PP du combat, puis on soigne (US-11 CA3).
+ * Le monstre qui a fini la vague sur le terrain commence la suivante.
+ */
+export function nextWave(run: RunState, teamAfterBattle: MonsterInstance[], activeIndex = run.activeIndex): RunState {
+  return { seed: run.seed, wave: run.wave + 1, team: healTeam(teamAfterBattle), activeIndex };
 }
 
 export const isRunOver = (team: MonsterInstance[]) => team.every((m) => m.hp <= 0);

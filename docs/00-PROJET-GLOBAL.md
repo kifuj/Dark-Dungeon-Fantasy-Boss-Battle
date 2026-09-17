@@ -18,7 +18,7 @@
 ### ✅ Dans le MVP (Must)
 - Moteur de combat : compétences, éléments, vitesse, KO, victoire/défaite.
 - Scène de combat Phaser avec sprites pixel-art et barres de PV.
-- Mode solo : choix d'un starter, vagues d'ennemis IA, récompenses entre les vagues.
+- Mode solo : choix d'un starter, vagues d'ennemis IA, récompenses entre les vagues, équipe de 4 monstres au maximum.
 - Connexion par pseudo (auth anonyme Supabase).
 - Multijoueur : créer ou rejoindre un salon par code, duel 1v1 avec choix simultanés et résolution côté serveur.
 - Écran titre, menu et écran des crédits.
@@ -26,8 +26,9 @@
 
 ### 🟡 Si on a le temps (Should / Could)
 - Draft d'équipe en duel, format en 3 manches (BO3), récompenses entre les manches.
-- Timeout de tour, reconnexion après un rafraîchissement, abandon.
-- Boss, classement, statuts (brûlure, poison), sons, version mobile.
+- Timeout de tour, reconnexion après un rafraîchissement, abandon (duel et solo).
+- Boss et raretés des monstres *(livrés en bonus au sprint 4)*, choix du remplaçant après un KO *(livré en bonus au sprint 4)*.
+- Classement, statuts (brûlure, poison), sons, version mobile.
 
 ### ❌ Hors périmètre
 - Matchmaking automatique, chat, comptes avec e-mail et mot de passe, boutique, plus de 2 joueurs.
@@ -93,9 +94,9 @@
 | 1 | 18 | **12** | US-01 et US-02 non terminées : elles dépendaient de comptes externes (Render, Supabase) plutôt que de code |
 | 2 | 18 | **18** | Sprint Goal atteint ; mode solo jouable en ligne. Les 2 US du sprint 1 restent ouvertes |
 | 3 | 18 | **18** (+ 3 pts d'US-02 récupérés du sprint 1) | Sprint Goal atteint : duel en ligne complet entre deux navigateurs. US-01 reste ouverte (configuration Render) |
-| 4 | 12 | **12** (+ 5 pts bonus avec US-09) | Sprint Goal atteint : récompenses, timeout, reprise, crédits. Un bug bloquant du solo, trouvé en jouant sur la production, est corrigé. US-01 reste ouverte (accès Render et réglages du dépôt) |
+| 4 | 12 | **12** (+ 5 pts bonus avec US-09, + 18 pts bonus ajoutés par le PO) | Sprint Goal atteint : récompenses, timeout, reprise, crédits. En bonus : choix du remplaçant après un KO (solo et duel), raretés et butins, boss, 5 nouveaux monstres, abandon en solo. Un bug bloquant du solo, trouvé en jouant sur la production, est corrigé. US-01 reste ouverte (accès Render et réglages du dépôt) |
 
-**Vélocité moyenne sur les 4 sprints : 15 points** (12, 18, 18, 12), soit **60 points terminés sur 66 engagés**, plus 3 points récupérés du sprint 1 (US-02) et 5 points bonus (US-09). Hors sprint, US-18 et US-29 (8 points proposés) ont été livrées le 16/09.
+**Vélocité moyenne sur les 4 sprints : 15 points** (12, 18, 18, 12), soit **60 points terminés sur 66 engagés**, plus 3 points récupérés du sprint 1 (US-02) et 23 points bonus (US-09, puis US-13 et US-30 à US-34 ajoutées par le PO le 17/09, estimations à rejouer). Hors sprint, US-18 et US-29 (8 points proposés) ont été livrées le 16/09.
 
 L'équipe livre ce qu'elle engage en développement depuis le sprint 2. Ce qui traîne depuis le sprint 1, c'est uniquement la **configuration des services externes** (US-01 : règle de réécriture du dashboard Render, protection de `main`). Ces tâches demandent des accès, pas du code. La protection de `main` a été activée au sprint 4 ; la règle de réécriture Render reste à faire depuis le dashboard. Le jeu fonctionne quand même en production grâce au repli `404.html`.
 
