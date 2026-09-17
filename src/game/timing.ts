@@ -18,6 +18,7 @@ export const EVENT_DURATION: Record<BattleEvent['type'], number> = {
   damage: 500,
   heal: 400,
   buff: 400,
+  level_up: 600,
   faint: 500,
   switch: 350,
   forfeit: 0,

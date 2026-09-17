@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createTurnRng, mulberry32 } from '../engine/rng.js';
-import { getActionOrder, resolveTurn } from '../engine/battle.js';
+import { ATK_UP_MULT, getActionOrder, resolveTurn } from '../engine/battle.js';
 import type { Action } from '../types.js';
 import { fixedRng, makeBattle } from './helpers.js';
 
@@ -17,8 +17,29 @@ describe('US-03 — compétences', () => {
   it('consomme 1 PP, sauf pour les compétences illimitées', () => {
     const s = makeBattle(['salamander'], ['knight']);
     const r = resolveTurn(s, [skill('fireball'), skill('strike')], mulberry32(1));
-    expect(r.state.players[0].team[0].skills.find((k) => k.id === 'fireball')?.ppLeft).toBe(9);
+    expect(r.state.players[0].team[0].skills.find((k) => k.id === 'fireball')?.ppLeft).toBe(12);
     expect(r.state.players[1].team[0].skills.find((k) => k.id === 'strike')?.ppLeft).toBeNull();
+  });
+
+  it('un boost d’attaque multiplie l’ATK du lanceur jusqu’à la fin du combat', () => {
+    const s = makeBattle(['wolf'], ['slime']);
+    const r = resolveTurn(s, [skill('howl'), skill('strike')], fixedRng(0.99));
+    expect(r.state.players[0].team[0].modifiers.atkMult).toBeCloseTo(ATK_UP_MULT);
+    expect(r.events).toContainEqual({ type: 'buff', seat: 0, stat: 'atk', mult: ATK_UP_MULT });
+
+    const plain = resolveTurn(s, [skill('strike'), skill('strike')], fixedRng(0.99));
+    const boosted = resolveTurn(r.state, [skill('strike'), skill('strike')], fixedRng(0.99));
+    const dealt = (turn: typeof r) => turn.events.find((e) => e.type === 'damage' && e.targetSeat === 1)!;
+    expect((dealt(boosted) as { amount: number }).amount).toBeGreaterThan((dealt(plain) as { amount: number }).amount);
+  });
+
+  it('lit un duel enregistré sans atkMult comme un multiplicateur de 1', () => {
+    const s = makeBattle(['wolf'], ['slime']);
+    const legacy = structuredClone(s);
+    delete legacy.players[0].team[0].modifiers.atkMult;
+    expect(resolveTurn(legacy, [skill('strike'), skill('strike')], fixedRng(0.5)).events).toEqual(
+      resolveTurn(s, [skill('strike'), skill('strike')], fixedRng(0.5)).events,
+    );
   });
 
   it('est déterministe : même seed + mêmes actions = même résultat', () => {

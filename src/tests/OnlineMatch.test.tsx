@@ -12,8 +12,10 @@ import { resolveTurn } from '../../shared/engine/battle.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
 import type { MatchRow } from '../../shared/types.js';
 
-const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, sendDraft, forfeitMatch, claimTimeout, loadProfile } = vi.hoisted(() => ({
+const { subscribeToMatch, subscribeToRoom, startMatch, hasPlayedThisTurn, fetchUsernames, sendAction, sendDraft, forfeitMatch, claimTimeout, loadProfile } = vi.hoisted(() => ({
   subscribeToMatch: vi.fn(),
+  subscribeToRoom: vi.fn(),
+  startMatch: vi.fn(),
   hasPlayedThisTurn: vi.fn(),
   fetchUsernames: vi.fn(),
   sendAction: vi.fn(),
@@ -23,7 +25,7 @@ const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, sendDra
   loadProfile: vi.fn(),
 }));
 
-vi.mock('../lib/realtime.ts', () => ({ subscribeToMatch, subscribeToRoom: vi.fn() }));
+vi.mock('../lib/realtime.ts', () => ({ subscribeToMatch, subscribeToRoom }));
 vi.mock('../lib/matches.ts', () => ({ hasPlayedThisTurn, fetchMatch: vi.fn() }));
 vi.mock('../lib/rooms.ts', () => ({ fetchUsernames, fetchRoom: vi.fn() }));
 vi.mock('../lib/api.ts', async (importOriginal) => ({
@@ -32,6 +34,7 @@ vi.mock('../lib/api.ts', async (importOriginal) => ({
   sendDraft,
   forfeitMatch,
   claimTimeout,
+  startMatch,
 }));
 vi.mock('../lib/session.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../lib/session.ts')>()),
@@ -177,6 +180,32 @@ describe('US-19 — jouer un combat en ligne', () => {
     const guest = await renderMatch('guest');
     await guest.push(finished);
     expect(screen.getByRole('heading', { name: /Défaite/ })).toBeDefined();
+  });
+
+  it('relance une revanche dans le même salon et y emmène les deux joueurs', async () => {
+    let roomUpdate: (room: { current_match_id: string | null }) => void = () => {};
+    subscribeToRoom.mockImplementation((_id: string, onRoom: typeof roomUpdate) => {
+      roomUpdate = onRoom;
+      return () => {};
+    });
+    startMatch.mockResolvedValue({ matchId: 'match-2' });
+    const { user, push } = await renderMatch('guest');
+    await push({ ...BASE, phase: 'finished', winner_id: 'host', version: 9 });
+    expect(subscribeToRoom).toHaveBeenCalledWith('room-1', expect.any(Function));
+
+    // L'adversaire a déjà lancé la revanche : on le suit.
+    await act(async () => roomUpdate({ current_match_id: 'match-1' }));
+    expect(subscribeToMatch).toHaveBeenLastCalledWith('match-1', expect.any(Function));
+    await act(async () => roomUpdate({ current_match_id: 'match-3' }));
+    expect(subscribeToMatch).toHaveBeenLastCalledWith('match-3', expect.any(Function));
+    expect(screen.getByText('Chargement du duel…')).toBeDefined(); // état remis à zéro pour le nouveau match
+
+    cleanup();
+    const again = await renderMatch('guest');
+    await again.push({ ...BASE, phase: 'finished', winner_id: 'host', version: 9 });
+    await user.click(screen.getByRole('button', { name: /Revanche/ }));
+    expect(startMatch).toHaveBeenCalledWith('room-1');
+    expect(subscribeToMatch).toHaveBeenLastCalledWith('match-2', expect.any(Function));
   });
 
   it('demande confirmation avant d’abandonner (US-23 CA1)', async () => {

@@ -8,7 +8,7 @@ Dark Dungeon Fantasy Boss battle est un projet étudiant non commercial. Merci a
 
 | Asset / pack | Auteur | Lien | Licence | Utilisé pour | Dans le repo ? |
 |---|---|---|---|---|---|
-| Sprites des 25 monstres (`public/assets/sprites/monsters/`) | Équipe groupe 3 | `tools/art/monsters.mjs` | CC0 (création de l'équipe) | Tous les monstres du bestiaire | Oui |
+| Sprites des 35 monstres, évolutions comprises (`public/assets/sprites/monsters/`) | Équipe groupe 3 | `tools/art/monsters.mjs` | CC0 (création de l'équipe) | Tous les monstres du bestiaire | Oui |
 | Icônes d'élément (`public/assets/ui/elements.png`) | Équipe groupe 3 | `tools/art/icons.mjs` | CC0 (création de l'équipe) | Encadrés de combat, cartes de starter | Oui |
 | Décor de combat (`public/assets/backgrounds/dungeon.png`) | Équipe groupe 3 | `tools/art/background.mjs` | CC0 (création de l'équipe) | Fond de la scène de combat | Oui |
 
@@ -22,7 +22,13 @@ Aucune police n'est téléchargée : le jeu utilise les polices déjà installé
 
 ## Sons et musiques
 
-Le jeu n'a pas encore de son : l'US-25 (musique et effets sonores) est restée dans la réserve du Product Backlog.
+| Asset | Auteur | Lien | Licence | Utilisé pour | Dans le repo ? |
+|---|---|---|---|---|---|
+| *Boss Battle Retro Rock* (`public/assets/musics/`) | À préciser | À préciser | À préciser | Musique de combat (solo et duel), en boucle | Oui (WAV d'origine + MP3 converti) |
+
+> ⚠️ **À compléter avant publication** : la piste a été ajoutée au dépôt sans sa source. Recopier ici l'auteur, le lien
+> et la licence exacte (CC0 ou CC-BY attendus pour un dépôt public). Le MP3 est une conversion du WAV (`ffmpeg -q:a 4`),
+> plus léger à charger sur Render. Pas encore d'effets sonores.
 
 ## Bibliothèques
 

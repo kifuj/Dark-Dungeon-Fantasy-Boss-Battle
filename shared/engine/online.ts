@@ -1,4 +1,4 @@
-import { SPECIES } from '../data/monsters.js';
+import { EVOLVED_IDS, SPECIES } from '../data/monsters.js';
 import { mulberry32 } from './rng.js';
 import { createMonster } from './stats.js';
 import { validateAction } from './validate.js';
@@ -9,9 +9,9 @@ export const ONLINE_TEAM_SIZE = 3;
 export const ONLINE_LEVEL = 10;
 /** Draft (US-18) : chaque joueur choisit ses 3 monstres parmi 6 propositions. */
 export const DRAFT_OFFER_SIZE = 6;
-/** Tout le bestiaire sauf les boss, qui sont réservés au solo (US-13). */
+/** Tout le bestiaire sauf les boss et les évolutions, réservés au solo (US-13). */
 export const ONLINE_POOL = Object.values(SPECIES)
-  .filter((species) => species.rarity !== 'boss')
+  .filter((species) => species.rarity !== 'boss' && !EVOLVED_IDS.has(species.id))
   .map((species) => species.id)
   .sort();
 

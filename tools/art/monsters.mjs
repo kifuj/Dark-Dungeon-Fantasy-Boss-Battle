@@ -1,7 +1,7 @@
 import { Canvas, rgb } from '../lib/canvas.mjs';
 
 /**
- * Sprites des 25 espèces du bestiaire (docs/01-GAME-DESIGN.md §5).
+ * Sprites des 35 espèces du bestiaire (dont 10 évolutions) (docs/01-GAME-DESIGN.md §5).
  * Chaque espèce est dessinée dans une grille 32 × 32 puis agrandie × 2 → cadre de 64 × 64.
  * Les pieds sont posés vers y = 29 pour laisser la place au contour et à l'oscillation d'attente.
  */
@@ -521,6 +521,142 @@ const hydra = (c) => {
   for (const [x, y] of [[12, 22], [16, 21], [20, 22]]) c.set(x, y, light); // écailles
 };
 
+// --- Évolutions (solo) : le dessin de l'espèce de base, recoloré, avec des attributs en plus. ---
+
+const GOLD_DARK = rgb('#8a5a12');
+const GOLD = rgb('#f2c14a');
+
+const toHsl = ([r, g, b]) => {
+  const [rn, gn, bn] = [r / 255, g / 255, b / 255];
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const h = max === rn ? (gn - bn) / d + (gn < bn ? 6 : 0) : max === gn ? (bn - rn) / d + 2 : (rn - gn) / d + 4;
+  return [h * 60, s, l];
+};
+
+const fromHsl = ([h, s, l]) => {
+  const k = (n) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+  return [f(0), f(8), f(4)].map((v) => Math.round(Math.min(1, Math.max(0, v)) * 255));
+};
+
+/**
+ * Recolore les pixels déjà dessinés : rotation de teinte, saturation et luminosité.
+ * `range` limite l'effet aux teintes comprises entre deux angles (ex. les verts d'un gobelin).
+ */
+function recolor(c, { hue = 0, sat = 1, light = 1, range = null }) {
+  for (let y = 0; y < c.height; y++) {
+    for (let x = 0; x < c.width; x++) {
+      const px = c.get(x, y);
+      if (px[3] === 0) continue;
+      const [h, s, l] = toHsl(px);
+      if (s < 0.08) continue; // gris, noirs et blancs gardent leur valeur
+      if (range && (h < range[0] || h > range[1])) continue;
+      c.data.set([...fromHsl([(h + hue + 360) % 360, Math.min(1, s * sat), Math.min(1, l * light)]), px[3]], (y * c.width + x) * 4);
+    }
+  }
+}
+
+const crown = (c, cx, y, halfWidth = 3.5) => {
+  c.rect(cx - halfWidth, y, halfWidth * 2 + 1, 2, GOLD);
+  for (const dx of [-halfWidth, 0, halfWidth]) c.triangle([cx + dx - 1, y + 0.5], [cx + dx + 0.5, y - 3], [cx + dx + 2, y + 0.5], GOLD);
+  c.line(cx - halfWidth, y + 1.5, cx + halfWidth + 1, y + 1.5, GOLD_DARK, 1);
+  c.set(cx, y + 0.5, rgb('#e0603a'));
+};
+
+const drakeid = (c) => {
+  const wing = rgb('#5a1a0c');
+  c.triangle([12, 18], [0, 6], [5, 26], wing);
+  c.triangle([20, 18], [32, 6], [27, 26], wing);
+  salamander(c);
+  recolor(c, { hue: -8, sat: 1.15, light: 0.9 });
+  c.triangle([11, 9], [9, 1], [14, 8], rgb('#3a1208')); // cornes plus longues
+  c.triangle([21, 9], [23, 1], [18, 8], rgb('#3a1208'));
+  c.ellipse(29, 14, 3, 3.5, rgb('#ff5a1a'), rgb('#ffe27a')); // flamme plus grande
+};
+
+const naiad = (c) => {
+  const stream = rgb('#1c6f8f');
+  c.line(9, 12, 4, 28, stream, 2); // chevelure d'eau
+  c.line(23, 12, 28, 28, stream, 2);
+  undine(c);
+  recolor(c, { hue: -18, sat: 1.1 });
+  for (const [x, y] of [[11, 14], [13.5, 12.8], [16, 12.3], [18.5, 12.8], [21, 14]]) {
+    c.ellipse(x, y, 1, 1, rgb('#e7c9e8'), rgb('#ffffff'), { shade: false }); // diadème de perles
+  }
+};
+
+const myconid = (c) => {
+  for (const [x, y] of [[4, 20], [28, 18], [6, 7], [27, 6]]) c.ellipse(x, y, 1, 1, rgb('#c9a0e8'), rgb('#f0dcff'), { shade: false }); // spores
+  mushroom(c);
+  recolor(c, { hue: -115, sat: 1.1, range: [60, 170] }); // chapeau vert → rouge
+  for (const [x, y] of [[8, 13], [12.5, 9], [20, 10], [24, 14]]) c.ellipse(x, y, 1.2, 1, WHITE, WHITE, { shade: false });
+};
+
+const goblinChief = (c) => {
+  c.line(24, 14, 28, 28, rgb('#5A3E2B'), 2); // gourdin
+  c.ellipse(24, 13, 2.5, 2.5, rgb('#3b2a1c'), rgb('#7a5a3a'));
+  goblin(c);
+  recolor(c, { hue: -12, light: 0.85, range: [60, 140] });
+  crown(c, 16, 6);
+};
+
+const skeletonLord = (c) => {
+  c.triangle([16, 13], [5, 31], [27, 31], rgb('#5a1422')); // cape
+  skeleton(c);
+  recolor(c, { hue: 90, range: [240, 300] }); // yeux rouges
+  crown(c, 16, 3);
+};
+
+const tyrantEye = (c) => {
+  const stalk = rgb('#3f2760');
+  for (const [x, y] of [[7, 3], [16, 1], [25, 3]]) c.line(16, 10, x, y + 2, stalk, 1); // pédoncules
+  flyingEye(c);
+  recolor(c, { hue: 80, sat: 1.2, range: [240, 300] }); // iris rouge
+  for (const [x, y] of [[7, 3], [16, 1], [25, 3]]) {
+    c.ellipse(x, y + 1, 1.6, 1.6, rgb('#b9b2a0'), rgb('#f7f2e4'));
+    c.set(x, y + 1, rgb('#c0283a'));
+  }
+};
+
+const slimeKing = (c) => {
+  slime(c);
+  recolor(c, { hue: 95, sat: 1.1, range: [60, 170] }); // vert → bleu
+  crown(c, 16, 13, 4.5);
+};
+
+const titanCrab = (c) => {
+  crab(c);
+  recolor(c, { hue: 45, light: 0.85, range: [180, 240] });
+  const spike = rgb('#2a1a50');
+  for (const x of [9, 13, 17, 21]) c.triangle([x, 19], [x + 1.5, 14.5], [x + 3, 19], spike); // pointes de la carapace
+  for (const x of [11, 16, 21]) c.set(x, 20, rgb('#e6d9ff'));
+};
+
+const banshee = (c) => {
+  const hair = rgb('#cfe9ef');
+  c.line(9, 7, 3, 27, hair, 2); // longue chevelure
+  c.line(23, 7, 29, 27, hair, 2);
+  c.line(11, 6, 7, 29, hair, 1);
+  c.line(21, 6, 25, 29, hair, 1);
+  ghost(c);
+  recolor(c, { hue: -95, range: [220, 300] }); // violet → turquoise
+  c.ellipse(16, 19.5, 2, 2.6, BLACK, BLACK, { shade: false }); // cri
+};
+
+const vampireLord = (c) => {
+  bat(c);
+  recolor(c, { hue: 85, sat: 1.2, light: 0.9, range: [240, 300] }); // violet → cramoisi
+  c.triangle([11, 15], [8, 19], [13, 17], rgb('#e8e0d0')); // col de la cape
+  c.triangle([21, 15], [24, 19], [19, 17], rgb('#e8e0d0'));
+  crown(c, 16, 7, 2.5);
+};
+
 export const MONSTER_ART = {
   salamander,
   undine,
@@ -547,6 +683,16 @@ export const MONSTER_ART = {
   kraken,
   phoenix,
   hydra,
+  drakeid,
+  naiad,
+  myconid,
+  goblin_chief: goblinChief,
+  skeleton_lord: skeletonLord,
+  tyrant_eye: tyrantEye,
+  slime_king: slimeKing,
+  titan_crab: titanCrab,
+  banshee,
+  vampire_lord: vampireLord,
 };
 
 /** Une espèce → une spritesheet de 2 images 64 × 64 (animation d'attente). */

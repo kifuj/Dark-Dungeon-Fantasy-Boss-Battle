@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { resolveTurn } from '../../shared/engine/battle.js';
 import { chooseAiAction, chooseAiReplacement } from '../../shared/engine/ai.js';
+import { grantKillLevels } from '../../shared/engine/level.js';
 import { describeEvents } from '../../shared/engine/log.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
 import { needsReplacement, resolveReplacement } from '../../shared/engine/replace.js';
@@ -14,7 +15,9 @@ import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
 import { ANIMATION_TIMEOUT_MS } from '../game/timing.ts';
 import { saveSoloRun, type SaveRunResult } from '../lib/leaderboard.ts';
+import { useBattleMusic } from '../lib/music.ts';
 import { ActionMenu } from '../components/ActionMenu.tsx';
+import { MusicToggle } from '../components/MusicToggle.tsx';
 import { RewardPanel } from '../components/RewardPanel.tsx';
 import { StarterSelect } from './StarterSelect.tsx';
 
@@ -161,7 +164,8 @@ export function SoloRun() {
       }
       const rng = createTurnRng(run.seed, run.wave, battle.turn);
       const aiAction = chooseAiAction(battle, 1, rng);
-      let result = resolveTurn(battle, [action, aiAction], rng);
+      // Chaque ennemi mis K.O. fait gagner un niveau au monstre du joueur (solo uniquement).
+      let result = grantKillLevels(resolveTurn(battle, [action, aiAction], rng));
       // Le monstre de l'IA est tombé : elle choisit tout de suite son remplaçant.
       if (result.winnerSeat === null && needsReplacement(result.state, 1)) {
         const replaced = resolveReplacement(result.state, { 1: chooseAiReplacement(result.state, 1) });
@@ -180,10 +184,10 @@ export function SoloRun() {
   }, [battle, endRun, run]);
 
   const chooseReward = useCallback(
-    (id: RewardId, targetUid?: string) => {
+    (id: RewardId, targetUid?: string, forgetSkillId?: string) => {
       if (!reward) return;
       const { next, wonWave } = reward;
-      const outcome = applyReward(next.team, id, { seed: next.seed, wave: wonWave, targetUid });
+      const outcome = applyReward(next.team, id, { seed: next.seed, wave: wonWave, targetUid, forgetSkillId });
       const advanced = { ...next, team: outcome.team };
       const fight = battleForWave(advanced);
       setReward(null);
@@ -194,11 +198,13 @@ export function SoloRun() {
     [reward],
   );
 
+  useBattleMusic(Boolean(run && battle));
+
   if (!run || !battle) {
     return (
       <main className="page solo-starter-screen">
         <StarterSelect onChoose={start} />
-        <Link to="/menu" className="button back-button">
+        <Link to="/menu" className="button back-button" data-shortcut="back">
           <span>Retour au menu</span>
           <span className="button-arrow" aria-hidden="true">↩</span>
         </Link>
@@ -216,6 +222,7 @@ export function SoloRun() {
       </header>
 
       <PhaserGame />
+      <MusicToggle />
 
       {over ? (
         <section className="run-over" aria-label="Fin de run">
@@ -245,7 +252,15 @@ export function SoloRun() {
           </div>
         </section>
       ) : reward ? (
-        <RewardPanel wave={reward.wonWave} seed={reward.next.seed} choices={reward.choices} team={reward.next.team} onChoose={chooseReward} />
+        <>
+          <RewardPanel wave={reward.wonWave} seed={reward.next.seed} choices={reward.choices} team={reward.next.team} onChoose={chooseReward} />
+          {/* Le dernier tour reste lisible : le K.O. final et le niveau gagné. */}
+          <ul className="battle-log" aria-live="polite">
+            {log.slice(-4).map((line, i) => (
+              <li key={`${line}-${i}`}>{line}</li>
+            ))}
+          </ul>
+        </>
       ) : (
         <>
           <ActionMenu state={battle} seat={0} busy={busy} onAction={play} />
@@ -262,7 +277,7 @@ export function SoloRun() {
                   <span>Confirmer l’abandon</span>
                   <span className="button-arrow" aria-hidden="true">⚑</span>
                 </button>
-                <button type="button" className="button" onClick={() => setConfirmingForfeit(false)}>
+                <button type="button" className="button" data-shortcut="back" onClick={() => setConfirmingForfeit(false)}>
                   <span>Continuer la run</span>
                   <span className="button-arrow" aria-hidden="true">↩</span>
                 </button>

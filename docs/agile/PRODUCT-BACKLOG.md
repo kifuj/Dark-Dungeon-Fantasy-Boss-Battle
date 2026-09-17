@@ -58,7 +58,7 @@ Une user story est terminée si :
 | US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | **5** | *backlog* (bonus S4, ✅ livré le 16/09) |
 | US-13 | Solo | Boss toutes les 5 vagues, avec butin de boss | Could | 3 | *3 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
 | US-22 | Multijoueur | Duel en 3 manches avec récompenses | Could | 5 | | *backlog* |
-| US-25 | Contenu | Musique, sons et volume | Could | 3 | | *backlog* |
+| US-25 | Contenu | Musique, sons et volume | Could | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, 🟡 musique de combat livrée le 17/09 ; sons et volume restants) |
 | US-27 | Contenu | Jouable sur mobile | Could | 3 | | *backlog* |
 | US-28 | Moteur | Statuts (brûlure, poison) | Could | 5 | | *backlog* |
 | US-29 | Contenu | Bestiaire étendu (20 espèces) | Could | 3 | **3** | *backlog* (bonus S4, ✅ livré le 16/09) |
@@ -67,9 +67,19 @@ Une user story est terminée si :
 | US-32 | Contenu | 5 nouveaux monstres (25 espèces) | Could | 3 | *3 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
 | US-33 | Solo | Abandonner une run solo | Should | 1 | *1 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
 | US-34 | Solo | Garder l'ordre de l'équipe d'une vague à l'autre | Should | 1 | *1 (à rejouer)* | 4 (bonus, ✅ livré le 17/09) |
+| US-35 | Moteur | 3 compétences et la Frappe pour chaque monstre | Should | 2 | *2 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-36 | Solo | Gagner un niveau en mettant un ennemi KO | Should | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-37 | Solo | Parchemin : voir la compétence et choisir celle à oublier | Should | 2 | *2 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-38 | Moteur | Rééquilibrer la DEF du Golem de pierre | Could | 1 | *1 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-39 | Moteur | +25 % de PP sur les attaques | Could | 1 | *1 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-40 | Moteur | Compétences de boost d'attaque | Should | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-41 | Contenu | Évolutions des starters et des monstres communs | Could | 5 | *5 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-42 | Solo | Recrutement plus fréquent, garanti une vague sur deux | Should | 1 | *1 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-43 | Contenu | Jouer entièrement au clavier | Should | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
+| US-44 | Multijoueur | Revanche sans recréer de salon | Should | 3 | *3 (à rejouer)* | *backlog* (bonus hors sprint, ✅ livré le 17/09 après le rendu) |
 | — | — | Matchmaking automatique, chat, 3+ joueurs | Won't | — | — | — |
 
-**Total proposé** : 116 points, dont 56 en Must (US-30 à US-34 ajoutées le 17/09 par le PO, 15 points). Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
+**Total proposé** : 140 points, dont 56 en Must (US-30 à US-34 ajoutées le 17/09 par le PO, 15 points ; US-35 à US-44 ajoutées le 17/09 après le rendu, 24 points, hors vélocité). Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
 
 ## 4. Planning Poker
 
@@ -114,6 +124,7 @@ Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, 
 | US-09 Animations *(bonus)* | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | La file d'événements existe depuis le sprint 2, le calibrage reste à faire |
 | US-18 Draft *(rejouée après coup)* | 5 / 5 / 8 / 5 | 5 / 5 / 5 / 5 | **5** | L'Edge Function réutilise le verrou du sprint 3 |
 | US-29 Bestiaire *(rejouée après coup)* | 3 / 2 / 3 / 3 | — | **3** | Les sprites sont générés par le code existant |
+| US-35 à US-44, US-25 *(bonus hors sprint, 17/09 après le rendu)* | à voter | — | *2, 3, 2, 1, 1, 3, 5, 1, 3, 3 et 3 proposés* | Demandées par le PO après le rendu (liste `TODO.md`) ; estimation proposée, à rejouer en Planning Poker |
 | US-13, US-30 à US-34 *(bonus, ajoutées le 17/09)* | à voter | — | *3, 5, 5, 3, 1, 1 proposés* | Demandées par le PO pendant le sprint 4 et livrées en bonus ; estimation proposée, à rejouer en Planning Poker |
 Détail des séances : [Sprint 1 — Planning Poker](SPRINT-1.md#planning-poker), [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les votes du sprint 4 sont à reporter dans [Sprint 4 — Planning Poker](SPRINT-4.md#planning-poker).
 
@@ -183,6 +194,41 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA3** : En solo, l'IA choisit elle-même son remplaçant (le monstre qui a l'avantage d'élément).
 - **CA4** : En duel, l'adversaire voit « l'adversaire choisit son remplaçant… » et ses actions sont refusées par le serveur ; une compétence du joueur KO est refusée aussi (`400 INVALID_ACTION`).
 - **CA5** : En duel, si le joueur KO ne choisit pas avant la fin du compte à rebours, son premier monstre en vie entre en combat.
+
+#### US-35 — 3 compétences et la Frappe · Should · 2 pts
+**En tant que** joueur, **je veux** que chaque monstre ait 3 compétences et la Frappe à PP illimités **afin de** toujours pouvoir agir et de comparer les monstres à armes égales.
+
+- **CA1** : Chaque espèce du bestiaire a exactement 4 compétences : 3 compétences et `strike` (Frappe, PP ∞).
+- **CA2** : La Frappe est la seule compétence à PP illimités.
+- **CA3** : Un duel enregistré avant ce changement (monstre sans Frappe) ne se bloque pas : le timeout joue toujours une action valide.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint.
+
+#### US-38 — Rééquilibrer le Golem · Could · 1 pt
+**En tant que** joueur, **je veux** que le Golem de pierre ne soit plus un mur imbattable **afin que** les combats contre lui restent jouables.
+
+- **CA1** : Le Golem (neutre, donc faible à aucun élément) a une DEF de base plus basse que celle du Crabe des abysses (55 au lieu de 75).
+- **CA2** : Sa rareté est recalculée par la puissance (peu commun).
+- **CA3** : Les boosts d'ATQ et de DEF ne durent qu'un combat : en solo, ils sont remis à zéro entre deux vagues.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint.
+
+#### US-39 — +25 % de PP · Could · 1 pt
+**En tant que** joueur, **je veux** plus de PP sur les attaques **afin de** moins tomber à court pendant une run.
+
+- **CA1** : Les PP de toutes les attaques sont augmentés de 25 %, arrondis (10 → 13, 8 → 10, 5 → 6, 4 → 5, 3 → 4).
+- **CA2** : Les PP des soins (Régénération, Chant apaisant) et des boosts ne changent pas.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint.
+
+#### US-40 — Boosts d'attaque · Should · 3 pts
+**En tant que** joueur, **je veux** des compétences qui augmentent l'attaque **afin de** préparer un gros coup.
+
+- **CA1** : Une compétence `atkUp` multiplie l'ATQ du lanceur par 1,15 jusqu'à la fin du combat (cumulable) ; le journal affiche « Votre monstre augmente son attaque ! ».
+- **CA2** : Chaque boost a l'élément du monstre ou l'élément Neutre, avec un nom cohérent (Embrasement pour le feu, Pacte ténébreux pour l'ombre, Hurlement pour le loup…).
+- **CA3** : Le moteur partagé gère le boost en solo comme en duel ; un duel enregistré sans multiplicateur d'ATQ se lit avec ×1.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint : 9 boosts, portés par 25 espèces (évolutions comprises).
 
 #### US-28 — Statuts · Could · 5 pts
 **En tant que** joueur, **je veux** des effets de statut (brûlure, poison) **afin d'**avoir plus de profondeur tactique.
@@ -271,6 +317,32 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA1** : Le monstre sur le terrain à la fin d'une vague commence la vague suivante ; l'ordre de l'équipe ne change pas.
 - **CA2** : S'il est KO, le premier monstre en vie commence.
 
+#### US-36 — Gagner un niveau en mettant un ennemi KO · Should · 3 pts
+**En tant que** joueur solo, **je veux** que mes monstres montent de niveau en combattant **afin de** ne plus avoir à choisir entre me soigner et progresser.
+
+- **CA1** : Quand mon monstre met un ennemi KO, il gagne 1 niveau (stats et PV max recalculés, PV perdus conservés) ; le texte « X passe au niveau N ! » s'affiche pendant le combat et reste lisible sur l'écran de récompense.
+- **CA2** : Les ennemis ne gagnent jamais de niveau, et le duel en ligne n'est pas concerné.
+- **CA3** : Les récompenses de niveaux sont réduites : Entraînement +1, Entraînement intensif +2, Camp d'entraînement +1, Relique +2.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint.
+
+#### US-37 — Parchemin : choisir la compétence oubliée · Should · 2 pts
+**En tant que** joueur solo, **je veux** voir la compétence qu'apprend le parchemin et choisir celle qu'il remplace **afin de** ne pas perdre ma meilleure attaque au hasard.
+
+- **CA1** : Au choix du monstre, chaque carte indique la compétence qu'il apprendrait.
+- **CA2** : Pour un monstre qui a déjà 4 compétences, l'écran suivant affiche la compétence apprise (élément, puissance ou effet, PP) et la liste des compétences à oublier ; la Frappe est grisée (« gardée »).
+- **CA3** : Échap ou « Choisir un autre monstre » revient au choix du monstre.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint.
+
+#### US-42 — Recrutement plus fréquent · Should · 1 pt
+**En tant que** joueur solo, **je veux** tomber plus souvent sur le recrutement **afin de** pouvoir agrandir mon équipe à coup sûr.
+
+- **CA1** : Le recrutement pèse 35 dans le tirage (au lieu de 20).
+- **CA2** : Il est toujours proposé après les vagues paires, même quand le tirage ne l'a pas sorti.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint.
+
 #### US-14 — Score et classement · Should · 3 pts
 **En tant que** joueur, **je veux** voir mon score et le top 20 **afin de** me comparer aux autres.
 
@@ -355,6 +427,18 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 
 ---
 
+#### US-44 — Revanche sans recréer de salon · Should · 3 pts
+**En tant que** joueur en duel, **je veux** relancer un match tout de suite avec le même adversaire **afin de** ne pas recréer de salon ni repartager de code.
+
+- **CA1** : L'écran de fin de duel propose « Revanche » (touche R) aux deux joueurs.
+- **CA2** : Un clic crée un nouveau match (nouveau draft) dans le même salon ; l'autre joueur, resté sur l'écran de fin, y est emmené automatiquement.
+- **CA3** : Si les deux joueurs cliquent en même temps, un seul match est créé (verrou sur `rooms.current_match_id`) ; un double-clic renvoie le match en cours.
+- **CA4** : Un joueur qui n'appartient pas au salon reçoit `403 NOT_A_PLAYER`.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint. La fonction `match-start` doit être redéployée après la fusion.
+
+---
+
 ### Epic 7 — Contenu et finitions
 
 #### US-24 — Écran titre et menu · Must · 2 pts
@@ -374,6 +458,28 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 - **CA1** : Une musique de menu et une musique de combat tournent en boucle.
 - **CA2** : Un son est joué à chaque coup reçu et à chaque KO.
 - **CA3** : Un réglage de volume (0–100 %) est mémorisé dans le `localStorage`.
+
+> 🟡 17/09 après le rendu, hors sprint : musique de combat (`public/assets/musics/`) en boucle pendant les combats solo et les duels, avec un bouton son (touche M) mémorisé par le navigateur. Restent : musique de menu, effets sonores, curseur de volume. Source et licence de la piste à renseigner dans [CREDITS](../CREDITS.md).
+
+#### US-43 — Jouer entièrement au clavier · Should · 3 pts
+**En tant que** joueur, **je veux** contrôler tout le jeu au clavier **afin de** jouer sans souris.
+
+- **CA1** : Sur chaque page, le premier bouton a le focus ; les flèches passent d'un bouton ou d'un lien à l'autre ; Entrée ou Espace valide ; Échap revient en arrière.
+- **CA2** : Les cartes et compétences numérotées se choisissent avec les touches 1 à 6 (starter, draft, compétences, remplaçant, récompenses, parchemin) ; V valide, C ouvre « Changer », M coupe la musique, R lance la revanche. Le numéro est affiché sur le bouton.
+- **CA3** : Dans un champ texte, les touches servent à écrire.
+- **CA4** : Le Guide liste les contrôles.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint.
+
+#### US-41 — Évolutions · Could · 5 pts
+**En tant que** joueur solo, **je veux** voir mes monstres évoluer **afin de** sentir ma progression et affronter des ennemis plus forts en fin de run.
+
+- **CA1** : Les 3 starters évoluent au niveau 12 et les 7 monstres communs au niveau 10, en une espèce plus puissante du même élément (jamais boss), avec son propre sprite.
+- **CA2** : Le monstre qui évolue garde ses compétences, ses PP et ses PV perdus ; le journal affiche « X évolue en Y ! ».
+- **CA3** : Les évolutions ne sont jamais tirées directement : un ennemi commun de niveau suffisant arrive évolué (à partir de la vague 11).
+- **CA4** : Les évolutions ne sont pas proposées au draft du duel ; le Guide indique pour chacune l'espèce et le niveau d'origine.
+
+> ✅ Livrée le 17/09 après le rendu, hors sprint : Drakéide, Naïade, Myconide, Chef gobelin, Seigneur squelette, Œil tyran, Roi slime, Crabe titan, Banshee, Seigneur vampire.
 
 #### US-27 — Mobile · Could · 3 pts
 **En tant que** joueur sur téléphone, **je veux** jouer en mode paysage **afin de** jouer n'importe où.

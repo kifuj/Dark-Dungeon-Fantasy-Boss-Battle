@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SPECIES } from '../data/monsters.js';
+import { COMMON_EVOLUTION_LEVEL, EVOLVED_IDS, evolvesFrom, SPECIES, speciesAtLevel } from '../data/monsters.js';
 import { RARITIES } from '../data/rarities.js';
 import {
   BOSS_POOL,
@@ -43,16 +43,40 @@ describe('US-11 — vagues', () => {
     expect(species.size).toBeGreaterThan(1); // les vagues ne se ressemblent pas toutes
   });
 
-  it('ne fait apparaître ni starter ni boss dans les vagues', () => {
+  it('ne fait apparaître ni starter ni boss dans les vagues, et les évolutions seulement par le niveau', () => {
     expect(WAVE_POOL.length).toBeGreaterThan(0);
     for (const id of WAVE_POOL) {
       expect(SPECIES[id].rarity).not.toBe('boss');
       expect(STARTER_IDS).not.toContain(id);
+      expect(EVOLVED_IDS.has(id)).toBe(false);
     }
-    for (let wave = 1; wave <= 30; wave++) {
-      if (isBossWave(wave)) continue;
-      for (const m of enemiesForWave(5, wave)) expect(WAVE_POOL).toContain(m.speciesId);
+    for (let seed = 0; seed < 20; seed++) {
+      for (let wave = 1; wave <= 30; wave++) {
+        if (isBossWave(wave)) continue;
+        for (const m of enemiesForWave(seed, wave)) {
+          const base = evolvesFrom(m.speciesId) ?? m.speciesId;
+          expect(WAVE_POOL).toContain(base);
+          expect(m.speciesId).toBe(speciesAtLevel(base, m.level));
+        }
+      }
     }
+  });
+
+  it('fait arriver les monstres communs déjà évolués en fin de run', () => {
+    const evolvedWaves = new Set<number>();
+    for (let seed = 0; seed < 200; seed++) {
+      for (let wave = 1; wave <= 14; wave++) {
+        if (enemiesForWave(seed, wave).some((m) => EVOLVED_IDS.has(m.speciesId))) evolvedWaves.add(wave);
+      }
+    }
+    // Ennemis de niveau N à la vague N ; la vague 10 est une vague de boss.
+    expect(Math.min(...evolvedWaves)).toBe(COMMON_EVOLUTION_LEVEL + 1);
+  });
+
+  it('remet les boosts à zéro d’une vague à l’autre', () => {
+    const run = createRun('salamander', 7);
+    const boosted = run.team.map((m) => ({ ...m, modifiers: { defMult: 1.3, atkMult: 1.5 } }));
+    expect(nextWave(run, boosted).team[0].modifiers).toEqual({ defMult: 1, atkMult: 1 });
   });
 
   it('oppose 1 monstre jusqu’à la vague 5, puis 2 (game design §6.1)', () => {
@@ -100,7 +124,7 @@ describe('US-11 — vagues', () => {
   it('garde les PP consommés d’une vague à l’autre', () => {
     const run = createRun('salamander', 7);
     const used = run.team.map((m) => ({ ...m, skills: m.skills.map((s) => ({ ...s, ppLeft: s.ppLeft === null ? null : s.ppLeft - 2 })) }));
-    expect(nextWave(run, used).team[0].skills.find((s) => s.id === 'fireball')?.ppLeft).toBe(8);
+    expect(nextWave(run, used).team[0].skills.find((s) => s.id === 'fireball')?.ppLeft).toBe(11);
   });
 });
 

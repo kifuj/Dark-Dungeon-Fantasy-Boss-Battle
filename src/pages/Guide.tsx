@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
 import { ELEMENT_LABELS } from '../../shared/data/elements.js';
-import { SPECIES } from '../../shared/data/monsters.js';
+import { COMMON_EVOLUTION_LEVEL, EVOLVED_IDS, evolvesFrom, SPECIES, STARTER_EVOLUTION_LEVEL } from '../../shared/data/monsters.js';
 import { RARITIES, RARITY_ORDER, speciesPower } from '../../shared/data/rarities.js';
 import { REWARDS } from '../../shared/data/rewards.js';
 import { SKILLS } from '../../shared/data/skills.js';
-import { DEF_UP_MULT } from '../../shared/engine/battle.js';
+import { ATK_UP_MULT, DEF_UP_MULT } from '../../shared/engine/battle.js';
 import { CRIT_CHANCE } from '../../shared/engine/damage.js';
 import { DRAFT_OFFER_SIZE, ONLINE_LEVEL, ONLINE_TEAM_SIZE, TURN_DURATION_MS } from '../../shared/engine/online.js';
-import { MAX_TEAM_SIZE, REWARD_CHOICES } from '../../shared/engine/rewards.js';
+import { KILL_LEVELS } from '../../shared/engine/level.js';
+import { MAX_TEAM_SIZE, RECRUIT_EVERY, REWARD_CHOICES } from '../../shared/engine/rewards.js';
 import { BOSS_LEVEL_BONUS, BOSS_WAVE_EVERY, STARTER_IDS, STARTER_LEVEL, WAVE_HEAL, WAVE_WITH_TWO_ENEMIES } from '../../shared/engine/run.js';
 import type { SkillDef } from '../../shared/types.js';
 
@@ -20,6 +21,10 @@ const isStarter = (id: string) => (STARTER_IDS as readonly string[]).includes(id
 
 const appearance = (id: string, rarity: keyof typeof RARITIES) => {
   if (isStarter(id)) return 'Starter';
+  if (EVOLVED_IDS.has(id)) {
+    const from = SPECIES[evolvesFrom(id)!];
+    return `Évolution de ${from.name} (N.${from.evolution!.level})`;
+  }
   if (rarity === 'boss') return `Boss (vagues ${BOSS_WAVE_EVERY}, ${BOSS_WAVE_EVERY * 2}…)`;
   return `Dès la vague ${RARITIES[rarity].firstWave}`;
 };
@@ -28,6 +33,7 @@ const EFFECT_LABELS: Record<NonNullable<SkillDef['effect']>, string> = {
   heal30: 'Soigne 30 % des PV max',
   drain50: 'Rend 50 % des dégâts infligés',
   defUp: `DEF ×${DEF_UP_MULT.toLocaleString('fr-FR')} (cumulable)`,
+  atkUp: `ATK ×${ATK_UP_MULT.toLocaleString('fr-FR')} (cumulable)`,
 };
 
 const skillEffect = (skill: SkillDef) =>
@@ -74,7 +80,11 @@ export function Guide() {
               Un monstre mis KO avant d'agir perd son action. Son joueur <strong>choisit</strong> ensuite le monstre qui le remplace,
               avant le tour suivant.
             </li>
-            <li>Chaque attaque a des <strong>PP</strong> (utilisations). À 0, elle n'est plus utilisable.</li>
+            <li>
+              Chaque monstre a 3 attaques et la <strong>Frappe</strong>. Chaque attaque a des <strong>PP</strong> (utilisations) : à 0,
+              elle n'est plus utilisable. La Frappe a des PP illimités.
+            </li>
+            <li>Les boosts d'ATK et de DEF durent jusqu'à la fin du combat.</li>
           </ul>
 
           <h2>Dégâts</h2>
@@ -149,10 +159,19 @@ export function Guide() {
             </li>
             <li>Le monstre sur le terrain à la fin d'une vague commence la suivante ; l'ordre de l'équipe ne change pas.</li>
             <li>Vous pouvez abandonner la run à tout moment pendant un combat.</li>
+            <li>Chaque ennemi mis KO fait gagner {KILL_LEVELS} niveau au monstre qui l'a abattu (en solo seulement).</li>
+            <li>
+              Évolutions : les starters évoluent au niveau {STARTER_EVOLUTION_LEVEL}, les monstres communs au niveau{' '}
+              {COMMON_EVOLUTION_LEVEL}. Les ennemis communs de haut niveau arrivent déjà évolués.
+            </li>
             <li>
               Après une victoire : PV et PP sont conservés, l'équipe récupère {percent(WAVE_HEAL)} de ses PV max (les KO restent KO).
             </li>
-            <li>Vous choisissez ensuite 1 récompense parmi {REWARD_CHOICES}. Équipe de {MAX_TEAM_SIZE} monstres maximum.</li>
+            <li>
+              Vous choisissez ensuite 1 récompense parmi {REWARD_CHOICES}. Équipe de {MAX_TEAM_SIZE} monstres maximum. Le recrutement
+              est proposé au moins une vague sur {RECRUIT_EVERY}.
+            </li>
+            <li>Le parchemin montre la compétence apprise ; vous choisissez celle à oublier (jamais la Frappe).</li>
             <li>La partie s'arrête quand toute l'équipe est KO.</li>
           </ul>
           <Table
@@ -164,16 +183,24 @@ export function Guide() {
             ])}
           />
 
+          <h2>Contrôles au clavier</h2>
+          <ul>
+            <li>Flèches (ou Tab) pour se déplacer, Entrée ou Espace pour valider, Échap pour revenir.</li>
+            <li>Touches 1 à 6 : la carte ou la compétence numérotée. V : valider le starter ou l'équipe. C : changer de monstre.</li>
+            <li>M : couper ou remettre la musique. R : revanche en fin de duel.</li>
+          </ul>
+
           <h2>Multijoueur</h2>
           <ul>
             <li>Chaque joueur choisit {ONLINE_TEAM_SIZE} monstres parmi {DRAFT_OFFER_SIZE} ; le premier choisi entre en combat.</li>
-            <li>Tous les monstres sont niveau {ONLINE_LEVEL}. Les boss ne sont pas proposés.</li>
+            <li>Tous les monstres sont niveau {ONLINE_LEVEL}. Les boss et les évolutions ne sont pas proposés, et on ne gagne pas de niveau.</li>
             <li>Quand un monstre tombe KO, son joueur choisit le remplaçant ; l'adversaire attend ce choix.</li>
             <li>{TURN_DURATION_MS / 1000} s par tour : sans réponse, une action est jouée automatiquement.</li>
             <li>Le premier joueur dont toute l'équipe est KO (ou qui abandonne) perd.</li>
+            <li>En fin de duel, « Revanche » relance un match dans le même salon, sans nouveau code.</li>
           </ul>
         </div>
-        <Link to="/menu" className="button back-button">
+        <Link to="/menu" className="button back-button" data-shortcut="back">
           <span>Retour au menu</span>
           <span className="button-arrow" aria-hidden="true">↩</span>
         </Link>

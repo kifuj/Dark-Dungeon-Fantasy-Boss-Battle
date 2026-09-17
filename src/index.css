@@ -1122,3 +1122,50 @@ h2,
 .leaderboard-me td { background: rgba(194, 181, 154, 0.08); color: var(--bone); }
 
 .run-save { margin: 0; font-size: 0.85rem; color: rgba(194, 181, 154, 0.72); }
+
+/* Contrôle au clavier : rappel de la touche sur les boutons (src/lib/keyboard.ts). */
+.key-hint {
+  display: inline-block;
+  min-width: 1.4em;
+  margin-right: 6px;
+  padding: 0 4px;
+  border: 1px solid var(--stone);
+  border-bottom-width: 2px;
+  background: var(--charcoal);
+  color: var(--bone);
+  font: inherit;
+  font-size: 0.75em;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.card-key {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  margin: 0;
+}
+
+.scroll-learned {
+  color: var(--ember);
+}
+
+/* Musique de combat : bouton son (src/components/MusicToggle.tsx). */
+.music-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  padding: 6px 10px;
+  border: 2px solid var(--stone);
+  background: var(--anthracite);
+  color: var(--bone);
+  font: inherit;
+  cursor: pointer;
+}
+
+.music-toggle:hover,
+.music-toggle:focus-visible {
+  border-color: var(--ember);
+}

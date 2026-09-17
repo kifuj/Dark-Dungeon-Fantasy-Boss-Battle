@@ -10,7 +10,7 @@ export const CRIT_CHANCE = 1 / 16;
  */
 export function computeDamage(attacker: MonsterInstance, defender: MonsterInstance, skill: SkillDef, rng: Rng) {
   const levelFactor = (attacker.level + 10) / 60;
-  const ratio = attacker.stats.atk / (defender.stats.def * defender.modifiers.defMult);
+  const ratio = (attacker.stats.atk * (attacker.modifiers.atkMult ?? 1)) / (defender.stats.def * defender.modifiers.defMult);
   const effectiveness = elementMultiplier(skill.element, defender.element);
   const stab = skill.element !== 'neutre' && skill.element === attacker.element ? 1.25 : 1;
   const crit = rng() < CRIT_CHANCE;

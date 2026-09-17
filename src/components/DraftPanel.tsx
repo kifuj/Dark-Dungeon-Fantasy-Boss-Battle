@@ -51,6 +51,7 @@ export function DraftPanel({ offer, locked, onConfirm }: DraftPanelProps) {
               badge={order !== -1 ? ORDER_LABELS[order] : undefined}
               disabled={locked || (full && order === -1)}
               onSelect={() => toggle(index)}
+              shortcut={String(index + 1)}
             />
           );
         })}
@@ -60,7 +61,7 @@ export function DraftPanel({ offer, locked, onConfirm }: DraftPanelProps) {
           ? 'Aucun monstre choisi.'
           : picks.map((index, order) => `${ORDER_LABELS[order]} ${SPECIES[offer[index]].name}`).join(' · ')}
       </p>
-      <button type="button" className="button confirm-button" disabled={!full || locked} onClick={() => onConfirm(picks)}>
+      <button type="button" className="button confirm-button" disabled={!full || locked} data-key="v" onClick={() => onConfirm(picks)}>
         {locked ? 'Équipe validée' : `Valider mon équipe (${picks.length}/${ONLINE_TEAM_SIZE})`}
         <span className="button-arrow" aria-hidden="true">⚔</span>
       </button>

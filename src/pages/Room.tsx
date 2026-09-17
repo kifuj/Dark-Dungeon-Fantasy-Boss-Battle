@@ -74,7 +74,7 @@ export function Room() {
       <main className="page centered-page">
         <section className="panel" aria-label="Salon">
           <p className="loading-line">{loaded ? 'Aucun salon avec ce code.' : 'Ouverture du salon…'}</p>
-          <Link to="/multi" className="button back-button">
+          <Link to="/multi" className="button back-button" data-shortcut="back">
             <span>Retour au multijoueur</span>
             <span className="button-arrow" aria-hidden="true">↩</span>
           </Link>
@@ -119,7 +119,7 @@ export function Room() {
 
         {error && <p className="form-error" role="alert">{error}</p>}
 
-        <Link to="/multi" className="button back-button">
+        <Link to="/multi" className="button back-button" data-shortcut="back">
           <span>Quitter le salon</span>
           <span className="button-arrow" aria-hidden="true">↩</span>
         </Link>

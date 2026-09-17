@@ -1,4 +1,4 @@
-import { SPECIES } from '../data/monsters.js';
+import { EVOLVED_IDS, SPECIES, speciesAtLevel } from '../data/monsters.js';
 import { RARITIES, RARITY_ORDER } from '../data/rarities.js';
 import { mulberry32, pick } from './rng.js';
 import { createMonster } from './stats.js';
@@ -24,15 +24,15 @@ export const BOSS_LEVEL_BONUS = 1;
 
 const isStarter = (id: string) => (STARTER_IDS as readonly string[]).includes(id);
 
-/** Espèces pouvant apparaître dans une vague normale : ni starters, ni boss. */
+/** Espèces pouvant être tirées dans une vague normale : ni starters, ni boss, ni évolutions (elles viennent avec le niveau). */
 export const WAVE_POOL = Object.values(SPECIES)
-  .filter((s) => s.rarity !== 'boss' && !isStarter(s.id))
+  .filter((s) => s.rarity !== 'boss' && !isStarter(s.id) && !EVOLVED_IDS.has(s.id))
   .map((s) => s.id)
   .sort();
 
 /** Boss des vagues 5, 10, 15… (US-13). */
 export const BOSS_POOL = Object.values(SPECIES)
-  .filter((s) => s.rarity === 'boss')
+  .filter((s) => s.rarity === 'boss' && !EVOLVED_IDS.has(s.id))
   .map((s) => s.id)
   .sort();
 
@@ -75,7 +75,9 @@ export function enemiesForWave(seed: number, wave: number): MonsterInstance[] {
     return [createMonster(pick(rng, BOSS_POOL), enemyLevelForWave(wave) + BOSS_LEVEL_BONUS, `${seed}-e${wave}-0`)];
   }
   const count = wave >= WAVE_WITH_TWO_ENEMIES ? 2 : 1;
-  return Array.from({ length: count }, (_, i) => createMonster(drawSpecies(rng, wave), enemyLevelForWave(wave), `${seed}-e${wave}-${i}`));
+  const level = enemyLevelForWave(wave);
+  // Un monstre commun tiré assez tard arrive déjà évolué.
+  return Array.from({ length: count }, (_, i) => createMonster(speciesAtLevel(drawSpecies(rng, wave), level), level, `${seed}-e${wave}-${i}`));
 }
 
 /** Niveau de butin d'une vague : celui de l'ennemi le plus rare (docs/01-GAME-DESIGN.md §6.2). */
@@ -108,10 +110,12 @@ export function healTeam(team: MonsterInstance[], fraction = WAVE_HEAL): Monster
 
 /**
  * Vague suivante : on garde les PV et les PP du combat, puis on soigne (US-11 CA3).
+ * Les boosts d'ATK et de DEF ne durent qu'un combat.
  * Le monstre qui a fini la vague sur le terrain commence la suivante.
  */
 export function nextWave(run: RunState, teamAfterBattle: MonsterInstance[], activeIndex = run.activeIndex): RunState {
-  return { seed: run.seed, wave: run.wave + 1, team: healTeam(teamAfterBattle), activeIndex };
+  const team = healTeam(teamAfterBattle).map((m) => ({ ...m, modifiers: { defMult: 1, atkMult: 1 } }));
+  return { seed: run.seed, wave: run.wave + 1, team, activeIndex };
 }
 
 export const isRunOver = (team: MonsterInstance[]) => team.every((m) => m.hp <= 0);

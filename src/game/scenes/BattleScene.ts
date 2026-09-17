@@ -151,7 +151,11 @@ export class BattleScene extends Scene {
         this.seatView(event.seat).animateHpTo({ hp: event.hpAfter, maxHp: event.maxHp }, EVENT_DURATION.heal);
         break;
       case 'buff':
-        this.seatView(event.seat).popText('Défense en hausse !');
+        this.seatView(event.seat).popText(event.stat === 'atk' ? 'Attaque en hausse !' : 'Défense en hausse !');
+        break;
+      case 'level_up':
+        this.seatView(event.seat).relabel(event.speciesId, event.name, event.level);
+        this.seatView(event.seat).popText(event.evolvedFrom ? `Évolution : ${event.name} !` : `Niveau ${event.level} !`);
         break;
       case 'faint':
         this.seatView(event.seat).playFaint(EVENT_DURATION.faint);

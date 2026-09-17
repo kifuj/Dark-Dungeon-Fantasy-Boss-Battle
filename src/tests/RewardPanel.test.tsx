@@ -2,7 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RewardPanel } from '../components/RewardPanel.tsx';
-import { recruitFor } from '../../shared/engine/rewards.js';
+import { SKILLS } from '../../shared/data/skills.js';
+import { recruitFor, scrollSkillFor } from '../../shared/engine/rewards.js';
 import { createMonster } from '../../shared/engine/stats.js';
 
 afterEach(cleanup);
@@ -39,6 +40,27 @@ describe('US-12 — écran de récompense', () => {
     expect(screen.getByRole('button', { name: /Gobelin/ }).textContent).toContain('KO');
     await userEvent.click(screen.getByRole('button', { name: /Salamandre/ }));
     expect(onChoose).toHaveBeenCalledWith('training', 'a');
+  });
+
+  it('montre la compétence du parchemin et demande laquelle oublier, jamais la Frappe', async () => {
+    const onChoose = vi.fn();
+    render(<RewardPanel wave={2} seed={SEED} choices={['potion', 'training', 'scroll']} team={smallTeam} onChoose={onChoose} />);
+    await userEvent.click(screen.getByRole('button', { name: /Parchemin/ }));
+    const learned = SKILLS[scrollSkillFor(SEED, 2, smallTeam[0])].name;
+    expect(screen.getByRole('button', { name: /Salamandre/ }).textContent).toContain(`Apprendrait : ${learned}`);
+    await userEvent.click(screen.getByRole('button', { name: /Salamandre/ }));
+    expect(onChoose).not.toHaveBeenCalled();
+    expect(screen.getByRole('heading').textContent).toBe(`Salamandre veut apprendre ${learned}`);
+    expect(screen.getByRole('button', { name: /Frappe \(gardée\)/ })).toHaveProperty('disabled', true);
+    await userEvent.click(screen.getByRole('button', { name: /Oublier Souffle ardent/ }));
+    expect(onChoose).toHaveBeenCalledWith('scroll', 'a', 'inferno');
+  });
+
+  it('se choisit au clavier avec les touches 1 à 3', async () => {
+    const onChoose = vi.fn();
+    render(<RewardPanel wave={2} seed={SEED} choices={['potion', 'elixir', 'recruit']} team={smallTeam} onChoose={onChoose} />);
+    expect(screen.getByRole('button', { name: /Élixir/ }).getAttribute('data-key')).toBe('2');
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: /Potion/ }));
   });
 
   it('demande quel monstre remplacer quand l’équipe est pleine (CA3)', async () => {

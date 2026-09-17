@@ -49,6 +49,7 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
   /** Navigation au clavier : flèches pour se déplacer, Entrée pour valider, Échap pour revenir (US-08 CA4). */
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape' && view === 'switch' && !replacing) {
+      event.preventDefault();
       setTab('root');
       return;
     }
@@ -66,7 +67,7 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
       {view === 'root' ? (
         <>
           <ul className="skill-grid">
-            {active.skills.map((slot) => {
+            {active.skills.map((slot, index) => {
               const skill = SKILLS[slot.id];
               const check = validateAction(state, seat, { type: 'skill', skillId: slot.id });
               return (
@@ -77,9 +78,13 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
                     style={{ '--element': ELEMENT_COLORS[skill.element] } as React.CSSProperties}
                     disabled={!check.ok}
                     title={check.ok ? `${skill.element} · puissance ${skill.power}` : 'Plus de PP'}
+                    data-key={index + 1}
                     onClick={() => send({ type: 'skill', skillId: slot.id })}
                   >
-                    <span className="skill-name">{skill.name}</span>
+                    <span className="skill-name">
+                      <kbd className="key-hint" aria-hidden="true">{index + 1}</kbd>
+                      {skill.name}
+                    </span>
                     <span className="skill-meta">
                       <span className="skill-element">{skill.element}</span>
                       <span className="skill-pp">{slot.ppLeft === null ? '∞' : `${slot.ppLeft}/${skill.pp}`} PP</span>
@@ -89,7 +94,8 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
               );
             })}
           </ul>
-          <button type="button" className="switch-button" disabled={!canSwitch} onClick={() => setTab('switch')}>
+          <button type="button" className="switch-button" disabled={!canSwitch} data-key="c" onClick={() => setTab('switch')}>
+            <kbd className="key-hint" aria-hidden="true">C</kbd>
             Changer {canSwitch ? '' : '(aucun monstre disponible)'}
           </button>
         </>
@@ -101,13 +107,20 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
             </p>
           )}
           <ul className="switch-list">
-            {switchable.map(({ monster, index }) => {
+            {switchable.map(({ monster, index }, position) => {
               const check = validateAction(state, seat, { type: 'switch', toIndex: index });
               const ratio = hpRatio(monster);
               return (
                 <li key={monster.uid}>
-                  <button type="button" className="switch-entry" disabled={!check.ok} onClick={() => send({ type: 'switch', toIndex: index })}>
+                  <button
+                    type="button"
+                    className="switch-entry"
+                    disabled={!check.ok}
+                    data-key={position + 1}
+                    onClick={() => send({ type: 'switch', toIndex: index })}
+                  >
                     <span className="skill-name">
+                      <kbd className="key-hint" aria-hidden="true">{position + 1}</kbd>
                       {monster.name} <span className="skill-element">N.{monster.level}</span>
                     </span>
                     <span className={`hp-pill hp-${hpTier(ratio)}`}>
@@ -119,7 +132,7 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
             })}
           </ul>
           {!replacing && (
-            <button type="button" className="switch-button" onClick={() => setTab('root')}>
+            <button type="button" className="switch-button" data-shortcut="back" onClick={() => setTab('root')}>
               Retour (Échap)
             </button>
           )}

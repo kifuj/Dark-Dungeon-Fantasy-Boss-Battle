@@ -15,7 +15,7 @@ export function Credits() {
         <p className="eyebrow">Merci à celles et ceux qui partagent</p>
         <h1>Crédits</h1>
         <Markdown source={body} />
-        <Link to="/menu" className="button back-button">
+        <Link to="/menu" className="button back-button" data-shortcut="back">
           <span>Retour au menu</span>
           <span className="button-arrow" aria-hidden="true">↩</span>
         </Link>
