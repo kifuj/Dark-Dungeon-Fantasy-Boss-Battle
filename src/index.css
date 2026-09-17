@@ -909,6 +909,13 @@ h2,
 
 .forfeit-confirm p { margin: 0; }
 
+/* ---------- Reprise d'un duel (US-21) ---------- */
+
+.resume-button {
+  border-color: var(--ember);
+  background: linear-gradient(90deg, rgba(182, 83, 36, 0.28), transparent);
+}
+
 /* ---------- Page Crédits (US-26) ---------- */
 
 .credits-panel {

@@ -26,3 +26,19 @@ export async function hasPlayedThisTurn(
     .maybeSingle();
   return Boolean(data);
 }
+
+/**
+ * Dernier match non terminé du joueur, pour le bouton « Reprendre la partie » du menu (US-21 CA3).
+ * La RLS ne renvoie que les matchs dont il est joueur (docs/03-BASE-DE-DONNEES.md §5).
+ */
+export async function fetchOngoingMatchId(userId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from('matches')
+    .select('id')
+    .or(`player1_id.eq.${userId},player2_id.eq.${userId}`)
+    .neq('phase', 'finished')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data as { id: string } | null)?.id ?? null;
+}
