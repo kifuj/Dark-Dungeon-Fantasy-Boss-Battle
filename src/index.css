@@ -915,3 +915,53 @@ h2,
   border-color: var(--ember);
   background: linear-gradient(90deg, rgba(182, 83, 36, 0.28), transparent);
 }
+
+/* ---------- Récompenses de fin de vague (US-12) ---------- */
+
+.reward-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: min(100%, 960px);
+  text-align: center;
+  animation: panel-enter 400ms ease-out both;
+}
+
+.reward-title {
+  margin: 0 0 0.6rem;
+  color: var(--bone);
+  text-shadow: 2px 2px 0 var(--violet);
+}
+
+.reward-grid,
+.reward-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 230px));
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 0.8rem;
+}
+
+.reward-icon {
+  margin-bottom: 0.7rem;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.reward-description {
+  margin-top: 0.7rem;
+  color: rgba(194, 181, 154, 0.75);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.reward-target .starter-sprite {
+  width: 4.2rem;
+  height: 4.2rem;
+}
+
+.reward-target .starter-level {
+  margin-bottom: 0;
+}
