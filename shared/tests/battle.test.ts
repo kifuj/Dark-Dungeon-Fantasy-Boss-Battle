@@ -43,11 +43,11 @@ describe('US-03 — compétences', () => {
     expect(r.events).toContainEqual({ type: 'heal', seat: 0, amount: 2, hpAfter: me.maxHp, maxHp: me.maxHp });
   });
 
-  it('Bénédiction augmente la DEF de 25 %', () => {
+  it('Bénédiction augmente la DEF de 15 %', () => {
     const s = makeBattle(['knight'], ['knight']);
     const r = resolveTurn(s, [skill('blessing'), skill('blessing')], mulberry32(1));
-    expect(r.state.players[0].team[0].modifiers.defMult).toBe(1.25);
-    expect(r.events).toContainEqual({ type: 'buff', seat: 0, stat: 'def', mult: 1.25 });
+    expect(r.state.players[0].team[0].modifiers.defMult).toBe(1.15);
+    expect(r.events).toContainEqual({ type: 'buff', seat: 0, stat: 'def', mult: 1.15 });
   });
 
   it('Drain vital soigne 50 % des dégâts infligés', () => {

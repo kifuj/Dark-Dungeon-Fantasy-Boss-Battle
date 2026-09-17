@@ -5,17 +5,17 @@ import type { SpeciesDef } from '../types.ts';
 export const SPECIES: Record<string, SpeciesDef> = {
   salamander: {
     id: 'salamander', name: 'Salamandre', element: 'feu', rarity: 'starter',
-    base: { hp: 50, atk: 65, def: 40, spd: 55 },
+    base: { hp: 55, atk: 70, def: 45, spd: 60 },
     skills: ['fireball', 'inferno', 'strike'], sprite: 'salamander',
   },
   undine: {
     id: 'undine', name: 'Ondine', element: 'eau', rarity: 'starter',
-    base: { hp: 55, atk: 55, def: 50, spd: 50 },
+    base: { hp: 60, atk: 60, def: 55, spd: 55 },
     skills: ['water_jet', 'deluge', 'strike'], sprite: 'undine',
   },
   mushroom: {
     id: 'mushroom', name: 'Champignon', element: 'nature', rarity: 'starter',
-    base: { hp: 60, atk: 50, def: 55, spd: 35 },
+    base: { hp: 65, atk: 55, def: 60, spd: 40 },
     skills: ['vine', 'regrowth', 'strike'], sprite: 'mushroom',
   },
   goblin: {

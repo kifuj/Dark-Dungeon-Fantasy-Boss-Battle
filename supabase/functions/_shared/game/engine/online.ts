@@ -99,12 +99,18 @@ export const TIMEOUT_GRACE_MS = 2_000;
 
 /**
  * Action jouée pour un joueur absent (US-20 CA2, docs/04-MULTIJOUEUR.md §7) : la première
- * compétence qui a encore des PP. `strike` a des PP illimités, il y en a donc toujours une.
+ * compétence qui a encore des PP. Toutes les espèces n'ont pas `strike` (PP illimités) : sans PP,
+ * on change de monstre si c'est possible, sinon on frappe quand même avec la première
+ * compétence (le moteur la résout), pour qu'un duel ne reste jamais bloqué.
  */
 export function defaultAction(state: BattleState, seat: Seat): Action {
   const player = state.players[seat];
-  const slot = player.team[player.activeIndex].skills.find((s) => validateAction(state, seat, { type: 'skill', skillId: s.id }).ok);
-  return { type: 'skill', skillId: (slot ?? player.team[player.activeIndex].skills[0]).id };
+  const skills = player.team[player.activeIndex].skills;
+  const usable = skills.find((s) => validateAction(state, seat, { type: 'skill', skillId: s.id }).ok);
+  if (usable) return { type: 'skill', skillId: usable.id };
+  const relay = player.team.findIndex((_, i) => validateAction(state, seat, { type: 'switch', toIndex: i }).ok);
+  if (relay !== -1) return { type: 'switch', toIndex: relay };
+  return { type: 'skill', skillId: skills[0].id };
 }
 
 /** Draft d'un joueur absent : les 3 premières propositions, dans l'ordre. */

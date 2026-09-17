@@ -42,13 +42,13 @@ describe('stats', () => {
 
 describe('computeDamage', () => {
   it('applique la formule (sans critique, aléa max)', () => {
-    const salamander = createMonster('salamander', 10, 'a'); // ATQ 111
+    const salamander = createMonster('salamander', 10, 'a'); // ATQ 120
     const goblin = createMonster('goblin', 10, 'b'); // DEF 68
-    // 50 × (111 / 68) × (20 / 60) × 1 × 1,25 (même élément) × ~1
+    // 50 × (120 / 68) × (20 / 60) × 1 × 1,25 (même élément) × ~1
     const { amount, effectiveness, crit } = computeDamage(salamander, goblin, SKILLS.fireball, fixedRng(0.99));
     expect(crit).toBe(false);
     expect(effectiveness).toBe(1);
-    expect(amount).toBe(Math.floor(50 * (111 / 68) * (20 / 60) * 1.25 * (0.9 + 0.99 * 0.1)));
+    expect(amount).toBe(Math.floor(50 * (120 / 68) * (20 / 60) * 1.25 * (0.9 + 0.99 * 0.1)));
   });
 
   it('multiplie par 1,5 sur un coup critique', () => {
