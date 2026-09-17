@@ -1,7 +1,7 @@
 import { REWARDS, type RewardId } from '../data/rewards.js';
 import { SKILLS } from '../data/skills.js';
 import { mulberry32, pick } from './rng.js';
-import { enemiesForWave } from './run.js';
+import { enemiesForWave, isBossWave, lootLevelForWave } from './run.js';
 import { createMonster } from './stats.js';
 import type { MonsterInstance, Rng } from '../types.js';
 
@@ -10,16 +10,32 @@ export const REWARD_CHOICES = 3;
 export const MAX_TEAM_SIZE = 4;
 export const POTION_HEAL = 0.5;
 export const TRAINING_LEVELS = 2;
+export const INTENSIVE_TRAINING_LEVELS = 4;
+export const WAR_CAMP_LEVELS = 2;
+export const RELIC_LEVELS = 3;
 
 /** RNG des récompenses de la vague N : distincte de celle des ennemis, mais tirée de la même seed (CA4). */
 export const rewardRng = (seed: number, wave: number): Rng => mulberry32((seed ^ Math.imul(wave, 0x165667b1) ^ 0x5bd1e995) >>> 0);
 
-/** 3 récompenses différentes, tirées selon leurs poids, sans remise (CA1). */
+/**
+ * Récompenses accessibles après la vague N : celles que le niveau de butin débloque.
+ * Une récompense rare pèse plus lourd quand l'ennemi vaincu dépasse son niveau minimal.
+ * Après un boss, seules les récompenses rares et le recrutement (du boss) restent en jeu.
+ */
+export function rewardPool(seed: number, wave: number): { id: RewardId; weight: number }[] {
+  const loot = lootLevelForWave(seed, wave);
+  const boss = isBossWave(wave);
+  return Object.values(REWARDS)
+    .filter((r) => r.minLoot <= loot && r.weight > 0 && (!boss || r.minLoot > 0 || r.id === 'recruit'))
+    .map((r) => ({ id: r.id, weight: r.minLoot > 0 ? r.weight * (1 + loot - r.minLoot) : r.weight }));
+}
+
+/** 3 récompenses différentes, tirées selon leurs poids, sans remise (CA1). Un boss garantit sa relique (US-13). */
 export function drawRewards(seed: number, wave: number): RewardId[] {
   const rng = rewardRng(seed, wave);
-  const pool = Object.values(REWARDS);
-  const drawn: RewardId[] = [];
-  while (drawn.length < REWARD_CHOICES) {
+  const pool = rewardPool(seed, wave);
+  const drawn: RewardId[] = isBossWave(wave) ? ['relic'] : [];
+  while (drawn.length < REWARD_CHOICES && pool.length > 0) {
     const total = pool.reduce((sum, r) => sum + r.weight, 0);
     let roll = rng() * total;
     const index = pool.findIndex((r) => (roll -= r.weight) < 0);
@@ -36,7 +52,7 @@ export function recruitFor(seed: number, wave: number): MonsterInstance {
 
 /** Vrai si le joueur doit désigner un monstre avant d'appliquer la récompense (CA3). */
 export function needsTarget(reward: RewardId, team: MonsterInstance[]): boolean {
-  if (reward === 'training' || reward === 'scroll') return true;
+  if (reward === 'training' || reward === 'intensive_training' || reward === 'scroll') return true;
   return reward === 'recruit' && team.length >= MAX_TEAM_SIZE;
 }
 
@@ -103,6 +119,31 @@ export function applyReward(
         message: `${trained.name} passe au niveau ${trained.level} !`,
       };
     }
+    case 'royal_potion':
+      return {
+        team: team.map((m) => ({ ...m, hp: m.maxHp, skills: m.skills.map((s) => ({ id: s.id, ppLeft: SKILLS[s.id].pp })) })),
+        message: 'L’équipe est entièrement soignée et ses PP sont rechargés.',
+      };
+    case 'intensive_training': {
+      const trained = levelUp(target!, INTENSIVE_TRAINING_LEVELS);
+      return {
+        team: team.map((m) => (m.uid === trained.uid ? trained : m)),
+        message: `${trained.name} passe au niveau ${trained.level} !`,
+      };
+    }
+    case 'war_camp':
+      return {
+        team: team.map((m) => levelUp(m, WAR_CAMP_LEVELS)),
+        message: `Toute l’équipe gagne ${WAR_CAMP_LEVELS} niveaux !`,
+      };
+    case 'relic':
+      return {
+        team: team.map((m) => {
+          const leveled = levelUp(m, RELIC_LEVELS);
+          return { ...leveled, hp: leveled.maxHp };
+        }),
+        message: `La relique donne ${RELIC_LEVELS} niveaux à toute l’équipe et la soigne entièrement !`,
+      };
     case 'recruit': {
       const recruit = recruitFor(seed, wave);
       if (!target) return { team: [...team, recruit], message: `${recruit.name} rejoint l’équipe !` };

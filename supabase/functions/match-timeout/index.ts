@@ -3,6 +3,7 @@ import { fail, json, preflight } from '../_shared/http.ts';
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts';
 import { tryResolveBattleTurn, tryResolveDraft } from '../_shared/turns.ts';
 import { DEFAULT_DRAFT_PICKS, defaultAction, isTurnExpired } from '../_shared/game/engine/online.ts';
+import { replacementSeats } from '../_shared/game/engine/replace.ts';
 import type { BattleState, Seat } from '../_shared/game/types.ts';
 
 /**
@@ -39,7 +40,10 @@ Deno.serve(async (req) => {
     .eq('turn', turn);
 
   const state = match.state as BattleState;
-  const autoActions = ([0, 1] as Seat[])
+  // Phase de remplacement : seuls les joueurs dont le monstre est KO doivent jouer.
+  const replacing = phase === 'battle' ? replacementSeats(state) : [];
+  const expected: Seat[] = replacing.length > 0 ? replacing : [0, 1];
+  const autoActions = expected
     .filter((seat) => !played?.some((a) => a.player_id === players[seat]))
     .map((seat) => ({
       match_id: match.id,

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ELEMENT_COLORS } from '../../shared/data/elements.js';
 import { SKILLS } from '../../shared/data/skills.js';
 import { hpRatio, hpTier } from '../../shared/engine/hp.js';
+import { needsReplacement } from '../../shared/engine/replace.js';
 import { validateAction } from '../../shared/engine/validate.js';
 import type { Action, BattleState, Seat } from '../../shared/types.js';
 
@@ -14,7 +15,8 @@ interface Props {
 }
 
 /**
- * Menu d'actions du joueur (US-08) et sous-menu « Changer » (US-04).
+ * Menu d'actions du joueur (US-08) et sous-menu « Changer » (US-04). Quand le monstre actif
+ * est KO, seul le choix de son remplaçant est proposé (docs/06-MOTEUR-DE-COMBAT.md §6).
  * Les actions impossibles sont grisées par `validateAction`, la même fonction que
  * celle qui protège le serveur (docs/06-MOTEUR-DE-COMBAT.md §7).
  */
@@ -28,11 +30,13 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
     .map((monster, index) => ({ monster, index }))
     .filter(({ index }) => index !== player.activeIndex);
   const canSwitch = switchable.some(({ index }) => validateAction(state, seat, { type: 'switch', toIndex: index }).ok);
+  const replacing = needsReplacement(state, seat);
+  const view = replacing ? 'switch' : tab;
 
   useEffect(() => {
     if (busy) return;
     containerRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])')?.focus();
-  }, [busy, tab, active.uid]);
+  }, [busy, view, active.uid]);
 
   if (busy) return <div className="action-menu action-menu-hidden" aria-hidden="true" />;
 
@@ -44,7 +48,7 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
 
   /** Navigation au clavier : flèches pour se déplacer, Entrée pour valider, Échap pour revenir (US-08 CA4). */
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape' && tab === 'switch') {
+    if (event.key === 'Escape' && view === 'switch' && !replacing) {
       setTab('root');
       return;
     }
@@ -59,7 +63,7 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
 
   return (
     <div className="action-menu" ref={containerRef} onKeyDown={onKeyDown} aria-label="Menu d'actions">
-      {tab === 'root' ? (
+      {view === 'root' ? (
         <>
           <ul className="skill-grid">
             {active.skills.map((slot) => {
@@ -91,6 +95,11 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
         </>
       ) : (
         <>
+          {replacing && (
+            <p className="replace-prompt">
+              {active.name} est K.O. ! Choisissez le monstre qui prend sa place.
+            </p>
+          )}
           <ul className="switch-list">
             {switchable.map(({ monster, index }) => {
               const check = validateAction(state, seat, { type: 'switch', toIndex: index });
@@ -109,9 +118,11 @@ export function ActionMenu({ state, seat, busy, onAction }: Props) {
               );
             })}
           </ul>
-          <button type="button" className="switch-button" onClick={() => setTab('root')}>
-            Retour (Échap)
-          </button>
+          {!replacing && (
+            <button type="button" className="switch-button" onClick={() => setTab('root')}>
+              Retour (Échap)
+            </button>
+          )}
         </>
       )}
     </div>

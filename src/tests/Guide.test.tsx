@@ -3,6 +3,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Guide } from '../pages/Guide.tsx';
 import { SPECIES } from '../../shared/data/monsters.js';
+import { RARITIES } from '../../shared/data/rarities.js';
 import { SKILLS } from '../../shared/data/skills.js';
 
 afterEach(cleanup);
@@ -20,12 +21,12 @@ describe('Guide du jeu', () => {
     for (const skill of Object.values(SKILLS)) expect(screen.getByRole('cell', { name: skill.name })).toBeTruthy();
   });
 
-  it('liste les monstres jouables avec leurs stats, sans les boss', () => {
+  it('liste tous les monstres avec leurs stats et leur rareté, boss compris', () => {
     renderGuide();
     for (const species of Object.values(SPECIES)) {
-      const cell = screen.queryByRole('cell', { name: species.name });
-      if (species.rarity === 'boss') expect(cell).toBeNull();
-      else expect(cell?.parentElement?.textContent).toContain(String(species.base.spd));
+      const row = screen.getByRole('cell', { name: species.name }).parentElement?.textContent;
+      expect(row).toContain(String(species.base.spd));
+      expect(row).toContain(RARITIES[species.rarity].label);
     }
   });
 

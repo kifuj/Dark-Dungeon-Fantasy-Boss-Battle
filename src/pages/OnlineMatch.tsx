@@ -7,6 +7,7 @@ import { subscribeToMatch } from '../lib/realtime.ts';
 import { fetchUsernames } from '../lib/rooms.ts';
 import { describeEvents } from '../../shared/engine/log.js';
 import { isTurnExpired } from '../../shared/engine/online.js';
+import { replacementSeats } from '../../shared/engine/replace.js';
 import type { Action, MatchRow, Seat } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
@@ -248,11 +249,19 @@ export function OnlineMatch() {
   const drafting = match.phase === 'draft';
   // Un abandon pendant le draft termine le match sans équipes : pas de scène à afficher.
   const hasTeams = match.state.players.every((player) => player.team.length > 0);
+  // Phase de remplacement : seul le joueur dont le monstre est KO choisit, l'autre attend.
+  const replacing = !drafting && hasTeams ? replacementSeats(match.state) : [];
+  const myReplacement = replacing.includes(seat);
+  const opponentReplacing = replacing.length > 0 && !myReplacement;
   const status = expired
     ? 'Temps écoulé : le tour se joue automatiquement…'
     : drafting && ui === 'waiting'
       ? 'Équipe validée. En attente du choix de l’adversaire…'
-      : STATUS_TEXT[ui];
+      : opponentReplacing && ui !== 'animating'
+        ? 'Le monstre adverse est K.O. : l’adversaire choisit son remplaçant…'
+        : myReplacement && ui === 'waiting'
+          ? 'Remplaçant choisi.'
+          : STATUS_TEXT[ui];
   const secondsLeft = deadline ? Math.max(0, Math.ceil((Date.parse(deadline) - now) / 1000)) : null;
 
   return (
@@ -298,7 +307,7 @@ export function OnlineMatch() {
           {drafting ? (
             <DraftPanel offer={match.state.draftOffers?.[seat] ?? []} locked={ui !== 'choosing'} onConfirm={draft} />
           ) : (
-            <ActionMenu state={match.state} seat={seat} busy={ui !== 'choosing'} onAction={play} />
+            <ActionMenu state={match.state} seat={seat} busy={ui !== 'choosing' || opponentReplacing} onAction={play} />
           )}
           {error && <p className="form-error" role="alert">{error}</p>}
           {!drafting && (

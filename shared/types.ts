@@ -18,13 +18,16 @@ export interface SkillDef {
   effect?: 'heal30' | 'drain50' | 'defUp';
 }
 
+/** Rareté d'une espèce, déduite de sa puissance (shared/data/rarities.ts). */
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'boss';
+
 export interface SpeciesDef {
   id: string;
   name: string;
   element: Element;
   base: BaseStats;
   skills: string[];
-  rarity: 'starter' | 'common' | 'rare' | 'boss';
+  rarity: Rarity;
   sprite: string; // clé de texture Phaser
 }
 

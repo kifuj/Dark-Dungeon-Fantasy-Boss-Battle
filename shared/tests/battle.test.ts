@@ -106,23 +106,15 @@ describe("US-05 — ordre d'action", () => {
 });
 
 describe('US-06 — KO et fin de combat', () => {
-  it('émet faint puis remplace automatiquement le monstre KO', () => {
+  it('émet faint et laisse le joueur choisir le remplaçant (pas de remplacement automatique)', () => {
     const s = makeBattle(['flying_eye'], ['slime', 'goblin']);
     s.players[1].team[0].hp = 1;
     const r = resolveTurn(s, [skill('shadow_claw'), skill('vine')], mulberry32(1));
     expect(r.events).toContainEqual({ type: 'faint', seat: 1, index: 0, name: 'Slime' });
-    expect(r.events.at(-1)).toEqual({ type: 'switch', seat: 1, fromIndex: 0, toIndex: 1, forced: true, name: 'Gobelin' });
-    expect(r.state.players[1].activeIndex).toBe(1);
+    expect(r.events.some((e) => e.type === 'switch')).toBe(false);
+    expect(r.state.players[1].activeIndex).toBe(0);
     expect(r.winnerSeat).toBeNull();
     expect(r.state.turn).toBe(2);
-  });
-
-  it('remplace par le premier monstre en vie', () => {
-    const s = makeBattle(['flying_eye'], ['slime', 'goblin', 'skeleton']);
-    s.players[1].team[0].hp = 1;
-    s.players[1].team[1].hp = 0;
-    const r = resolveTurn(s, [skill('shadow_claw'), skill('vine')], mulberry32(1));
-    expect(r.state.players[1].activeIndex).toBe(2);
   });
 
   it("déclare la victoire quand toute l'équipe adverse est KO", () => {

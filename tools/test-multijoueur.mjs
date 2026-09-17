@@ -1,6 +1,6 @@
 // Scénarios de test du multijoueur (docs/04-MULTIJOUEUR.md §11) joués contre le vrai
 // projet Supabase : trois sessions anonymes, un salon, un draft, un duel complet, un abandon,
-// un timeout de tour.
+// un timeout de tour, le choix du remplaçant après un KO.
 // Usage : `npm run test:multi` (lit VITE_SUPABASE_URL et VITE_SUPABASE_PUBLISHABLE_KEY
 // dans .env / .env.local ou dans l'environnement). Avec SUPABASE_ACCESS_TOKEN, la deadline
 // du tour est avancée en SQL pour tester le timeout tout de suite ; sans, on attend 62 s.
@@ -70,6 +70,13 @@ const firstUsableSkill = (row, seat) => {
   return monster.skills.find((skill) => skill.ppLeft === null || skill.ppLeft > 0).id;
 };
 
+/** Sièges dont le monstre actif est KO avec encore un monstre en vie : ils doivent choisir un remplaçant. */
+const koSeats = (row) =>
+  [0, 1].filter((seat) => {
+    const player = row.state.players[seat];
+    return player.team[player.activeIndex].hp <= 0 && player.team.some((m) => m.hp > 0);
+  });
+
 const tag = Math.random().toString(36).slice(2, 6).toUpperCase();
 const [A, B, C] = await Promise.all([anonymousPlayer(`TestA-${tag}`), anonymousPlayer(`TestB-${tag}`), anonymousPlayer(`TestC-${tag}`)]);
 console.log(`Trois sessions anonymes : ${A.username} (hôte), ${B.username} (invité), ${C.username} (tiers)\n`);
@@ -130,15 +137,40 @@ const afterTurn = await readMatch(A, matchId);
 check('le tour avance et la version augmente', [afterTurn.turn, afterTurn.version], [row.turn + 1, row.version + 1]);
 check('les deux joueurs lisent la même version', (await readMatch(B, matchId)).version, afterTurn.version);
 
-// --- Duel joué jusqu'à la victoire (M5) ---
+// --- Duel joué jusqu'à la victoire (M5), avec choix du remplaçant après chaque KO ---
 row = afterTurn;
 let turns = 1;
-while (row.phase === 'battle' && turns < 60) {
-  await fn('match-action', A, { matchId, round: row.round, turn: row.turn, action: { type: 'skill', skillId: firstUsableSkill(row, 0) } });
-  await fn('match-action', B, { matchId, round: row.round, turn: row.turn, action: { type: 'skill', skillId: firstUsableSkill(row, 1) } });
-  row = await readMatch(A, matchId);
+let replacementChecked = false;
+while (row.phase === 'battle' && turns < 80) {
+  const ko = koSeats(row);
+  if (ko.length > 0) {
+    const seat = ko[0];
+    const [koPlayer, other] = seat === 0 ? [A, B] : [B, A];
+    const alive = row.state.players[seat].team.map((m, i) => (m.hp > 0 ? i : -1)).filter((i) => i !== -1);
+    const choice = alive.at(-1); // le dernier monstre en vie : ce n'est pas le choix automatique
+    const at = { matchId, round: row.round, turn: row.turn };
+    if (!replacementChecked) {
+      const otherSeat = seat === 0 ? 1 : 0;
+      check('KO : l’adversaire ne joue pas pendant le choix du remplaçant', (await fn('match-action', other, { ...at, action: { type: 'skill', skillId: firstUsableSkill(row, otherSeat) } })).body.error, 'INVALID_ACTION');
+      check('KO : le joueur KO ne peut que changer de monstre', (await fn('match-action', koPlayer, { ...at, action: { type: 'skill', skillId: row.state.players[seat].team[row.state.players[seat].activeIndex].skills[0].id } })).body.error, 'INVALID_ACTION');
+    }
+    const status = (await fn('match-action', koPlayer, { ...at, action: { type: 'switch', toIndex: choice } })).body.status;
+    const before = row;
+    row = await readMatch(A, matchId);
+    if (!replacementChecked) {
+      check('KO : le choix du seul joueur concerné résout le tour', status, 'resolved');
+      check('KO : le monstre choisi entre en combat', [row.state.players[seat].activeIndex, row.turn], [choice, before.turn + 1]);
+      check('KO : un seul événement, un changement forcé', row.last_events.map((e) => [e.type, e.seat, e.toIndex, e.forced]), [['switch', seat, choice, true]]);
+      replacementChecked = true;
+    }
+  } else {
+    await fn('match-action', A, { matchId, round: row.round, turn: row.turn, action: { type: 'skill', skillId: firstUsableSkill(row, 0) } });
+    await fn('match-action', B, { matchId, round: row.round, turn: row.turn, action: { type: 'skill', skillId: firstUsableSkill(row, 1) } });
+    row = await readMatch(A, matchId);
+  }
   turns++;
 }
+check('KO : au moins un remplacement choisi pendant le duel', replacementChecked, true);
 check('M5 le duel se termine sur une victoire', [row.phase, row.winner_id === A.id || row.winner_id === B.id], ['finished', true]);
 check('M5 le dernier événement est battle_end', row.last_events.at(-1).type, 'battle_end');
 check('le salon passe en finished', (await call(`/rest/v1/rooms?id=eq.${roomId}&select=status`, { token: A.token })).body[0].status, 'finished');
@@ -161,19 +193,22 @@ check('US-23 abandonner deux fois est sans effet', (await fn('match-forfeit', B,
 // --- Timeout de tour (US-20, M3) ---
 const PROJECT_REF = new URL(BASE).hostname.split('.')[0];
 /** Fait comme si la deadline du tour était passée depuis 5 s (API de gestion Supabase), sinon attend 62 s. */
+async function adminSql(query) {
+  const response = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${process.env.SUPABASE_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  if (!response.ok) throw new Error(`requête SQL refusée (${response.status})`);
+}
+
 async function expireDeadline(id) {
-  const token = process.env.SUPABASE_ACCESS_TOKEN;
-  if (!token) {
+  if (!process.env.SUPABASE_ACCESS_TOKEN) {
     console.log('   (pas de SUPABASE_ACCESS_TOKEN : attente réelle de 62 s)');
     await new Promise((resolve) => setTimeout(resolve, 62_000));
     return;
   }
-  const response = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query: `update public.matches set turn_deadline = now() - interval '5 seconds' where id = '${id}'` }),
-  });
-  if (!response.ok) throw new Error(`deadline non modifiable (${response.status})`);
+  await adminSql(`update public.matches set turn_deadline = now() - interval '5 seconds' where id = '${id}'`);
 }
 
 const room3 = (await fn('rooms-create', A)).body;
@@ -202,6 +237,15 @@ check('US-20 l’action de l’hôte a été gardée', timedOut.last_events.find
 const autoFlags = (await call(`/rest/v1/match_actions?match_id=eq.${match3}&phase=eq.battle&select=is_auto`, { token: B.token })).body;
 check('US-20 l’action de l’invité est marquée is_auto', autoFlags, [{ is_auto: true }]);
 check('US-20 un second appel ne rejoue pas le tour', (await fn('match-timeout', B, { matchId: match3 })).body.error, 'TOO_EARLY');
+if (process.env.SUPABASE_ACCESS_TOKEN) {
+  // Timeout pendant un choix de remplaçant : le monstre actif de l'invité est mis KO en SQL.
+  await adminSql(`update public.matches set state = jsonb_set(state, '{players,1,team,${timedOut.state.players[1].activeIndex},hp}', '0') where id = '${match3}'`);
+  await expireDeadline(match3);
+  check('KO + timeout : le tour de remplacement est résolu', (await fn('match-timeout', A, { matchId: match3 })).body.status, 'resolved');
+  const replaced = await readMatch(A, match3);
+  const firstAlive = replaced.state.players[1].team.findIndex((m) => m.hp > 0);
+  check('KO + timeout : seul l’invité absent est remplacé, par son premier monstre en vie', replaced.last_events.map((e) => [e.type, e.seat, e.toIndex, e.forced]), [['switch', 1, firstAlive, true]]);
+}
 await fn('match-forfeit', A, { matchId: match3 });
 check('US-20 timeout après la fin du duel → nothing_to_do', (await fn('match-timeout', B, { matchId: match3 })).body.status, 'nothing_to_do');
 

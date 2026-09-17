@@ -376,3 +376,33 @@ describe('US-18 — draft d’équipe en duel', () => {
     expect(screen.queryByTestId('phaser-canvas')).toBeNull();
   });
 });
+
+describe('Duel — choix du remplaçant après un KO', () => {
+  /** Ligne où le monstre actif de l'hôte (siège 0) vient de tomber KO. */
+  const koRow = (): MatchRow => {
+    const state = structuredClone(BASE.state);
+    state.players[0].team[0].hp = 0;
+    state.turn = 2;
+    return { ...BASE, state, turn: 2, version: 2 };
+  };
+
+  it('fait choisir le remplaçant au joueur dont le monstre est KO', async () => {
+    const { user, push } = await renderMatch('host');
+    await push(koRow());
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+    expect(screen.getByText(/est K\.O\. ! Choisissez le monstre qui prend sa place/)).toBeTruthy();
+    sendAction.mockResolvedValue({ status: 'resolved' });
+
+    const second = koRow().state.players[0].team[1];
+    await user.click(screen.getByRole('button', { name: new RegExp(second.name) }));
+    expect(sendAction).toHaveBeenCalledWith('match-1', 1, 2, { type: 'switch', toIndex: 1 });
+    expect(screen.getByRole('status').textContent).toBe('Remplaçant choisi.');
+  });
+
+  it('fait patienter l’adversaire pendant ce choix', async () => {
+    await renderMatch('guest').then(({ push }) => push(koRow()));
+    await waitFor(() => expect(screen.getByRole('status').textContent).toMatch(/l’adversaire choisit son remplaçant/));
+    expect(document.querySelector('.action-menu-hidden')).not.toBeNull();
+    expect(sendAction).not.toHaveBeenCalled();
+  });
+});

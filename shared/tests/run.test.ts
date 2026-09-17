@@ -1,6 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { SPECIES } from '../data/monsters.js';
-import { battleForWave, createRun, enemiesForWave, enemyForWave, healTeam, isRunOver, nextWave, STARTER_LEVEL, WAVE_POOL } from '../engine/run.js';
+import { RARITIES } from '../data/rarities.js';
+import {
+  BOSS_POOL,
+  battleForWave,
+  createRun,
+  enemiesForWave,
+  enemyForWave,
+  healTeam,
+  isBossWave,
+  isRunOver,
+  lootLevelForWave,
+  nextWave,
+  raritiesForWave,
+  STARTER_IDS,
+  STARTER_LEVEL,
+  WAVE_POOL,
+} from '../engine/run.js';
 
 describe('US-10 — départ de la run', () => {
   it('démarre avec le starter choisi au niveau 5', () => {
@@ -18,7 +34,7 @@ describe('US-10 — départ de la run', () => {
 
 describe('US-11 — vagues', () => {
   it('oppose un ennemi de niveau N (niveau 1 à la vague 1)', () => {
-    for (const wave of [1, 2, 5, 12]) expect(enemyForWave(1234, wave).level).toBe(wave);
+    for (const wave of [1, 2, 4, 12]) expect(enemyForWave(1234, wave).level).toBe(wave);
   });
 
   it('tire toujours le même ennemi pour une seed et une vague données', () => {
@@ -29,13 +45,32 @@ describe('US-11 — vagues', () => {
 
   it('ne fait apparaître ni starter ni boss dans les vagues', () => {
     expect(WAVE_POOL.length).toBeGreaterThan(0);
-    for (const id of WAVE_POOL) expect(['common', 'rare']).toContain(SPECIES[id].rarity);
+    for (const id of WAVE_POOL) {
+      expect(SPECIES[id].rarity).not.toBe('boss');
+      expect(STARTER_IDS).not.toContain(id);
+    }
+    for (let wave = 1; wave <= 30; wave++) {
+      if (isBossWave(wave)) continue;
+      for (const m of enemiesForWave(5, wave)) expect(WAVE_POOL).toContain(m.speciesId);
+    }
   });
 
   it('oppose 1 monstre jusqu’à la vague 5, puis 2 (game design §6.1)', () => {
-    for (const wave of [1, 3, 5]) expect(enemiesForWave(99, wave)).toHaveLength(1);
+    for (const wave of [1, 3, 4]) expect(enemiesForWave(99, wave)).toHaveLength(1);
     for (const wave of [6, 9]) expect(enemiesForWave(99, wave)).toHaveLength(2);
     expect(enemiesForWave(99, 7).every((m) => m.level === 7)).toBe(true);
+  });
+
+  it('garde le monstre actif et l’ordre de l’équipe d’une vague à l’autre', () => {
+    const run = createRun('salamander', 7);
+    const team = [run.team[0], { ...run.team[0], uid: 'b', speciesId: 'goblin', name: 'Gobelin' }];
+    const next = nextWave({ ...run, team }, team, 1);
+    const battle = battleForWave(next);
+    expect(battle.players[0].activeIndex).toBe(1);
+    expect(battle.players[0].team.map((m) => m.uid)).toEqual([run.team[0].uid, 'b']);
+    // Si ce monstre est KO, le premier monstre en vie ouvre la vague.
+    const koTeam = [team[0], { ...team[1], hp: 0 }];
+    expect(battleForWave({ ...next, team: koTeam }).players[0].activeIndex).toBe(0);
   });
 
   it('place le joueur au siège 0 et l’IA au siège 1', () => {
@@ -66,5 +101,44 @@ describe('US-11 — vagues', () => {
     const run = createRun('salamander', 7);
     const used = run.team.map((m) => ({ ...m, skills: m.skills.map((s) => ({ ...s, ppLeft: s.ppLeft === null ? null : s.ppLeft - 2 })) }));
     expect(nextWave(run, used).team[0].skills.find((s) => s.id === 'fireball')?.ppLeft).toBe(8);
+  });
+});
+
+describe('US-13 — boss et raretés', () => {
+  it('oppose un boss seul, un niveau au-dessus, toutes les 5 vagues', () => {
+    for (const wave of [5, 10, 15, 20]) {
+      const enemies = enemiesForWave(42, wave);
+      expect(enemies).toHaveLength(1);
+      expect(BOSS_POOL).toContain(enemies[0].speciesId);
+      expect(enemies[0].level).toBe(wave + 1);
+    }
+    for (const wave of [4, 6, 11]) expect(isBossWave(wave)).toBe(false);
+  });
+
+  it('débloque les raretés au fil des vagues', () => {
+    expect(raritiesForWave(1)).toEqual(['common']);
+    expect(raritiesForWave(3)).toEqual(['common', 'uncommon']);
+    expect(raritiesForWave(8)).toEqual(['common', 'uncommon', 'rare', 'epic']);
+    for (let seed = 0; seed < 200; seed++) {
+      for (const wave of [1, 2, 3, 4, 6, 7]) {
+        for (const m of enemiesForWave(seed, wave)) expect(RARITIES[SPECIES[m.speciesId].rarity].firstWave).toBeLessThanOrEqual(wave);
+      }
+    }
+  });
+
+  it('fait apparaître des monstres épiques dans les vagues tardives', () => {
+    const late = new Set<string>();
+    for (let seed = 0; seed < 200; seed++) for (const m of enemiesForWave(seed, 9)) late.add(SPECIES[m.speciesId].rarity);
+    expect(late.has('epic')).toBe(true);
+    expect(late.has('common')).toBe(true);
+  });
+
+  it('calcule le niveau de butin sur l’ennemi le plus rare', () => {
+    expect(lootLevelForWave(42, 5)).toBe(4);
+    expect(lootLevelForWave(42, 1)).toBe(0);
+    for (let seed = 0; seed < 50; seed++) {
+      const expected = Math.max(...enemiesForWave(seed, 7).map((m) => RARITIES[SPECIES[m.speciesId].rarity].loot));
+      expect(lootLevelForWave(seed, 7)).toBe(expected);
+    }
   });
 });

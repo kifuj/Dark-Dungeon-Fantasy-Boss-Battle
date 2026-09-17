@@ -1,5 +1,6 @@
 // ⚠️ Fichier généré par `npm run functions:sync` — ne pas modifier : éditer shared/ puis relancer la commande.
 import { SKILLS } from '../data/skills.ts';
+import { replacementSeats } from './replace.ts';
 import type { BattleState, Seat } from '../types.ts';
 
 /**
@@ -11,6 +12,11 @@ export function validateAction(state: BattleState, seat: Seat, action: unknown):
   const a = action as Record<string, unknown>;
   const player = state.players[seat];
   const current = player.team[player.activeIndex];
+
+  // Phase de remplacement : seuls les joueurs dont le monstre est KO jouent, et uniquement un changement.
+  const replacing = replacementSeats(state);
+  if (replacing.length > 0 && !replacing.includes(seat)) return { ok: false, reason: 'opponent_replacing' };
+  if (replacing.includes(seat) && a.type !== 'switch') return { ok: false, reason: 'must_replace' };
 
   if (a.type === 'skill') {
     const slot = current.skills.find((s) => s.id === a.skillId);

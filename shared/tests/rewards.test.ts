@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { REWARDS, type RewardId } from '../data/rewards.js';
 import { SKILLS } from '../data/skills.js';
-import { applyReward, drawRewards, MAX_TEAM_SIZE, needsTarget, recruitFor } from '../engine/rewards.js';
-import { createRun, enemiesForWave } from '../engine/run.js';
+import { applyReward, drawRewards, MAX_TEAM_SIZE, needsTarget, recruitFor, rewardPool } from '../engine/rewards.js';
+import { BOSS_POOL, createRun, enemiesForWave, lootLevelForWave } from '../engine/run.js';
 import { createMonster } from '../engine/stats.js';
 
 const SEED = 777;
@@ -122,5 +122,77 @@ describe('US-12 — équipe pleine (CA3)', () => {
 
   it('refuse le recrutement dans une équipe pleine sans monstre à remplacer', () => {
     expect(() => applyReward(fullTeam(), 'recruit', ctx())).toThrow();
+  });
+});
+
+describe('US-13 — butin selon la rareté et butin de boss', () => {
+  it('ne propose que des récompenses débloquées par le niveau de butin', () => {
+    for (let seed = 0; seed < 300; seed++) {
+      for (const wave of [1, 2, 3, 6, 8, 9]) {
+        const loot = lootLevelForWave(seed, wave);
+        for (const id of drawRewards(seed, wave)) expect(REWARDS[id].minLoot).toBeLessThanOrEqual(loot);
+      }
+    }
+    expect(rewardPool(SEED, 1).every((r) => REWARDS[r.id].minLoot === 0)).toBe(true);
+  });
+
+  it('propose plus souvent un butin rare après un monstre plus rare', () => {
+    const rareShare = (wave: number) => {
+      let rare = 0;
+      let total = 0;
+      for (let seed = 0; seed < 1500; seed++) {
+        if (lootLevelForWave(seed, wave) === 0) continue;
+        total += 3;
+        rare += drawRewards(seed, wave).filter((id) => REWARDS[id].minLoot > 0).length;
+      }
+      return rare / total;
+    };
+    expect(rareShare(3)).toBeGreaterThan(0);
+    expect(rareShare(9)).toBeGreaterThan(rareShare(3));
+  });
+
+  it('garantit la Relique après un boss, sans butin ordinaire hors recrutement', () => {
+    for (let seed = 0; seed < 200; seed++) {
+      for (const wave of [5, 10]) {
+        const drawn = drawRewards(seed, wave);
+        expect(drawn[0]).toBe('relic');
+        expect(new Set(drawn).size).toBe(3);
+        for (const id of drawn) expect(REWARDS[id].minLoot > 0 || id === 'recruit').toBe(true);
+      }
+    }
+  });
+
+  it('Recrutement après un boss : le boss rejoint l’équipe', () => {
+    expect(BOSS_POOL).toContain(recruitFor(SEED, 5).speciesId);
+  });
+
+  const team = () => [createMonster('salamander', 6, 'a'), { ...createMonster('goblin', 5, 'b'), hp: 0 }];
+
+  it('Potion royale : soigne tout et recharge les PP, KO compris', () => {
+    const hurt = team().map((m) => ({ ...m, hp: Math.min(m.hp, 3), skills: m.skills.map((s) => ({ ...s, ppLeft: 0 })) }));
+    const { team: after } = applyReward(hurt, 'royal_potion', ctx());
+    for (const m of after) {
+      expect(m.hp).toBe(m.maxHp);
+      for (const s of m.skills) expect(s.ppLeft).toBe(SKILLS[s.id].pp);
+    }
+  });
+
+  it('Entraînement intensif : +4 niveaux pour le monstre choisi', () => {
+    const { team: after } = applyReward(team(), 'intensive_training', ctx('a'));
+    expect(after[0].level).toBe(10);
+    expect(after[1].level).toBe(5);
+    expect(needsTarget('intensive_training', team())).toBe(true);
+  });
+
+  it('Camp d’entraînement : +2 niveaux pour toute l’équipe, un KO reste KO', () => {
+    const { team: after } = applyReward(team(), 'war_camp', ctx());
+    expect(after.map((m) => m.level)).toEqual([8, 7]);
+    expect(after[1].hp).toBe(0);
+  });
+
+  it('Relique : +3 niveaux et soin complet pour toute l’équipe', () => {
+    const { team: after } = applyReward(team(), 'relic', ctx());
+    expect(after.map((m) => m.level)).toEqual([9, 8]);
+    for (const m of after) expect(m.hp).toBe(m.maxHp);
   });
 });

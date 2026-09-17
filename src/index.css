@@ -1043,3 +1043,43 @@ h2,
 .reward-target .starter-level {
   margin-bottom: 0;
 }
+
+/* ---------- Remplacement d'un KO, butins rares, boss, raretés ---------- */
+
+.replace-prompt {
+  margin: 0 0 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border-left: 4px solid var(--blood);
+  background: rgba(36, 35, 41, 0.8);
+  color: var(--bone);
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.78rem;
+}
+
+.reward-card-rare {
+  border-color: var(--loot, var(--ember));
+  box-shadow: 0 0 0 1px var(--loot, var(--ember)), 4px 4px 0 var(--charcoal);
+}
+
+.loot-badge,
+.rarity-badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid currentcolor;
+  color: var(--rarity, var(--ember));
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.loot-badge {
+  margin-bottom: 0.5rem;
+  color: var(--loot, var(--ember));
+}
+
+.run-boss {
+  color: var(--blood);
+  font-weight: bold;
+  letter-spacing: 0.2em;
+}

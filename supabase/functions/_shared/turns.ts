@@ -1,11 +1,14 @@
 import { supabaseAdmin } from './supabaseAdmin.ts';
 import { resolveTurn } from './game/engine/battle.ts';
+import { replacementSeats, resolveReplacement } from './game/engine/replace.ts';
 import { createTurnRng } from './game/engine/rng.ts';
 import { startBattleFromDrafts, TURN_DURATION_MS } from './game/engine/online.ts';
-import type { Action, BattleState } from './game/types.ts';
+import type { Action, BattleState, TurnResult } from './game/types.ts';
 
 /**
- * Résout le tour courant si les 2 actions sont présentes (docs/04-MULTIJOUEUR.md §5).
+ * Résout le tour courant si les actions attendues sont présentes (docs/04-MULTIJOUEUR.md §5) :
+ * les 2 actions pour un tour de combat, ou seulement celles des joueurs dont le monstre est KO
+ * pendant une phase de remplacement.
  * Sans danger si elle est appelée plusieurs fois : le verrou optimiste sur `version`
  * fait qu'un seul appel écrit le tour.
  */
@@ -23,10 +26,24 @@ export async function tryResolveBattleTurn(matchId: string): Promise<boolean> {
 
   const a1 = actions?.find((a) => a.player_id === match.player1_id)?.payload as Action | undefined;
   const a2 = actions?.find((a) => a.player_id === match.player2_id)?.payload as Action | undefined;
-  if (!a1 || !a2) return false; // on attend l'autre joueur
-
-  const rng = createTurnRng(match.seed, match.round, match.turn);
-  const { state, events, winnerSeat } = resolveTurn(match.state as BattleState, [a1, a2], rng);
+  const current = match.state as BattleState;
+  const replacing = replacementSeats(current);
+  let result: TurnResult;
+  if (replacing.length > 0) {
+    const bySeat = [a1, a2];
+    if (replacing.some((seat) => !bySeat[seat])) return false; // on attend le choix du remplaçant
+    const choices = Object.fromEntries(
+      replacing.map((seat) => {
+        const action = bySeat[seat]!;
+        return [seat, action.type === 'switch' ? action.toIndex : undefined];
+      }),
+    );
+    result = resolveReplacement(current, choices);
+  } else {
+    if (!a1 || !a2) return false; // on attend l'autre joueur
+    result = resolveTurn(current, [a1, a2], createTurnRng(match.seed, match.round, match.turn));
+  }
+  const { state, events, winnerSeat } = result;
   const finished = winnerSeat !== null;
 
   // Verrou optimiste : si un autre appel a déjà résolu ce tour, 0 ligne n'est modifiée.

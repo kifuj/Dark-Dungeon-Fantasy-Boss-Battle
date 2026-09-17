@@ -100,3 +100,30 @@ describe('US-04 — changer de monstre actif', () => {
     expect(screen.getByRole('button', { name: /Changer/ })).toHaveProperty('disabled', true);
   });
 });
+
+describe('Remplacement d’un monstre KO', () => {
+  const koState = () => {
+    const s = state();
+    s.players[0].team[0].hp = 0;
+    s.players[0].team[2].hp = 0;
+    return s;
+  };
+
+  it('ne propose que le choix du remplaçant, sans retour possible', () => {
+    render(<ActionMenu state={koState()} seat={0} busy={false} onAction={vi.fn()} />);
+    expect(screen.getByText(/Salamandre est K\.O\. ! Choisissez le monstre qui prend sa place/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /Boule de feu/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Retour/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /Ondine/ })).toHaveProperty('disabled', false);
+    expect(screen.getByRole('button', { name: /Champignon/ })).toHaveProperty('disabled', true);
+  });
+
+  it('envoie le monstre choisi et ignore Échap', async () => {
+    const onAction = vi.fn();
+    render(<ActionMenu state={koState()} seat={0} busy={false} onAction={onAction} />);
+    fireEvent.keyDown(screen.getByLabelText("Menu d'actions"), { key: 'Escape' });
+    expect(screen.getByText(/prend sa place/)).toBeTruthy();
+    await userEvent.setup().click(screen.getByRole('button', { name: /Ondine/ }));
+    expect(onAction).toHaveBeenCalledWith({ type: 'switch', toIndex: 1 });
+  });
+});

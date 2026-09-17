@@ -70,3 +70,23 @@ describe('Solo — la run ne se fige pas si la scène ne répond pas', () => {
     expect(document.querySelector('.action-menu-hidden')).not.toBeNull();
   });
 });
+
+describe('Solo — abandon et boss', () => {
+  it('demande confirmation puis termine la run sur un abandon', async () => {
+    const user = await startRun();
+    await user.click(screen.getByRole('button', { name: /Abandonner/ }));
+    await user.click(screen.getByRole('button', { name: /Continuer la run/ }));
+    expect(screen.queryByRole('heading', { name: /abandonnée/ })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: /Abandonner/ }));
+    await user.click(screen.getByRole('button', { name: /Confirmer l’abandon/ }));
+    expect(screen.getByRole('heading', { name: 'Run abandonnée' })).toBeTruthy();
+    expect(screen.getByLabelText('Fin de run').textContent).toContain('1');
+    expect(screen.getByRole('button', { name: /Nouvelle run/ })).toBeTruthy();
+  });
+
+  it('annonce la vague sans mention de boss à la vague 1', async () => {
+    await startRun();
+    expect(screen.queryByText('BOSS')).toBeNull();
+  });
+});
