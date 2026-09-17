@@ -909,6 +909,25 @@ h2,
 
 .forfeit-confirm p { margin: 0; }
 
+/* ---------- Compte à rebours du tour (US-20) ---------- */
+
+.turn-timer {
+  margin: 0;
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--bone);
+}
+
+.turn-timer-urgent {
+  color: var(--ember);
+  animation: timer-pulse 1s ease-in-out infinite;
+}
+
+@keyframes timer-pulse {
+  50% { opacity: 0.55; }
+}
+
 /* ---------- Reprise d'un duel (US-21) ---------- */
 
 .resume-button {

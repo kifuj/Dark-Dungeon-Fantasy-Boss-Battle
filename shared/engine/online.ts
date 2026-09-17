@@ -1,7 +1,8 @@
 import { SPECIES } from '../data/monsters.js';
 import { mulberry32 } from './rng.js';
 import { createMonster } from './stats.js';
-import type { BattleState, MonsterInstance, Seat } from '../types.js';
+import { validateAction } from './validate.js';
+import type { Action, BattleState, MonsterInstance, Seat } from '../types.js';
 
 /** Duel en ligne (US-19) : 3 monstres de niveau 10 par joueur, tirés avec la seed du match. */
 export const ONLINE_TEAM_SIZE = 3;
@@ -89,4 +90,32 @@ export function startBattleFromDrafts(state: BattleState, picks: [number[], numb
     ],
     draftOffers: null,
   };
+}
+
+/** Durée d'un tour et marge laissée aux horloges des clients avant de réclamer le timeout (US-20). */
+export const TURN_DURATION_MS = 60_000;
+export const TIMEOUT_GRACE_MS = 2_000;
+
+/**
+ * Action jouée pour un joueur absent (US-20 CA2, docs/04-MULTIJOUEUR.md §7) : la première
+ * compétence qui a encore des PP. Toutes les espèces n'ont pas `strike` (PP illimités) : sans PP,
+ * on change de monstre si c'est possible, sinon on frappe quand même avec la première
+ * compétence (le moteur la résout), pour qu'un duel ne reste jamais bloqué.
+ */
+export function defaultAction(state: BattleState, seat: Seat): Action {
+  const player = state.players[seat];
+  const skills = player.team[player.activeIndex].skills;
+  const usable = skills.find((s) => validateAction(state, seat, { type: 'skill', skillId: s.id }).ok);
+  if (usable) return { type: 'skill', skillId: usable.id };
+  const relay = player.team.findIndex((_, i) => validateAction(state, seat, { type: 'switch', toIndex: i }).ok);
+  if (relay !== -1) return { type: 'switch', toIndex: relay };
+  return { type: 'skill', skillId: skills[0].id };
+}
+
+/** Draft d'un joueur absent : les 3 premières propositions, dans l'ordre. */
+export const DEFAULT_DRAFT_PICKS: readonly number[] = Array.from({ length: ONLINE_TEAM_SIZE }, (_, i) => i);
+
+/** Vrai quand la deadline du tour, marge comprise, est dépassée (US-20 CA3). */
+export function isTurnExpired(turnDeadline: string | null, now: number): boolean {
+  return turnDeadline !== null && now > Date.parse(turnDeadline) + TIMEOUT_GRACE_MS;
 }

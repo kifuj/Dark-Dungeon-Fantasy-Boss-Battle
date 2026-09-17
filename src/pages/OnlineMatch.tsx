@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ApiError, errorMessage, forfeitMatch, sendAction, sendDraft } from '../lib/api.ts';
+import { ApiError, claimTimeout, errorMessage, forfeitMatch, sendAction, sendDraft } from '../lib/api.ts';
 import { useProfile } from '../lib/profile.tsx';
 import { hasPlayedThisTurn } from '../lib/matches.ts';
 import { subscribeToMatch } from '../lib/realtime.ts';
 import { fetchUsernames } from '../lib/rooms.ts';
 import { describeEvents } from '../../shared/engine/log.js';
+import { isTurnExpired } from '../../shared/engine/online.js';
 import type { Action, MatchRow, Seat } from '../../shared/types.js';
 import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
@@ -16,6 +17,10 @@ type UiState = 'loading' | 'choosing' | 'waiting' | 'animating' | 'finished';
 
 /** Un tour animé dure moins de 4 s (US-09 CA4) : au-delà, on considère la scène en échec. */
 const ANIMATION_TIMEOUT_MS = 4500;
+/** Délai entre deux réclamations du timeout si le serveur répond TOO_EARLY (horloges décalées). */
+const TIMEOUT_RETRY_MS = 3000;
+/** En dessous, le compte à rebours passe en rouge. */
+const TIMER_URGENT_S = 10;
 
 const STATUS_TEXT: Record<UiState, string> = {
   loading: 'Chargement du duel…',
@@ -39,12 +44,14 @@ export function OnlineMatch() {
   const [names, setNames] = useState<Record<string, string>>({});
   const [missing, setMissing] = useState(false);
   const [confirmingForfeit, setConfirmingForfeit] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
 
   const versionRef = useRef<number | null>(null);
   const pendingRef = useRef<MatchRow | null>(null);
   const matchRef = useRef<MatchRow | null>(null);
   const seatRef = useRef<Seat>(0);
   const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutClaimRef = useRef<{ version: number; at: number } | null>(null);
 
   const seat: Seat = match && profile && match.player2_id === profile.id ? 1 : 0;
 
@@ -142,6 +149,36 @@ export function OnlineMatch() {
     void fetchUsernames([player1Id, player2Id]).then(setNames);
   }, [player1Id, player2Id]);
 
+  const deadline = match?.turn_deadline ?? null;
+  const counting = Boolean(deadline) && (ui === 'choosing' || ui === 'waiting');
+
+  /** Compte à rebours du tour (US-20 CA1) : une horloge par seconde, seulement quand un choix est attendu. */
+  useEffect(() => {
+    if (!counting) return;
+    const refresh = setTimeout(() => setNow(Date.now()), 0); // l'horloge a pu dormir depuis le tour précédent
+    const tick = setInterval(() => setNow(Date.now()), 1000);
+    return () => {
+      clearTimeout(refresh);
+      clearInterval(tick);
+    };
+  }, [counting, deadline]);
+
+  /**
+   * Deadline dépassée (marge comprise) : on réclame le timeout au serveur, qui joue l'action par défaut
+   * pour le joueur absent (US-20 CA2). Les deux clients peuvent le faire, la fonction est idempotente.
+   */
+  const expired = counting && isTurnExpired(deadline, now);
+  useEffect(() => {
+    const row = matchRef.current;
+    if (!expired || !row || !isTurnExpired(row.turn_deadline, Date.now())) return;
+    const last = timeoutClaimRef.current;
+    if (last && last.version === row.version && now - last.at < TIMEOUT_RETRY_MS) return;
+    timeoutClaimRef.current = { version: row.version, at: now };
+    claimTimeout(row.id).catch(() => {
+      // TOO_EARLY (horloge en avance) ou réseau : on réessaiera au prochain passage.
+    });
+  }, [expired, now]);
+
   const play = useCallback(
     async (action: Action) => {
       const row = matchRef.current;
@@ -212,7 +249,12 @@ export function OnlineMatch() {
   const drafting = match.phase === 'draft';
   // Un abandon pendant le draft termine le match sans équipes : pas de scène à afficher.
   const hasTeams = match.state.players.every((player) => player.team.length > 0);
-  const status = drafting && ui === 'waiting' ? 'Équipe validée. En attente du choix de l’adversaire…' : STATUS_TEXT[ui];
+  const status = expired
+    ? 'Temps écoulé : le tour se joue automatiquement…'
+    : drafting && ui === 'waiting'
+      ? 'Équipe validée. En attente du choix de l’adversaire…'
+      : STATUS_TEXT[ui];
+  const secondsLeft = deadline ? Math.max(0, Math.ceil((Date.parse(deadline) - now) / 1000)) : null;
 
   return (
     <main className="page solo-page">
@@ -249,6 +291,11 @@ export function OnlineMatch() {
       ) : (
         <>
           <p className="match-status" role="status">{status}</p>
+          {counting && secondsLeft !== null && (
+            <p className={`turn-timer ${secondsLeft <= TIMER_URGENT_S ? 'turn-timer-urgent' : ''}`} role="timer" aria-label="Temps restant">
+              ⏳ {secondsLeft} s
+            </p>
+          )}
           {drafting ? (
             <DraftPanel offer={match.state.draftOffers?.[seat] ?? []} locked={ui !== 'choosing'} onConfirm={draft} />
           ) : (

@@ -19,3 +19,6 @@ verify_jwt = true
 
 [functions.match-forfeit]
 verify_jwt = true
+
+[functions.match-timeout]
+verify_jwt = true

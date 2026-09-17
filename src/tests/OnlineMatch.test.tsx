@@ -12,13 +12,14 @@ import { resolveTurn } from '../../shared/engine/battle.js';
 import { createTurnRng } from '../../shared/engine/rng.js';
 import type { MatchRow } from '../../shared/types.js';
 
-const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, sendDraft, forfeitMatch, loadProfile } = vi.hoisted(() => ({
+const { subscribeToMatch, hasPlayedThisTurn, fetchUsernames, sendAction, sendDraft, forfeitMatch, claimTimeout, loadProfile } = vi.hoisted(() => ({
   subscribeToMatch: vi.fn(),
   hasPlayedThisTurn: vi.fn(),
   fetchUsernames: vi.fn(),
   sendAction: vi.fn(),
   sendDraft: vi.fn(),
   forfeitMatch: vi.fn(),
+  claimTimeout: vi.fn(),
   loadProfile: vi.fn(),
 }));
 
@@ -30,6 +31,7 @@ vi.mock('../lib/api.ts', async (importOriginal) => ({
   sendAction,
   sendDraft,
   forfeitMatch,
+  claimTimeout,
 }));
 vi.mock('../lib/session.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../lib/session.ts')>()),
@@ -244,6 +246,57 @@ describe('US-19 — jouer un combat en ligne', () => {
     await push(BASE);
 
     await waitFor(() => expect(screen.getByRole('status').textContent).toBe('En attente de l’adversaire…'));
+  });
+});
+
+describe('US-20 — timeout de tour', () => {
+  const inSeconds = (seconds: number) => new Date(Date.now() + seconds * 1000).toISOString();
+
+  it('affiche le compte à rebours pendant le choix (CA1)', async () => {
+    const { push } = await renderMatch();
+    await push({ ...BASE, turn_deadline: inSeconds(45) });
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+    expect(screen.getByRole('timer').textContent).toMatch(/^⏳ 4[45] s$/);
+    expect(screen.getByRole('timer').className).not.toContain('urgent');
+    expect(claimTimeout).not.toHaveBeenCalled(); // CA3 : rien n'est réclamé avant la deadline
+  });
+
+  it('passe le compte à rebours en rouge dans les 10 dernières secondes', async () => {
+    const { push } = await renderMatch();
+    await push({ ...BASE, turn_deadline: inSeconds(8) });
+    await waitFor(() => expect(screen.getByRole('timer').className).toContain('turn-timer-urgent'));
+  });
+
+  it('garde le compte à rebours pendant l’attente de l’adversaire', async () => {
+    const { push } = await renderMatch('host', true);
+    await push({ ...BASE, turn_deadline: inSeconds(30) });
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('En attente de l’adversaire…'));
+    expect(screen.getByRole('timer')).toBeTruthy();
+  });
+
+  it('réclame le timeout une seule fois quand la deadline est dépassée (CA2)', async () => {
+    claimTimeout.mockResolvedValue({ status: 'resolved' });
+    const { push } = await renderMatch('guest', true);
+    await push({ ...BASE, turn_deadline: inSeconds(-5) });
+    await waitFor(() => expect(claimTimeout).toHaveBeenCalledWith('match-1'));
+    expect(screen.getByRole('status').textContent).toBe('Temps écoulé : le tour se joue automatiquement…');
+    expect(screen.getByRole('timer').textContent).toBe('⏳ 0 s');
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 1100))); // un tic d'horloge
+    expect(claimTimeout).toHaveBeenCalledTimes(1);
+  });
+
+  it('attend la marge de 2 s après la deadline avant de réclamer', async () => {
+    const { push } = await renderMatch();
+    await push({ ...BASE, turn_deadline: inSeconds(-1) });
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+    expect(claimTimeout).not.toHaveBeenCalled();
+  });
+
+  it('n’affiche pas de compte à rebours une fois le duel terminé', async () => {
+    const { push } = await renderMatch();
+    await push({ ...BASE, phase: 'finished', winner_id: 'host', turn_deadline: null });
+    await waitFor(() => expect(screen.getByRole('heading', { name: /Victoire/ })).toBeTruthy());
+    expect(screen.queryByRole('timer')).toBeNull();
   });
 });
 

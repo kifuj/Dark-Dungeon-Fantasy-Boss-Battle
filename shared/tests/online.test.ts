@@ -2,16 +2,28 @@ import { describe, expect, it } from 'vitest';
 import {
   createDraftState,
   createOnlineBattle,
+  DEFAULT_DRAFT_PICKS,
+  defaultAction,
   DRAFT_OFFER_SIZE,
   draftOffer,
+  isTurnExpired,
   ONLINE_LEVEL,
   ONLINE_POOL,
   ONLINE_TEAM_SIZE,
   onlineTeam,
   startBattleFromDrafts,
+  TIMEOUT_GRACE_MS,
+  TURN_DURATION_MS,
   validateDraftPicks,
 } from '../engine/online.js';
+import { validateAction } from '../engine/validate.js';
+import { resolveTurn } from '../engine/battle.js';
+import { createTurnRng } from '../engine/rng.js';
+import { createMonster } from '../engine/stats.js';
+import type { BattleState, MonsterInstance } from '../types.js';
 import { SPECIES } from '../data/monsters.js';
+
+const SEED_TIMEOUT = 2026;
 
 describe('US-19 — équipes du duel en ligne', () => {
   it('donne 3 monstres de niveau 10 à chaque joueur (CA1)', () => {
@@ -105,5 +117,68 @@ describe('US-18 — draft d’équipe', () => {
     const draft = createDraftState(12, 'a', 'b');
     expect(() => startBattleFromDrafts(draft, [[0, 0, 1], [1, 2, 3]])).toThrow();
     expect(() => startBattleFromDrafts(createOnlineBattle(12, 'a', 'b'), [[0, 1, 2], [0, 1, 2]])).toThrow();
+  });
+});
+
+describe('US-20 — timeout de tour', () => {
+  const battle = () => createOnlineBattle(SEED_TIMEOUT, 'host', 'guest');
+  /** Équipe fixe : Salamandre (a `strike`), puis Loup et Feu follet (pas de PP illimités). */
+  const fixed = (): BattleState => {
+    const state = battle();
+    state.players[1].team = ['salamander', 'wolf', 'wisp'].map((id, i) => createMonster(id, 10, `p1-m${i}`));
+    return state;
+  };
+  const drain = (monster: MonsterInstance) => monster.skills.forEach((slot) => slot.ppLeft !== null && (slot.ppLeft = 0));
+
+  it('joue la première compétence qui a encore des PP (CA2)', () => {
+    const state = fixed();
+    expect(defaultAction(state, 1)).toEqual({ type: 'skill', skillId: 'fireball' });
+    drain(state.players[1].team[0]);
+    expect(defaultAction(state, 1)).toEqual({ type: 'skill', skillId: 'strike' });
+  });
+
+  it('change de monstre quand l’actif n’a plus aucune compétence utilisable', () => {
+    const state = fixed();
+    state.players[1].activeIndex = 1;
+    drain(state.players[1].team[1]);
+    const action = defaultAction(state, 1);
+    expect(action).toEqual({ type: 'switch', toIndex: 0 });
+    expect(validateAction(state, 1, action).ok).toBe(true);
+  });
+
+  it('frappe quand même si le dernier monstre n’a plus de PP : le duel ne se bloque pas', () => {
+    const state = fixed();
+    state.players[1].activeIndex = 1;
+    state.players[1].team[0].hp = 0;
+    state.players[1].team[2].hp = 0;
+    drain(state.players[1].team[1]);
+    const action = defaultAction(state, 1);
+    expect(action).toEqual({ type: 'skill', skillId: 'vine' });
+    const result = resolveTurn(state, [defaultAction(state, 0), action], createTurnRng(SEED_TIMEOUT, 1, 1));
+    expect(result.events.some((e) => e.type === 'skill_used' && e.seat === 1)).toBe(true);
+  });
+
+  it('suit le monstre actif du joueur absent', () => {
+    const state = battle();
+    state.players[0].activeIndex = 2;
+    expect(defaultAction(state, 0)).toEqual({ type: 'skill', skillId: state.players[0].team[2].skills[0].id });
+  });
+
+  it('prend les 3 premières propositions pour un draft absent', () => {
+    expect(validateDraftPicks([...DEFAULT_DRAFT_PICKS])).toBe(true);
+    expect(DEFAULT_DRAFT_PICKS).toEqual([0, 1, 2]);
+  });
+
+  it('refuse le timeout avant la deadline et pendant la marge de 2 s (CA3)', () => {
+    const deadline = '2026-09-17T10:00:00.000Z';
+    const at = Date.parse(deadline);
+    expect(isTurnExpired(deadline, at - 30_000)).toBe(false);
+    expect(isTurnExpired(deadline, at + TIMEOUT_GRACE_MS)).toBe(false);
+    expect(isTurnExpired(deadline, at + TIMEOUT_GRACE_MS + 1)).toBe(true);
+    expect(isTurnExpired(null, at + 3_600_000)).toBe(false); // match terminé : pas de deadline
+  });
+
+  it('laisse 60 s par tour', () => {
+    expect(TURN_DURATION_MS).toBe(60_000);
   });
 });
