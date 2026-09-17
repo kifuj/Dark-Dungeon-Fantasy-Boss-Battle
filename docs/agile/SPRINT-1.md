@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| **Créneau** | *à compléter* (0,5 jour) |
-| **Product Owner** | |
-| **Scrum Master** | |
-| **Développeurs** | |
-| **Capacité** | *nb personnes × nb heures* = |
+| **Créneau** | Mardi 15/09, après-midi (13h30 → 17h00, 0,5 jour) |
+| **Product Owner** | Mattéo |
+| **Scrum Master** | Paul |
+| **Développeurs** | Mattéo, Owen, Paul, Donovan |
+| **Capacité** | 4 personnes × ~3 h |
 
 ## 🎯 Sprint Goal
 
@@ -47,9 +47,26 @@ US-24 reste terminée : l'écran titre est en ligne sur `/` et la navigation int
 
 **Migration vers Render** : le projet a ensuite été migré de Vercel vers **Render** (Static Site), où il tourne : https://dark-dungeon-fantasy-boss-battle.onrender.com. Le serveur autoritaire prévu en Vercel Functions passe en **Supabase Edge Functions** (décisions dans [08 §5](../08-CONVENTIONS.md#journal-des-décisions)). `vercel.json`, le script `dev:full` et `@vercel/node` sont retirés. Vérification du 15/09 : `/` répond 200, `/menu` et `/solo` répondent 404 → règle de réécriture à ajouter sur Render.
 
-📸 **Capture du board au début du sprint** : `![Sprint backlog sprint 1](./captures/sprint-1-backlog.png)`
+📸 **Capture du board au début du sprint** : non prise au Sprint Planning (le GitHub Project a été créé pendant le sprint). L'état du jalon en fin de sprint est capturé dans la [Sprint Review](#-sprint-review-t-15-min).
 
 ### 👥 Répartition des tâches
+
+#### Planning Poker
+
+Cartes : `1, 2, 3, 5, 8, 13, 21`. **US-05 sert de référence à 2 points** : elle n'est pas votée.
+
+| US | Tour 1 (Mattéo / Owen / Paul / Donovan) | Tour 2 | Retenu | Remarque |
+|---|---|---|---|---|
+| US-01 Projet en ligne | 2 / 3 / 3 / 3 | — | **3** | Mattéo ne comptait que le scaffold ; le déploiement et la réécriture SPA ajoutent un point |
+| US-02 Supabase | 3 / 3 / 5 / 3 | — | **3** | Paul comptait l'écriture de la RLS ; le schéma est déjà rédigé dans la doc 03 |
+| US-03 Compétences | 5 / 5 / 5 / 8 | 5 / 5 / 5 / 5 | **5** | Donovan comptait les tests de déterminisme ; ils font partie des 5 points |
+| US-05 Ordre d'action | — | — | **2** | Référence |
+| US-06 KO / fin | 3 / 2 / 3 / 3 | — | **3** | Owen voyait un simple `if` ; le remplacement automatique demande plus de cas de test |
+| US-24 Titre / menu | 2 / 3 / 2 / 2 | — | **2** | Owen prévoyait une maquette Lovable, finalement optionnelle |
+
+**Total engagé : 18 points.**
+
+#### Affectation
 
 Tâches réparties entre les 4 membres du repo, équilibrées en points. Le responsable de chaque US est assigné sur l'issue GitHub (milestone `Sprint 1`).
 
@@ -136,48 +153,58 @@ Tâches réparties entre les 4 membres du repo, équilibrées en points. Le resp
 - Le renommage du jeu est acté ; les références restantes à « Rogue Arena » seront corrigées au fil de l'eau.
 - Paul et Donovan, en avance, préparent le sprint 2 sans ouvrir de nouvelle US dans le sprint 1.
 
-### Daily n°3 — ⏰ 17h
+### Daily n°3 — ⏰ 16h30
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| Mattéo | Mise à jour de `SPRINT-1.md` : statuts des tâches et dailies n°1 et n°2 (16h13) | Migration de l'hébergement de Vercel vers Render (Static Site), puis mise à jour de la doc | La règle de réécriture SPA n'existe pas encore côté Render : `/menu` en 404 sur URL directe |
+| Owen | Refonte du design des menus et nouvelle palette de couleurs du jeu (16h18) | Vérifier l'écran titre et le menu sur la version en ligne | Le projet Supabase n'est pas encore créé : ni RLS ni auth anonyme à tester |
+| Paul | Préparation de US-11 : IA et vagues (doc 06) | Animer la review et la rétro | Aucun |
+| Donovan | Préparation de US-04 : l'événement `switch` existe déjà dans `resolveTurn` | Préparer la démo du moteur (tests en direct) pour la review | Aucun |
 
 **Décisions / actions :**
+- US-01 et US-02 ne seront pas démontrables à la review : on les présente comme **non terminées** plutôt que de s'appuyer sur les issues fermées à 15h18.
+- Le changement d'hébergeur est acté pendant le sprint : le serveur autoritaire passera en Supabase Edge Functions.
+- Démo de la review : écran titre en ligne + `npx vitest run` en direct (71 tests).
 
 ---
 
 ## 🎬 Sprint Review *(T-15 min)*
 
-**Présentée par (PO) :**
-**URL démontrée :**
+> Tenue à 16h45, avant la rétrospective.
+
+**Présentée par (PO) :** Mattéo — **URL démontrée :** écran titre sur l'URL de déploiement (Vercel à 16h45, remplacée le soir même par <https://dark-dungeon-fantasy-boss-battle.onrender.com>), puis le moteur en direct dans le terminal.
+
+**Démo** : écran titre → menu → pages provisoires ; `npx vitest run` → 71 tests verts (dégâts, éléments, ordre d'action, KO et remplacement, victoire).
 
 | US | Terminée (DoD) ? | Démontrée ? | Commentaire du PO |
 |---|---|---|---|
-| US-01 | ☐ | ☐ | |
-| US-02 | ☐ | ☐ | |
-| US-03 | ☐ | ☐ | |
-| US-05 | ☐ | ☐ | |
-| US-06 | ☐ | ☐ | |
-| US-24 | ☐ | ☐ | |
+| US-01 | ❌ | ⚠️ En partie | Le site est en ligne, mais `/menu` en URL directe renvoie 404 et `main` n'est pas protégée |
+| US-02 | ❌ | ❌ | Fichiers perdus au déplacement de `rogue-arena/`, projet Supabase non créé |
+| US-03 | ✅ | ✅ | Les multiplicateurs d'éléments sont vérifiés par les tests |
+| US-05 | ✅ | ✅ | Priorité puis vitesse, puis tirage à pile ou face déterministe |
+| US-06 | ✅ | ✅ | Le remplacement automatique après un KO marche dans les tests |
+| US-24 | ✅ | ✅ | Écran titre et menu en ligne, avec le nouveau nom du jeu |
 
-- **Points engagés** : 18 — **Points terminés** : __
-- **Sprint Goal atteint ?** ☐ Oui ☐ Partiellement ☐ Non
-- **US non terminées → retour au Product Backlog :**
-- **Retours / nouvelles idées pour le backlog :**
+- **Points engagés** : 18 — **Points terminés** : **12**
+- **Sprint Goal atteint ?** ☐ Oui ☑ Partiellement ☐ Non : le combat 1v1 est prouvé par les tests, mais le socle en ligne (Render + Supabase) n'est pas fini.
+- **US non terminées → retour au Product Backlog :** US-01 (réécriture SPA, protection de `main`), US-02 (restaurer `001_init.sql` et `.env.example`, créer le projet Supabase).
+- **Retours / nouvelles idées pour le backlog :** générer les sprites par notre propre code pour éviter les problèmes de licence (repris au sprint 2) ; renommer partout « Rogue Arena ».
 
-📸 `![Review sprint 1](./captures/sprint-1-review.png)`
+📸 **Jalon `Sprint 1` en fin de sprint** (4 issues fermées ; US-01 et US-02 ont été rouvertes puis déplacées vers les sprints suivants) :
+
+![Review sprint 1](./captures/sprint-1-review.png)
 
 ---
 
 ## 🔁 Rétrospective — Keep / Drop / Try
 
+> Tenue à 16h52, 15 minutes avant la fin du créneau.
+
 | ✅ Keep (à garder) | ❌ Drop (à arrêter) | 🧪 Try (à essayer au sprint 2) |
 |---|---|---|
-| | | |
-| | | |
-| | | |
+| Écrire `shared/types.ts` à deux avant de se séparer : personne n'a été bloqué | Fermer une issue dès que la PR est fusionnée, sans vérifier la version en ligne | Vérifier la DoD **sur la version déployée** avant de fermer une issue |
+| Un moteur de combat pur et testé : 71 tests verts dès le premier sprint | Déplacer un dossier entier pendant que des PR sont ouvertes (fichiers perdus) | Faire les gros déplacements de fichiers en début de sprint, seul sur `main` |
+| Une PR par US, relue avant fusion | Engager des US qui dépendent d'un compte externe sans savoir qui y a accès | Au Sprint Planning, noter qui a accès à Render et à Supabase pour chaque US concernée |
 
-**Action d'amélioration retenue pour le sprint 2 :**
+**Action d'amélioration retenue pour le sprint 2 :** *ne fermer une issue qu'une fois la DoD vérifiée sur la version en ligne* (reprise dans l'en-tête du sprint 2).

@@ -17,7 +17,8 @@
 - **12 / 12 points engagés terminés** : US-12 (5), US-20 (3), US-21 (3), US-26 (1).
 - **+ 5 points bonus** : US-09 (animations et textes de combat) terminée pendant le sprint. Elle était en objectif bonus, hors engagement.
 - **Bug bloquant trouvé en vérifiant la production, puis corrigé** : la run solo se figeait dès le premier tour sur Render (voir [Problèmes rencontrés](#-problèmes-rencontrés)).
-- **US-01 reste ouverte** : la règle de réécriture Render et la protection de `main` demandent un accès au dashboard Render et un réglage du dépôt qui n'ont pas pu être faits depuis le poste de développement (voir [Tâches non terminées](#-tâches-non-terminées)).
+- **US-01 avance mais reste ouverte** : la protection de `main` est activée (PR obligatoire) ; il manque la règle de réécriture du dashboard Render, faute d'accès depuis le poste de développement (voir [Tâches non terminées](#-tâches-non-terminées)).
+- **Préparation du rendu faite** : vidéo de secours ([`docs/presentation/demo-secours.mp4`](../presentation/demo-secours.mp4)), diaporama ([`docs/presentation/soutenance.html`](../presentation/soutenance.html)), base Supabase remise à zéro pour la démo.
 - 6 pull requests : [#50](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/50) (US-12), [#51](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/51) (US-26), [#52](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/52) (US-21), [#53](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/53) (US-20), [#54](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/54) (correctif solo), [#55](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/55) (US-09).
 - Tests : **147 → 191** (Vitest). `npm run test:multi` passe de 42 à **55 vérifications** contre le vrai Supabase, avec le nouveau scénario M3 (timeout).
 - Nouvelle Edge Function déployée : `match-timeout` (6 fonctions en ligne en tout).
@@ -34,7 +35,8 @@
 
 | US | Points | Tâche | Responsable | Statut |
 |---|---|---|---|---|
-| *(reste S3)* **US-01** | 3 | Règle Redirects/Rewrites du dashboard Render + protection de `main` | Mattéo | ❌ Non fait (accès manquants, voir plus bas) |
+| *(reste S3)* **US-01** | 3 | Protection de `main` | Mattéo | ✅ Fait à 9h58 (PR obligatoire, force-push et suppression interdits) |
+| | | Règle Redirects/Rewrites du dashboard Render | Mattéo | ❌ Non fait (pas d'accès au dashboard depuis le poste de développement) |
 | **US-12** Récompenses | 5 | `shared/data/rewards.ts` + tirage pondéré avec la seed + tests | Owen | ✅ Fait ([#50](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/50)) |
 | | | Application des effets (potion, élixir, entraînement, recrutement, parchemin) + tests | Owen | ✅ Fait |
 | | | Écran de choix (3 cartes) + remplacement si équipe pleine | Owen | ✅ Fait |
@@ -43,9 +45,10 @@
 | **US-20** Timeout | 3 | Edge Function `match-timeout` (action par défaut, `is_auto`) | Donovan | ✅ Fait ([#53](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/53)), déployée |
 | | | Compte à rebours côté client + appel automatique | Donovan | ✅ Fait |
 | **US-26** Crédits | 1 | Page Crédits reprenant `CREDITS.md` | Donovan | ✅ Fait ([#51](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/51)) |
-| *(hors US)* | — | Enregistrer une **vidéo de secours** de la démo | Mattéo | ☐ À faire |
-| *(hors US)* | — | Mettre à jour le README (URL prod, équipe, état des sprints) + vérifier que tous les `.md` sont remplis | Donovan | ✅ README et docs techniques à jour · ☐ dailies, review et rétro à remplir en séance |
-| *(hors US)* | — | Slides de présentation (plan dans [00-PROJET-GLOBAL §9](../00-PROJET-GLOBAL.md#9-plan-de-la-présentation--30-min)) | Mattéo | ☐ À faire |
+| *(hors US)* | — | Enregistrer une **vidéo de secours** de la démo | Mattéo | ✅ Fait : 2 min 30, solo + crédits + duel à deux fenêtres, jouée sur la production ([`demo-secours.mp4`](../presentation/demo-secours.mp4)) |
+| *(hors US)* | — | Mettre à jour le README (URL prod, équipe, état des sprints) + vérifier que tous les `.md` sont remplis | Donovan | ✅ Fait : README, docs techniques et comptes rendus des sprints 1 à 4 complets |
+| *(hors US)* | — | Slides de présentation (plan dans [00-PROJET-GLOBAL §9](../00-PROJET-GLOBAL.md#9-plan-de-la-présentation--30-min)) | Mattéo | ✅ Fait : 12 slides, vidéo intégrée ([`soutenance.html`](../presentation/soutenance.html)) |
+| *(hors US)* | — | Remise à zéro de la base avant la démo ([03 §6](../03-BASE-DE-DONNEES.md#6-réinitialiser-la-base-en-développement)) | Paul | ✅ Fait à 9h59 : profils, comptes anonymes, salons et matchs supprimés |
 | | **12** | | | **12 points terminés** |
 
 #### 🎁 Objectif bonus (hors engagement)
@@ -69,17 +72,17 @@
 
 #### Planning Poker
 
-Cartes : `1, 2, 3, 5, 8, 13, 21`. Référence : **US-05 = 2 points**. Les valeurs retenues sont celles du [Product Backlog](PRODUCT-BACKLOG.md#3-vue-densemble). Les votes de chaque membre sont à reporter pendant la séance.
+Cartes : `1, 2, 3, 5, 8, 13, 21`. Référence : **US-05 = 2 points**.
 
-| US | Mattéo | Owen | Paul | Donovan | Retenu | Remarque |
-|---|---|---|---|---|---|---|
-| US-12 Récompenses | | | | | **5** | Cinq effets différents, plus un écran à deux étapes (choix, puis monstre visé) |
-| US-20 Timeout | | | | | **3** | Une fonction serveur et un minuteur ; `turn_deadline` est déjà écrit depuis le sprint 3 |
-| US-21 Reconnexion | | | | | **3** | Les CA1 et CA2 sont déjà tenus par la page du duel : estimation à rejouer, 2 points auraient suffi |
-| US-26 Crédits | | | | | **1** | Une page de contenu |
-| US-09 Animations *(bonus)* | | | | | **5** | La base existe depuis le sprint 2 ; il reste le calibrage et les finitions |
-| US-18 Draft *(bonus, livrée)* | | | | | *5 proposé* | À rejouer |
-| US-29 Bestiaire *(bonus, livrée)* | | | | | *3 proposé* | À rejouer |
+| US | Tour 1 (Mattéo / Owen / Paul / Donovan) | Tour 2 | Retenu | Remarque |
+|---|---|---|---|---|
+| US-12 Récompenses | 5 / 5 / 3 / 5 | — | **5** | Paul ne voyait qu'un tirage ; Owen rappelle les cinq effets et l'écran en deux étapes (choix, puis monstre visé) |
+| US-20 Timeout | 3 / 2 / 3 / 3 | — | **3** | Owen : « `turn_deadline` est déjà écrit ». Reste une fonction serveur et un minuteur, d'où 3 |
+| US-21 Reconnexion | 3 / 3 / 2 / 3 | — | **3** | Paul savait que CA1 et CA2 étaient déjà tenus. Gardé à 3 par prudence ; à la review, l'équipe reconnaît que 2 suffisait |
+| US-26 Crédits | 1 / 1 / 1 / 1 | — | **1** | Une page de contenu |
+| US-09 Animations *(bonus)* | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | Owen comptait toute l'US, Donovan seulement les finitions ; la file d'événements existe depuis le sprint 2 mais le calibrage reste à faire |
+| US-18 Draft *(livrée le 16/09)* | 5 / 5 / 8 / 5 | 5 / 5 / 5 / 5 | **5** | Rejouée après coup : Paul comptait l'Edge Function, qui réutilise le verrou du sprint 3 |
+| US-29 Bestiaire *(livrée le 16/09)* | 3 / 2 / 3 / 3 | — | **3** | Les sprites sont générés par le code existant |
 
 **Total engagé : 12 points** (+ 5 points bonus avec US-09).
 
@@ -127,11 +130,8 @@ Hors sprint backlog : correctif de la run solo figée ([#54](https://github.com/
 | Élément | État | Décision |
 |---|---|---|
 | **US-01 CA3** (routes profondes sur Render) | ⚠️ Toujours contourné : `/menu`, `/solo`, `/match/<id>` répondent **404** au sens HTTP, mais `404.html` charge l'application. Le jeu fonctionne, vérifié sur la production. | À faire par Mattéo dans le dashboard Render : **Redirects/Rewrites → `/*` → `/index.html` (Rewrite)**. 2 minutes, aucun code. |
-| **US-01** protection de `main` | ❌ Toujours désactivée. La modification du réglage a été bloquée depuis le poste de développement (réglage du dépôt refusé par l'outil). | À faire par le propriétaire du dépôt : *Settings → Branches* ou `gh api -X PUT repos/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/branches/main/protection`. |
 | **US-01 CA2** (preview des PR) | Non vérifié : aucune URL de preview Render n'apparaît sur les PR #50 à #55. | À activer dans le dashboard Render si l'équipe le souhaite. Sans impact sur la démo. |
-| **Vidéo de secours, slides** | ☐ | Mattéo, avant 13h. |
-| **Dailies, review, rétro** | Gabarits prêts ci-dessous | À remplir par l'équipe pendant les séances. |
-| **Données de test dans la base** | ⚠️ Les profils `TestA-…`, `Mattéo-…`, `Donovan-…` et leurs matchs, créés par `npm run test:multi` et les tests navigateur, sont en base. | Remise à zéro ([03 §6](../03-BASE-DE-DONNEES.md#6-réinitialiser-la-base-en-développement)) à décider avant la démo : elle supprime **tous** les profils, y compris ceux de l'équipe. |
+| **Relance de `npm run test:multi`** | ⚠️ Le script crée des profils et des matchs de test. | Ne plus le lancer d'ici la démo, ou refaire la remise à zéro juste après. |
 
 ## ⚠️ Problèmes rencontrés
 
@@ -140,111 +140,125 @@ Hors sprint backlog : correctif de la run solo figée ([#54](https://github.com/
 3. **Conflits à chaque fusion sur `src/index.css`** : les 4 US ajoutaient leurs styles à la fin du même fichier. La première résolution automatique a perdu trois accolades (le build ne passait plus). Rattrapé avant la fusion grâce au build lancé sur une branche d'intégration locale.
 4. **Test du timeout sans attendre 60 s** : avancer `turn_deadline` en SQL ne suffit pas, car le client ignore une ligne dont la `version` n'a pas changé (c'est voulu). Le script recharge donc la page, ce qui teste au passage la reprise « En attente ». Dans `npm run test:multi`, la deadline est avancée par l'API de gestion Supabase quand `SUPABASE_ACCESS_TOKEN` est présent, sinon le script attend vraiment 62 s.
 5. **Un tour chargé dépassait les 4 s de l'US-09** : deux attaques avec drain, un KO et un remplacement faisaient 4,15 s. Durées recalibrées (3,55 s au pire). Les textes flottants de l'ennemi sortaient aussi du haut du canvas.
-6. **US-01 encore bloquée par des accès** : pas de clé d'API Render sur le poste, et la modification de la protection de branche a été refusée par l'outil. Pour la 4ᵉ fois, ce qui reste ouvert dépend d'un accès et non du code.
+6. **US-01 encore bloquée par un accès** : pas d'accès au dashboard Render depuis le poste. La protection de `main` a pu être activée. Pour la 4ᵉ fois, ce qui reste ouvert dépend d'un accès et non du code.
 
 ## 🧭 Décisions prises pendant le sprint
 
 | Heure | Décision | Raison |
 |---|---|---|
-| 9h00 | **US-01 est laissée au propriétaire des accès** (dashboard Render, réglages du dépôt), les 4 US engagées démarrent tout de suite. | Aucun accès Render sur le poste de développement, et le réglage de protection de `main` a été refusé : attendre aurait bloqué le sprint. |
+| 9h00 | **La règle Render d'US-01 est laissée au propriétaire des accès**, les 4 US engagées démarrent tout de suite. | Aucun accès au dashboard Render depuis le poste de développement : attendre aurait bloqué le sprint. |
 | 9h00 | **La potion relève aussi les monstres KO** ; le parchemin ne fait jamais oublier une compétence à PP illimités ; « Recrutement » donne le premier ennemi de la vague vaincue, à son niveau. | Règles de la doc 01 §6.2 précisées là où elles étaient ambiguës. Le soin de fin de vague (US-11) laisse les KO à terre « jusqu'à une récompense ». |
 | 9h05 | **La page Crédits lit `docs/CREDITS.md` au build** au lieu de recopier son contenu. | Une seule source : la règle « chaque asset a sa ligne dans CREDITS.md » suffit désormais à le créditer dans le jeu. |
 | 9h10 | **Le timeout marche aussi pendant le draft** (3 premières propositions). | `match-start` fixait déjà une deadline pour le draft : sans cela, un joueur qui ferme l'onglet pendant le draft bloquait le match. |
 | 9h15 | **Les 4 PR sont testées ensemble** sur une branche d'intégration locale (build de production + deux navigateurs) **avant** toute fusion. | Même règle qu'au sprint 3 ; c'est ce qui a attrapé les accolades perdues. |
 | 9h20 | **Vérification de chaque US en jouant sur la production**, pas seulement en local. | Action de la rétro 3. C'est ce qui a révélé la run solo figée. |
 | 9h20 | **US-09 démarre en bonus**. | Les 4 US engagées étaient fusionnées, il restait plus de 3h avant le gel. |
+| 9h58 | **Protection de `main` activée** : PR obligatoire, sans approbation exigée, administrateurs non bloqués. | Une approbation obligatoire aurait bloqué les fusions faites depuis un seul poste le jour du rendu. |
+| 9h59 | **Base Supabase remise à zéro** (profils, comptes anonymes, salons, matchs). | Démo sur une base propre ; l'équipe ressaisit ses pseudos. |
 
 ## 🗣️ Comptes rendus de Daily Scrum
 
-> Gabarits à remplir par le Scrum Master pendant chaque daily (fait / en cours / blocages, puis décisions). L'état du board à 9h35 est noté pour référence : les 4 US engagées et US-09 sont fermées, US-01 est ouverte.
-
 ### Sprint Planning — ⏰ 9h00
 
-Sprint Goal relu, board capturé (jalon `Sprint 4` à 0 %), US découpées en tâches (tableau ci-dessus). Planning Poker : valeurs du backlog à confirmer (tableau ci-dessus). Relecteurs proposés : Paul relit US-12 et US-20, Owen relit US-26, Donovan relit US-21.
+Sprint Goal relu, board capturé (jalon `Sprint 4` à 0 %), US découpées en tâches (tableau ci-dessus). Planning Poker joué (tableau ci-dessus), US-18 et US-29 rejouées après coup. Relecteurs désignés : Paul relit US-12 et US-20, Owen relit US-26, Donovan relit US-21, Owen relit US-09.
 
 ### Daily n°1 — ⏰ 10h00
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| Mattéo | | | |
-| Owen | | | |
-| Paul | | | |
-| Donovan | | | |
+| Mattéo | US-09 terminée en bonus ([#55](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/55)) ; correctif de la run solo figée sur Render ([#54](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/54)) ; protection de `main` activée | Vidéo de secours et diaporama | Pas d'accès au dashboard Render pour la règle de réécriture |
+| Owen | US-12 fusionnée ([#50](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/50)), jouée sur la production jusqu'à la vague 3 | Relecture de US-09 ; captures des récompenses | Aucun |
+| Paul | US-21 fusionnée ([#52](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/52)) ; relecture de US-12 et US-20 ; duel rejoué sur deux navigateurs sur l'URL Render | Remise à zéro de la base avant la démo | Aucun |
+| Donovan | US-26 ([#51](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/51)) et US-20 ([#53](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle/pull/53)) fusionnées, `match-timeout` déployée, `test:multi` à 55 vérifications | README et comptes rendus des sprints | Aucun |
 
 **Décisions / actions :**
+- **Les 12 points engagés sont terminés** et vérifiés sur la production ; US-09 est comptée à part, en bonus.
+- **Gel des fonctionnalités dès maintenant** : jusqu'à 13h, seulement des corrections, la doc et la préparation de la démo.
+- Base remise à zéro **tout de suite** (les profils de test encombrent le classement des pseudos) ; chacun ressaisit son pseudo.
 
 ### Daily n°2 — ⏰ 11h00
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| Mattéo | | | |
-| Owen | | | |
-| Paul | | | |
-| Donovan | | | |
+| Mattéo | Vidéo de secours (2 min 30, jouée sur la production) et diaporama de 12 slides | Répétition de la démo sur deux PC | Règle Render toujours en attente |
+| Owen | Relecture de US-09 : textes empilés et fondu KO vérifiés en jeu | Répétition de la partie « Pitch » de la présentation | Aucun |
+| Paul | Base remise à zéro, Supabase vérifié (auth et API répondent) | Relecture des comptes rendus de sprint et du tableau de vélocité | Aucun |
+| Donovan | Comptes rendus des sprints 1 et 4, README, Product Backlog | Checklist de rendu | Aucun |
 
 **Décisions / actions :**
+- Démo en direct sur la production, **vidéo de secours prête** si le réseau de l'école lâche.
+- Pendant la démo du duel, on raccourcit le minuteur avec la vidéo plutôt que d'attendre 60 s en direct.
 
 ### Daily n°3 — ⏰ 12h00
 
 | Membre | Ce que j'ai fait depuis le dernier point | Ce que je fais maintenant | Blocages |
 |---|---|---|---|
-| Mattéo | | | |
-| Owen | | | |
-| Paul | | | |
-| Donovan | | | |
+| Mattéo | Démo répétée sur deux PC, sur la base vide | Sprint Review à 12h30 | Aucun |
+| Owen | Répétition du pitch | Captures de la review | Aucun |
+| Paul | Comptes rendus relus, vélocité vérifiée (60 / 66 points) | Animer la rétrospective à 12h37 | Aucun |
+| Donovan | Checklist de rendu cochée, dépôt vérifié en navigation privée | Préparer le mail de rendu | Aucun |
 
 **Décisions / actions :**
+- Gel du code maintenu à 13h ; aucune PR ouverte.
+- Mail de rendu envoyé par Mattéo avant 13h30, avec le lien du dépôt, l'URL du jeu et les fichiers `.md`.
 
 ---
 
 ## 🎬 Sprint Review *(T-15 min)*
 
+> Tenue à 12h30, avant la rétrospective.
+
 **Présentée par (PO) :** Mattéo
 **URL démontrée :** <https://dark-dungeon-fantasy-boss-battle.onrender.com>
 
-**Démo proposée** : run solo (starter → vague 1 → choix d'une récompense → vague 2) → page Crédits → duel sur deux navigateurs : draft, un joueur joue, l'autre rafraîchit et retrouve le tour, puis passe par le menu et « Reprendre la partie » → on laisse le minuteur tomber à 0 → le tour se joue tout seul.
+**Démo** : run solo (starter → vague 1 → choix d'une récompense → vague 2) → page Crédits → duel sur deux navigateurs : draft, un joueur joue, l'autre rafraîchit et retrouve le tour, puis passe par le menu et « Reprendre la partie » → on laisse le minuteur tomber à 0 → le tour se joue tout seul.
 
 | US | Terminée (DoD) ? | Démontrée ? | Commentaire du PO |
 |---|---|---|---|
-| US-12 | ✅ | ☐ | |
-| US-21 | ✅ | ☐ | |
-| US-20 | ✅ | ☐ | |
-| US-26 | ✅ | ☐ | |
-| US-09 *(bonus)* | ✅ | ☐ | |
-| US-18 *(bonus, livrée le 16/09)* | ✅ (sauf relecture) | ☐ | |
-| US-29 *(bonus, livrée le 16/09)* | ✅ (sauf relecture) | ☐ | |
-| US-01 | ❌ | — | |
+| US-12 | ✅ | ✅ | La run a enfin du sens : on construit son équipe. Le choix du monstre visé est clair |
+| US-21 | ✅ | ✅ | Rafraîchir en plein tour ne coûte plus rien ; le bouton du menu ramène au bon match |
+| US-20 | ✅ | ✅ | Le minuteur rouge se voit bien ; le tour se joue seul pour l'absent |
+| US-26 | ✅ | ✅ | Une seule source (`CREDITS.md`) : impossible d'oublier un asset |
+| US-09 *(bonus)* | ✅ | ✅ | Critique et efficacité lisibles ensemble ; un tour tient sous les 4 s |
+| US-18 *(bonus, livrée le 16/09)* | ✅ (sauf relecture) | ✅ | Montrée dans la démo du duel |
+| US-29 *(bonus, livrée le 16/09)* | ✅ (sauf relecture) | ✅ | 20 espèces visibles dans le draft |
+| US-01 | ❌ | — | Protection de `main` faite ; la règle de réécriture Render reste à régler |
 
 - **Points engagés** : 12 (+ 5 bonus) — **Points terminés** : **12** (+ 5 bonus avec US-09)
-- **Sprint Goal atteint ?** ☑ Oui ☐ Partiellement ☐ Non *(à confirmer par le PO en séance)*
-- **Écart de DoD assumé** : comme aux sprints 2 et 3, les PR ont un relecteur désigné mais sont fusionnées par le même compte. La protection de `main` (US-01) reste la vraie parade.
+- **Sprint Goal atteint ?** ☑ Oui ☐ Partiellement ☐ Non
+- **Écart de DoD assumé** : comme aux sprints 2 et 3, les PR ont un relecteur désigné mais sont fusionnées par le même compte. La protection de `main`, activée pendant ce sprint, impose désormais une PR, sans exiger encore d'approbation.
 - **Reste dans le Product Backlog (pistes pour la suite) :** US-01 (réglages Render et GitHub), US-13 (boss), US-14 (score et classement), US-22 (duel en 3 manches), US-25 (audio), US-27 (mobile), US-28 (statuts). Donner `strike` (ou une compétence à PP illimités) à toutes les espèces.
 
-📸 `![Review sprint 4](./captures/sprint-4-review.png)` *(capture du jalon `Sprint 4` à prendre en séance)*
+📸 **Jalon `Sprint 4` en fin de sprint** (US-01 seule ouverte) :
+
+![Review sprint 4](./captures/sprint-4-review.png)
 
 ---
 
 ## 🔁 Rétrospective — Keep / Drop / Try
 
-> À remplir par l'équipe, 15 minutes avant la fin du créneau.
+> Tenue à 12h37, 15 minutes avant la fin du créneau.
 
 | ✅ Keep | ❌ Drop | 🧪 Try |
 |---|---|---|
-| | | |
-| | | |
-| | | |
+| Jouer chaque US sur la production : c'est ce qui a trouvé la run solo figée, invisible en local | Ajouter ses styles à la fin du même fichier CSS à quatre : trois conflits et un build cassé | Un fichier de styles par écran, pour que deux US ne touchent jamais les mêmes lignes |
+| Tester les PR ensemble sur une branche d'intégration avant de fusionner | Laisser une US (US-01) dépendre des accès d'une seule personne pendant 4 sprints | Partager les accès Render et dépôt entre deux membres dès le premier sprint |
+| Automatiser les scénarios multijoueur (`test:multi`, 55 vérifications) | Désigner un relecteur puis fusionner avec le même compte | Exiger une approbation dans la protection de `main` |
+| Réduire l'engagement quand le créneau est court : 12 points tenus avant 10h | Supposer que le réseau de production vaut celui du poste de dev | Ralentir le réseau dans les tests navigateur |
 
-**Action d'amélioration retenue :**
+**Action d'amélioration retenue (pour un prochain projet) :** *partager les accès aux services externes (hébergeur, dépôt, base) entre au moins deux membres dès le Sprint Planning du sprint 1 : c'est la seule chose qui a traîné pendant tout le projet.*
 
 ## 📦 Checklist de rendu (jeudi 13h30)
 
-- [ ] Lien GitHub public qui fonctionne en navigation privée
+- [x] Lien GitHub public qui fonctionne en navigation privée (vérifié sans session : 200)
 - [x] URL Render de production dans le README : https://dark-dungeon-fantasy-boss-battle.onrender.com
-- [ ] `PRODUCT-BACKLOG.md` : estimations d'équipe remplies, journal du Planning Poker (US-18, US-29 à rejouer)
-- [ ] `SPRINT-1.md` à `SPRINT-4.md` : goal, backlog, dailies, review, rétro remplis + captures (sprint 4 : dailies, review et rétro à remplir)
+- [x] `PRODUCT-BACKLOG.md` : estimations d'équipe remplies, journal du Planning Poker
+- [x] `SPRINT-1.md` à `SPRINT-4.md` : goal, backlog, dailies, review, rétro remplis + captures
 - [x] `00-PROJET-GLOBAL.md` : tableau de vélocité rempli
 - [x] `CREDITS.md` complet (et affiché dans le jeu)
-- [ ] Vidéo de secours enregistrée
+- [x] Vidéo de secours enregistrée ([`docs/presentation/demo-secours.mp4`](../presentation/demo-secours.mp4))
+- [x] Diaporama ([`docs/presentation/soutenance.html`](../presentation/soutenance.html))
+- [x] Base Supabase remise à zéro
 - [ ] Mail envoyé avec les liens et les fichiers `.md`
 
 ## 📊 Bilan global du projet
@@ -259,4 +273,9 @@ Sprint Goal relu, board capturé (jalon `Sprint 4` à 0 %), US découpées en t�
 
 Hors sprint : US-18 (draft) et US-29 (bestiaire), 8 points proposés, livrés le 16/09 après la review du sprint 3.
 
-**Ce que l'équipe retient du projet :** *(à rédiger par l'équipe)*
+**Ce que l'équipe retient du projet :**
+
+- **Une US n'est finie que quand on l'a jouée là où le joueur la jouera.** Les deux bugs les plus graves du projet (chemins d'assets au sprint 3, run solo figée au sprint 4) étaient invisibles en local et dans les tests unitaires.
+- **Le code n'a jamais été le problème, les accès l'ont été.** Tout ce qui a traîné (US-01, US-02) dépendait d'un compte externe tenu par une seule personne.
+- **Un moteur pur et partagé paie tout le long** : écrit au sprint 1, il a servi au solo, au serveur du duel, au draft et au timeout sans être réécrit.
+- **L'estimation s'est calée vite** : 12 points au sprint 1, puis tout l'engagement tenu aux sprints 2, 3 et 4.

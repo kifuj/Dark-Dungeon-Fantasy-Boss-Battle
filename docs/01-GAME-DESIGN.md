@@ -100,11 +100,11 @@ Un triangle (comme Feu / Plante / Eau) plus un duo opposé :
 | `shadow_claw` | Griffe d'ombre | Ombre | 50 | 10 | 0 | — |
 | `life_drain` | Drain vital | Ombre | 40 | 5 | 0 | Soigne 50 % des dégâts infligés |
 | `holy_ray` | Rayon sacré | Lumière | 50 | 10 | 0 | — |
-| `blessing` | Bénédiction | Lumière | — | 2 | 0 | DEF ×1,25 jusqu'à la fin du combat |
+| `blessing` | Bénédiction | Lumière | — | 2 | 0 | DEF ×1,15 jusqu'à la fin du combat |
 | `bite` | Morsure | Neutre | 60 | 8 | 0 | — |
 | `rock_throw` | Jet de roc | Neutre | 70 | 5 | 0 | — |
-| `harden` | Durcissement | Neutre | — | 2 | 0 | DEF ×1,25 jusqu'à la fin du combat |
-| `shell_guard` | Carapace | Eau | — | 2 | 0 | DEF ×1,25 jusqu'à la fin du combat |
+| `harden` | Durcissement | Neutre | — | 2 | 0 | DEF ×1,15 jusqu'à la fin du combat |
+| `shell_guard` | Carapace | Eau | — | 2 | 0 | DEF ×1,15 jusqu'à la fin du combat |
 | `soothing_song` | Chant apaisant | Eau | — | 3 | 0 | Soigne 30 % des PV max |
 | `thorn_storm` | Tempête d'épines | Nature | 80 | 3 | 0 | — |
 | `sunburst` | Éclat solaire | Lumière | 80 | 3 | 0 | — |
@@ -118,9 +118,9 @@ Les sprites proposés sont indicatifs : **adapter selon le pack choisi** (voir [
 
 | id | Nom | Élément | PV | ATQ | DEF | VIT | Compétences | Rôle |
 |---|---|---|---|---|---|---|---|---|
-| `salamander` | Salamandre | Feu | 50 | 65 | 40 | 55 | fireball, inferno, strike | **Starter** |
-| `undine` | Ondine | Eau | 55 | 55 | 50 | 50 | water_jet, deluge, strike | **Starter** |
-| `mushroom` | Champignon | Nature | 60 | 50 | 55 | 35 | vine, regrowth, strike | **Starter** |
+| `salamander` | Salamandre | Feu | 55 | 70 | 45 | 60 | fireball, inferno, strike | **Starter** |
+| `undine` | Ondine | Eau | 60 | 60 | 55 | 55 | water_jet, deluge, strike | **Starter** |
+| `mushroom` | Champignon | Nature | 65 | 55 | 60 | 40 | vine, regrowth, strike | **Starter** |
 | `goblin` | Gobelin | Neutre | 45 | 55 | 40 | 70 | strike, quick_strike, shadow_claw | Commun |
 | `skeleton` | Squelette | Ombre | 50 | 55 | 55 | 40 | shadow_claw, life_drain, strike | Commun |
 | `flying_eye` | Œil volant | Ombre | 40 | 60 | 35 | 75 | shadow_claw, quick_strike, life_drain | Commun |
@@ -147,9 +147,9 @@ Les sprites proposés sont indicatifs : **adapter selon le pack choisi** (voir [
 
 | Vague | Ennemis | Niveau ennemi |
 |---|---|---|
-| 1 – 4 | 1 monstre commun | `3 + vague` |
-| 5, 10, 15… | 1 boss *(Could, sinon 2 communs)* | `4 + vague` |
-| 6 et + | 2 monstres (communs ou rares) | `3 + vague` |
+| 1 – 4 | 1 monstre commun | `vague` (niveau 1 à la vague 1) |
+| 5, 10, 15… | 1 boss *(Could, sinon 2 communs)* | `vague + 1` |
+| 6 et + | 2 monstres (communs ou rares) | `vague` |
 
 - Entre deux vagues : **+20 % des PV max** pour toute l'équipe.
 - Taille d'équipe maximale : **4**.

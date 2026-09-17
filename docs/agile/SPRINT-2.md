@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Créneau** | Mercredi 16/09, matin (08h45 → 12h30, 0,5 jour) |
-| **Product Owner** | *à compléter* |
-| **Scrum Master** | *à compléter* |
+| **Product Owner** | Mattéo |
+| **Scrum Master** | Paul |
 | **Développeurs** | Mattéo, Owen, Paul, Donovan |
 | **Capacité** | 4 personnes × ~3 h |
 | **Vélocité du sprint 1** | **12** points (18 engagés) |
@@ -180,7 +180,7 @@ Hors sprint backlog, terminé aussi : mise à jour des docs 02 (événements Rea
 
 > Tenue à 12h05, avant la rétrospective.
 
-**Présentée par (PO) :** *à compléter* — **URL démontrée :** <https://dark-dungeon-fantasy-boss-battle.onrender.com>
+**Présentée par (PO) :** Mattéo — **URL démontrée :** <https://dark-dungeon-fantasy-boss-battle.onrender.com>
 
 Déroulé : écran titre → menu → Solo → choix du starter (Salamandre) → vague 1 contre un Slime → un tour joué (Boule de feu, super efficace) → vague suivante → fin de run.
 

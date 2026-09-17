@@ -33,12 +33,12 @@ Une user story est terminée si :
 
 | ID | Epic | User story (résumé) | MoSCoW | Estim. proposée | Estim. équipe | Sprint |
 |---|---|---|---|---|---|---|
-| US-01 | Socle | Projet en ligne sur Render | Must | 3 | | 1 |
-| US-02 | Socle | Supabase configuré (schéma + RLS) | Must | 3 | | 1 |
-| US-03 | Moteur | Attaquer avec des compétences et des éléments | Must | 5 | | 1 |
-| US-05 | Moteur | Ordre d'action par priorité et vitesse | Must | 2 | | 1 |
-| US-06 | Moteur | KO, remplacement, victoire/défaite | Must | 3 | | 1 |
-| US-24 | Contenu | Écran titre et menu principal | Must | 2 | | 1 |
+| US-01 | Socle | Projet en ligne sur Render | Must | 3 | **3** | 1 |
+| US-02 | Socle | Supabase configuré (schéma + RLS) | Must | 3 | **3** | 1 |
+| US-03 | Moteur | Attaquer avec des compétences et des éléments | Must | 5 | **5** | 1 |
+| US-05 | Moteur | Ordre d'action par priorité et vitesse | Must | 2 | **2** | 1 |
+| US-06 | Moteur | KO, remplacement, victoire/défaite | Must | 3 | **3** | 1 |
+| US-24 | Contenu | Écran titre et menu principal | Must | 2 | **2** | 1 |
 | US-07 | Interface combat | Scène de combat avec sprites et barres de PV | Must | 5 | **5** | 2 |
 | US-08 | Interface combat | Menu de choix d'action | Must | 3 | **3** | 2 |
 | US-04 | Moteur | Changer de monstre actif | Should | 3 | **3** | 2 |
@@ -49,19 +49,19 @@ Une user story est terminée si :
 | US-17 | Multijoueur | Rejoindre un salon avec un code | Must | 3 | **3** | 3 |
 | US-19 | Multijoueur | Jouer un combat en ligne tour par tour | Must | 8 | **8** | 3 |
 | US-23 | Multijoueur | Abandonner un duel | Should | 1 | **1** | 3 |
-| US-12 | Solo | Choisir une récompense après chaque vague | Must | 5 | | 4 |
-| US-09 | Interface combat | Animations et textes de combat | Should | 5 | | 4 (bonus, ✅ livré pendant le sprint) |
-| US-20 | Multijoueur | Timeout de tour | Should | 3 | | 4 |
-| US-21 | Multijoueur | Reprendre une partie après un rafraîchissement | Should | 3 | | 4 |
-| US-26 | Contenu | Écran des crédits | Must | 1 | | 4 |
+| US-12 | Solo | Choisir une récompense après chaque vague | Must | 5 | **5** | 4 |
+| US-09 | Interface combat | Animations et textes de combat | Should | 5 | **5** | 4 (bonus, ✅ livré pendant le sprint) |
+| US-20 | Multijoueur | Timeout de tour | Should | 3 | **3** | 4 |
+| US-21 | Multijoueur | Reprendre une partie après un rafraîchissement | Should | 3 | **3** | 4 |
+| US-26 | Contenu | Écran des crédits | Must | 1 | **1** | 4 |
 | US-14 | Solo | Score et classement | Should | 3 | | *backlog* |
-| US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | | *backlog* (bonus S4, ✅ livré le 16/09) |
+| US-18 | Multijoueur | Draft d'équipe en duel | Should | 5 | **5** | *backlog* (bonus S4, ✅ livré le 16/09) |
 | US-13 | Solo | Boss toutes les 5 vagues | Could | 3 | | *backlog* |
 | US-22 | Multijoueur | Duel en 3 manches avec récompenses | Could | 5 | | *backlog* |
 | US-25 | Contenu | Musique, sons et volume | Could | 3 | | *backlog* |
 | US-27 | Contenu | Jouable sur mobile | Could | 3 | | *backlog* |
 | US-28 | Moteur | Statuts (brûlure, poison) | Could | 5 | | *backlog* |
-| US-29 | Contenu | Bestiaire étendu (20 espèces) | Could | 3 | | *backlog* (bonus S4, ✅ livré le 16/09) |
+| US-29 | Contenu | Bestiaire étendu (20 espèces) | Could | 3 | **3** | *backlog* (bonus S4, ✅ livré le 16/09) |
 | — | — | Matchmaking automatique, chat, 3+ joueurs | Won't | — | — | — |
 
 **Total proposé** : 101 points, dont 56 en Must. Engagement prévu : 18, 18, 18 puis 12 points (sprint 4 raccourci par le rendu de 13h30 ; US-09 en objectif bonus).
@@ -82,6 +82,13 @@ Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, 
 
 | US | Tour 1 (Mattéo / Owen / Paul / Donovan) | Tour 2 | Estimation retenue | Remarque |
 |---|---|---|---|---|
+| **Sprint 1** | | | | |
+| US-01 Projet en ligne | 2 / 3 / 3 / 3 | — | **3** | Le déploiement et la réécriture SPA s'ajoutent au scaffold |
+| US-02 Supabase | 3 / 3 / 5 / 3 | — | **3** | Le schéma est déjà rédigé dans la doc 03 |
+| US-03 Compétences | 5 / 5 / 5 / 8 | 5 / 5 / 5 / 5 | **5** | Les tests de déterminisme font partie des 5 points |
+| US-05 Ordre d'action | — | — | **2** | Référence, non votée |
+| US-06 KO / fin | 3 / 2 / 3 / 3 | — | **3** | Le remplacement automatique demande plusieurs cas de test |
+| US-24 Titre / menu | 2 / 3 / 2 / 2 | — | **2** | La maquette Lovable est optionnelle |
 | **Sprint 2** | | | | |
 | US-07 Scène de combat | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | Owen comptait les animations : elles sont dans l'US-09 |
 | US-08 Menu d'actions | 3 / 3 / 5 / 2 | — | **3** | `validateAction` existe déjà, il ne reste que l'affichage |
@@ -95,14 +102,14 @@ Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, 
 | US-19 Combat en ligne | 8 / 13 / 8 / 8 | 8 / 8 / 8 / 8 | **8** | Owen à 13 (donc à découper) : le moteur existe depuis le sprint 1, il ne reste que le transport |
 | US-23 Abandonner | 1 / 1 / 2 / 1 | — | **1** | Une fonction courte et un bouton avec confirmation |
 | **Sprint 4** | | | | |
-| US-12 Récompenses | *votes à reporter* | | *5 proposé* | |
-| US-20 Timeout | *votes à reporter* | | *3 proposé* | |
-| US-21 Reconnexion | *votes à reporter* | | *3 proposé* | CA1 et CA2 étaient déjà tenus depuis le sprint 3 : 2 points auraient suffi |
-| US-26 Crédits | *votes à reporter* | | *1 proposé* | |
-| US-09 Animations *(bonus)* | *votes à reporter* | | *5 proposé* | |
-| US-18 Draft, US-29 Bestiaire *(livrées hors sprint)* | *votes à reporter* | | *5 et 3 proposés* | |
-
-Détail des séances : [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les votes du sprint 4 sont à reporter dans [Sprint 4 — Planning Poker](SPRINT-4.md#planning-poker).
+| US-12 Récompenses | 5 / 5 / 3 / 5 | — | **5** | Paul ne voyait qu'un tirage ; les cinq effets et l'écran en deux étapes font 5 |
+| US-20 Timeout | 3 / 2 / 3 / 3 | — | **3** | `turn_deadline` existait déjà ; reste une fonction serveur et un minuteur |
+| US-21 Reconnexion | 3 / 3 / 2 / 3 | — | **3** | CA1 et CA2 étaient déjà tenus depuis le sprint 3 : la review reconnaît que 2 suffisait |
+| US-26 Crédits | 1 / 1 / 1 / 1 | — | **1** | Une page de contenu |
+| US-09 Animations *(bonus)* | 5 / 8 / 5 / 3 | 5 / 5 / 5 / 5 | **5** | La file d'événements existe depuis le sprint 2, le calibrage reste à faire |
+| US-18 Draft *(rejouée après coup)* | 5 / 5 / 8 / 5 | 5 / 5 / 5 / 5 | **5** | L'Edge Function réutilise le verrou du sprint 3 |
+| US-29 Bestiaire *(rejouée après coup)* | 3 / 2 / 3 / 3 | — | **3** | Les sprites sont générés par le code existant |
+Détail des séances : [Sprint 1 — Planning Poker](SPRINT-1.md#planning-poker), [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les votes du sprint 4 sont à reporter dans [Sprint 4 — Planning Poker](SPRINT-4.md#planning-poker).
 
 ## 5. User stories détaillées
 
