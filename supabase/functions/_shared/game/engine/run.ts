@@ -31,7 +31,10 @@ export function createRun(starterId: string, seed: number): RunState {
 /** RNG propre à une vague : même seed de run + même vague = même ennemi. */
 export const waveRng = (seed: number, wave: number) => mulberry32((seed ^ Math.imul(wave, 0x27d4eb2d)) >>> 0);
 
-/** Ennemi de la vague N : niveau `3 + N`, espèce tirée avec la seed de la run (US-11 CA1). */
+/** Niveau des ennemis de la vague N : 1 à la vague 1, puis +1 par vague. */
+export const enemyLevelForWave = (wave: number) => wave;
+
+/** Ennemi de la vague N : niveau `enemyLevelForWave(N)`, espèce tirée avec la seed de la run (US-11 CA1). */
 export function enemyForWave(seed: number, wave: number): MonsterInstance {
   return enemiesForWave(seed, wave)[0];
 }
@@ -42,7 +45,7 @@ export const WAVE_WITH_TWO_ENEMIES = 6;
 export function enemiesForWave(seed: number, wave: number): MonsterInstance[] {
   const rng = waveRng(seed, wave);
   const count = wave >= WAVE_WITH_TWO_ENEMIES ? 2 : 1;
-  return Array.from({ length: count }, (_, i) => createMonster(pick(rng, WAVE_POOL), 3 + wave, `${seed}-e${wave}-${i}`));
+  return Array.from({ length: count }, (_, i) => createMonster(pick(rng, WAVE_POOL), enemyLevelForWave(wave), `${seed}-e${wave}-${i}`));
 }
 
 /** Combat de la vague en cours : le joueur occupe le siège 0, l'IA le siège 1. */

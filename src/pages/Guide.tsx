@@ -3,6 +3,7 @@ import { ELEMENT_LABELS } from '../../shared/data/elements.js';
 import { SPECIES } from '../../shared/data/monsters.js';
 import { REWARDS } from '../../shared/data/rewards.js';
 import { SKILLS } from '../../shared/data/skills.js';
+import { DEF_UP_MULT } from '../../shared/engine/battle.js';
 import { CRIT_CHANCE } from '../../shared/engine/damage.js';
 import { DRAFT_OFFER_SIZE, ONLINE_LEVEL, ONLINE_TEAM_SIZE, TURN_DURATION_MS } from '../../shared/engine/online.js';
 import { MAX_TEAM_SIZE, REWARD_CHOICES } from '../../shared/engine/rewards.js';
@@ -20,7 +21,7 @@ const RARITY_ORDER: SpeciesDef['rarity'][] = ['starter', 'common', 'rare'];
 const EFFECT_LABELS: Record<NonNullable<SkillDef['effect']>, string> = {
   heal30: 'Soigne 30 % des PV max',
   drain50: 'Rend 50 % des dégâts infligés',
-  defUp: 'DEF ×1,25 (cumulable)',
+  defUp: `DEF ×${DEF_UP_MULT.toLocaleString('fr-FR')} (cumulable)`,
 };
 
 const skillEffect = (skill: SkillDef) =>
@@ -110,7 +111,7 @@ export function Guide() {
           <h2>Solo : les vagues</h2>
           <ul>
             <li>Vous commencez avec un starter niveau {STARTER_LEVEL}.</li>
-            <li>Vague N : un ennemi niveau 3 + N, tiré parmi les monstres communs et rares.</li>
+            <li>Vague N : un ennemi niveau N, tiré parmi les monstres communs et rares.</li>
             <li>À partir de la vague {WAVE_WITH_TWO_ENEMIES} : deux ennemis.</li>
             <li>
               Après une victoire : PV et PP sont conservés, l'équipe récupère {percent(WAVE_HEAL)} de ses PV max (les KO restent KO).

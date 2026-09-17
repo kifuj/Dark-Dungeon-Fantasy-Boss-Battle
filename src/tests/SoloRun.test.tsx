@@ -47,7 +47,7 @@ describe('Solo — la run ne se fige pas si la scène ne répond pas', () => {
     const played: unknown[] = [];
     EventBus.on('play-events', (events: unknown) => played.push(events));
 
-    await user.click(screen.getAllByRole('button', { name: /PP|∞/ })[0]);
+    await user.click(screen.getAllByRole('button', { name: /∞/ })[0]); // Frappe : l'ennemi survit
     expect(played).toHaveLength(1);
     expect(document.querySelector('.action-menu-hidden')).not.toBeNull(); // tour en cours
 
@@ -60,11 +60,12 @@ describe('Solo — la run ne se fige pas si la scène ne répond pas', () => {
 
   it('applique le tour dès que la scène a fini, sans attendre le délai', async () => {
     const user = await startRun();
-    await user.click(screen.getAllByRole('button', { name: /PP|∞/ })[0]);
+    // Frappe (∞) : l'ennemi de niveau 1 survit au premier coup, même critique.
+    await user.click(screen.getAllByRole('button', { name: /∞/ })[0]);
     await act(async () => EventBus.emit('events-played'));
     expect(document.querySelector('.action-menu-hidden')).toBeNull();
     // Le délai de sécurité est annulé : il ne rejoue pas une fin de tour fantôme au tour suivant.
-    await user.click(screen.getAllByRole('button', { name: /PP|∞/ })[0]);
+    await user.click(screen.getAllByRole('button', { name: /∞/ })[0]);
     await act(async () => vi.advanceTimersByTime(1000));
     expect(document.querySelector('.action-menu-hidden')).not.toBeNull();
   });

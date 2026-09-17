@@ -2,6 +2,9 @@ import { SKILLS } from '../data/skills.js';
 import { computeDamage } from './damage.js';
 import type { Action, BattleEvent, BattleState, Rng, Seat, TurnResult } from '../types.js';
 
+/** Multiplicateur de DEF des compétences `defUp` (Bénédiction, Durcissement, Carapace). */
+export const DEF_UP_MULT = 1.15;
+
 const other = (seat: Seat): Seat => (seat === 0 ? 1 : 0);
 const active = (s: BattleState, seat: Seat) => s.players[seat].team[s.players[seat].activeIndex];
 const isDefeated = (s: BattleState, seat: Seat) => s.players[seat].team.every((m) => m.hp <= 0);
@@ -61,8 +64,8 @@ export function resolveTurn(input: BattleState, actions: [Action, Action], rng: 
       continue;
     }
     if (skill.effect === 'defUp') {
-      actor.modifiers.defMult *= 1.25;
-      events.push({ type: 'buff', seat, stat: 'def', mult: 1.25 });
+      actor.modifiers.defMult *= DEF_UP_MULT;
+      events.push({ type: 'buff', seat, stat: 'def', mult: DEF_UP_MULT });
       continue;
     }
 

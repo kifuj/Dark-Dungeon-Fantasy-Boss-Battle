@@ -17,8 +17,8 @@ describe('US-10 — départ de la run', () => {
 });
 
 describe('US-11 — vagues', () => {
-  it('oppose un ennemi de niveau 3 + N', () => {
-    for (const wave of [1, 2, 5, 12]) expect(enemyForWave(1234, wave).level).toBe(3 + wave);
+  it('oppose un ennemi de niveau N (niveau 1 à la vague 1)', () => {
+    for (const wave of [1, 2, 5, 12]) expect(enemyForWave(1234, wave).level).toBe(wave);
   });
 
   it('tire toujours le même ennemi pour une seed et une vague données', () => {
@@ -35,14 +35,14 @@ describe('US-11 — vagues', () => {
   it('oppose 1 monstre jusqu’à la vague 5, puis 2 (game design §6.1)', () => {
     for (const wave of [1, 3, 5]) expect(enemiesForWave(99, wave)).toHaveLength(1);
     for (const wave of [6, 9]) expect(enemiesForWave(99, wave)).toHaveLength(2);
-    expect(enemiesForWave(99, 7).every((m) => m.level === 10)).toBe(true);
+    expect(enemiesForWave(99, 7).every((m) => m.level === 7)).toBe(true);
   });
 
   it('place le joueur au siège 0 et l’IA au siège 1', () => {
     const battle = battleForWave(createRun('salamander', 7));
     expect(battle.players[0].userId).toBe('solo');
     expect(battle.players[1].userId).toBeNull();
-    expect(battle.players[1].team[0].level).toBe(4);
+    expect(battle.players[1].team[0].level).toBe(1);
   });
 
   it('rend 20 % des PV max après une vague gagnée, sans dépasser le maximum', () => {
