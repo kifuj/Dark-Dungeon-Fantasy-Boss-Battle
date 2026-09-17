@@ -33,8 +33,9 @@ describe('stats', () => {
     const m = createMonster('salamander', 5, 'm');
     expect(m.hp).toBe(m.maxHp);
     expect(m.skills).toEqual([
-      { id: 'fireball', ppLeft: 10 },
-      { id: 'inferno', ppLeft: 3 },
+      { id: 'fireball', ppLeft: 13 },
+      { id: 'inferno', ppLeft: 4 },
+      { id: 'kindle', ppLeft: 2 },
       { id: 'strike', ppLeft: null },
     ]);
   });

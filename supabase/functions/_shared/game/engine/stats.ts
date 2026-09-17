@@ -18,6 +18,6 @@ export function createMonster(speciesId: string, level: number, uid: string): Mo
       spd: statAtLevel(s.base.spd, level),
     },
     skills: s.skills.map((id) => ({ id, ppLeft: SKILLS[id].pp })),
-    modifiers: { defMult: 1 },
+    modifiers: { defMult: 1, atkMult: 1 },
   };
 }

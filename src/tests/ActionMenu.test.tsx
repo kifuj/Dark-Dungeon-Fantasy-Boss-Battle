@@ -27,7 +27,7 @@ describe('US-08 — menu de choix d’action', () => {
   it('affiche les compétences du monstre actif avec leur élément et leurs PP (CA1)', () => {
     render(<ActionMenu state={state()} seat={0} busy={false} onAction={vi.fn()} />);
     expect(screen.getByRole('button', { name: /Boule de feu/ })).toHaveProperty('disabled', false);
-    expect(screen.getByRole('button', { name: /Boule de feu/ }).textContent).toContain('10/10 PP');
+    expect(screen.getByRole('button', { name: /Boule de feu/ }).textContent).toContain('13/13 PP');
     expect(screen.getByRole('button', { name: /Souffle ardent/ }).textContent).toContain('feu');
     expect(screen.getByRole('button', { name: /Frappe/ }).textContent).toContain('∞ PP');
   });

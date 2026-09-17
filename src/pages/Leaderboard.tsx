@@ -58,7 +58,7 @@ export function Leaderboard() {
           <span>Jouer en solo</span>
           <span className="button-arrow" aria-hidden="true">⚔</span>
         </Link>
-        <Link to="/menu" className="button back-button">
+        <Link to="/menu" className="button back-button" data-shortcut="back">
           <span>Retour au menu</span>
           <span className="button-arrow" aria-hidden="true">↩</span>
         </Link>

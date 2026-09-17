@@ -16,7 +16,7 @@ export interface SkillDef {
   power: number; // 0 pour les compétences sans dégâts
   pp: number | null; // null = illimité
   priority?: number; // défaut 0
-  effect?: 'heal30' | 'drain50' | 'defUp';
+  effect?: 'heal30' | 'drain50' | 'defUp' | 'atkUp';
 }
 
 /** Rareté d'une espèce, déduite de sa puissance (shared/data/rarities.ts). */
@@ -30,6 +30,8 @@ export interface SpeciesDef {
   skills: string[];
   rarity: Rarity;
   sprite: string; // clé de texture Phaser
+  /** Évolution en solo : l'espèce devient `into` en atteignant le niveau `level`. */
+  evolution?: { into: string; level: number };
 }
 
 export interface MonsterInstance {
@@ -42,7 +44,8 @@ export interface MonsterInstance {
   maxHp: number;
   stats: { atk: number; def: number; spd: number };
   skills: { id: string; ppLeft: number | null }[];
-  modifiers: { defMult: number };
+  /** `atkMult` est absent des duels enregistrés avant l'ajout des boosts d'attaque : lire `atkMult ?? 1`. */
+  modifiers: { defMult: number; atkMult?: number };
 }
 
 export interface PlayerState {
@@ -69,7 +72,9 @@ export type BattleEvent =
   | { type: 'skill_used'; seat: Seat; actorName: string; skillName: string; skillId: string }
   | { type: 'damage'; targetSeat: Seat; amount: number; hpAfter: number; maxHp: number; effectiveness: number; crit: boolean }
   | { type: 'heal'; seat: Seat; amount: number; hpAfter: number; maxHp: number }
-  | { type: 'buff'; seat: Seat; stat: 'def'; mult: number }
+  | { type: 'buff'; seat: Seat; stat: 'def' | 'atk'; mult: number }
+  /** Solo uniquement : le monstre du joueur gagne un niveau en mettant un ennemi K.O. (et peut évoluer). */
+  | { type: 'level_up'; seat: Seat; speciesId: string; name: string; level: number; evolvedFrom: string | null }
   | { type: 'faint'; seat: Seat; index: number; name: string }
   | { type: 'forfeit'; seat: Seat }
   | { type: 'battle_end'; winnerSeat: Seat };

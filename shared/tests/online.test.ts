@@ -122,10 +122,16 @@ describe('US-18 — draft d’équipe', () => {
 
 describe('US-20 — timeout de tour', () => {
   const battle = () => createOnlineBattle(SEED_TIMEOUT, 'host', 'guest');
-  /** Équipe fixe : Salamandre (a `strike`), puis Loup et Feu follet (pas de PP illimités). */
+  /**
+   * Équipe fixe : Salamandre (a `strike`), puis Loup et Feu follet privés de leur Frappe, comme dans
+   * un duel enregistré avant que toutes les espèces aient une compétence à PP illimités.
+   */
   const fixed = (): BattleState => {
     const state = battle();
-    state.players[1].team = ['salamander', 'wolf', 'wisp'].map((id, i) => createMonster(id, 10, `p1-m${i}`));
+    state.players[1].team = ['salamander', 'wolf', 'wisp'].map((id, i) => {
+      const monster = createMonster(id, 10, `p1-m${i}`);
+      return i === 0 ? monster : { ...monster, skills: monster.skills.filter((s) => s.id !== 'strike') };
+    });
     return state;
   };
   const drain = (monster: MonsterInstance) => monster.skills.forEach((slot) => slot.ppLeft !== null && (slot.ppLeft = 0));

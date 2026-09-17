@@ -77,6 +77,17 @@ export class FighterView {
     this.update(monster);
   }
 
+  /** Montée de niveau ou évolution en plein combat : sprite, nom et niveau changent, les PV affichés restent. */
+  relabel(speciesId: string, name: string, level: number) {
+    const textureKey = SPECIES[speciesId].sprite;
+    if (this.sprite && this.sprite.texture.key !== textureKey) {
+      this.sprite.setTexture(textureKey, 0).play(`${textureKey}-idle`, true);
+      this.scene.tweens.add({ targets: this.sprite, alpha: { from: 0.2, to: 1 }, duration: 400 });
+    }
+    this.name.setText(name);
+    this.level.setText(`N.${level}`);
+  }
+
   /** Met à jour la barre de PV et sa couleur, sans transition (rechargement / init — US-16 CA1). */
   update(monster: MonsterInstance) {
     this.displayedHp = { hp: monster.hp, maxHp: monster.maxHp };

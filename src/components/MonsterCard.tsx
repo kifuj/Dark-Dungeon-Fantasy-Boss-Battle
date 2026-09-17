@@ -12,10 +12,12 @@ interface MonsterCardProps {
   /** Pastille affichée sur une carte choisie (ex. ordre d'entrée dans le draft). */
   badge?: string;
   disabled?: boolean;
+  /** Touche qui choisit la carte (voir src/lib/keyboard.ts). */
+  shortcut?: string;
 }
 
 /** Carte d'une espèce avec ses stats au niveau donné (choix du starter US-10, draft US-18). */
-export function MonsterCard({ speciesId, level, selected, onSelect, badge, disabled = false }: MonsterCardProps) {
+export function MonsterCard({ speciesId, level, selected, onSelect, badge, disabled = false, shortcut }: MonsterCardProps) {
   const species = SPECIES[speciesId];
   const preview = createMonster(speciesId, level, `preview-${speciesId}`);
 
@@ -26,7 +28,13 @@ export function MonsterCard({ speciesId, level, selected, onSelect, badge, disab
       onClick={onSelect}
       aria-pressed={selected}
       disabled={disabled}
+      data-key={shortcut}
     >
+      {shortcut && (
+        <kbd className="key-hint card-key" aria-hidden="true">
+          {shortcut}
+        </kbd>
+      )}
       {badge && <span className="card-badge">{badge}</span>}
       <span className={`starter-sprite sprite-${species.sprite}`}>
         <MonsterSprite speciesId={speciesId} scale={1.25} />

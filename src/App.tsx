@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { useKeyboardNavigation } from './lib/keyboard.ts';
 import { ProfileProvider, RequireProfile } from './lib/profile.tsx';
 import { Credits } from './pages/Credits.tsx';
 import { Guide } from './pages/Guide.tsx';
@@ -12,6 +13,7 @@ import { SoloRun } from './pages/SoloRun.tsx';
 import { Title } from './pages/Title.tsx';
 
 export default function App() {
+  useKeyboardNavigation();
   return (
     <ProfileProvider>
       <Routes>

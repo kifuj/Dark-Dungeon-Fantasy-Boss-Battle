@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ApiError, claimTimeout, errorMessage, forfeitMatch, sendAction, sendDraft } from '../lib/api.ts';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ApiError, claimTimeout, errorMessage, forfeitMatch, sendAction, sendDraft, startMatch } from '../lib/api.ts';
 import { useProfile } from '../lib/profile.tsx';
 import { hasPlayedThisTurn } from '../lib/matches.ts';
-import { subscribeToMatch } from '../lib/realtime.ts';
+import { useBattleMusic } from '../lib/music.ts';
+import { subscribeToMatch, subscribeToRoom } from '../lib/realtime.ts';
 import { fetchUsernames } from '../lib/rooms.ts';
 import { describeEvents } from '../../shared/engine/log.js';
 import { isTurnExpired } from '../../shared/engine/online.js';
@@ -13,6 +14,7 @@ import { EventBus } from '../game/EventBus.ts';
 import { PhaserGame } from '../game/PhaserGame.tsx';
 import { ANIMATION_TIMEOUT_MS } from '../game/timing.ts';
 import { ActionMenu } from '../components/ActionMenu.tsx';
+import { MusicToggle } from '../components/MusicToggle.tsx';
 import { DraftPanel } from '../components/DraftPanel.tsx';
 
 type UiState = 'loading' | 'choosing' | 'waiting' | 'animating' | 'finished';
@@ -36,7 +38,14 @@ const STATUS_TEXT: Record<UiState, string> = {
  */
 export function OnlineMatch() {
   const { matchId = '' } = useParams();
+  // Une revanche change l'URL : la clé repart d'un état vierge pour le nouveau match.
+  return <OnlineMatchView key={matchId} matchId={matchId} />;
+}
+
+function OnlineMatchView({ matchId }: { matchId: string }) {
   const { profile } = useProfile();
+  const navigate = useNavigate();
+  const [rematching, setRematching] = useState(false);
   const [match, setMatch] = useState<MatchRow | null>(null);
   const [ui, setUi] = useState<UiState>('loading');
   const [log, setLog] = useState<string[]>([]);
@@ -217,6 +226,28 @@ export function OnlineMatch() {
     [ui],
   );
 
+  // Fin de duel : on suit le salon, pour rejoindre la revanche dès que l'un des deux la lance.
+  const roomId = ui === 'finished' ? (match?.room_id ?? null) : null;
+  useEffect(() => {
+    if (!roomId) return;
+    return subscribeToRoom(roomId, (room) => {
+      if (room.current_match_id && room.current_match_id !== matchId) navigate(`/match/${room.current_match_id}`, { replace: true });
+    });
+  }, [roomId, matchId, navigate]);
+
+  async function rematch() {
+    if (!roomId || rematching) return;
+    setRematching(true);
+    setError(null);
+    try {
+      const { matchId: next } = await startMatch(roomId);
+      navigate(`/match/${next}`, { replace: true });
+    } catch (failure) {
+      setError(errorMessage(failure));
+      setRematching(false);
+    }
+  }
+
   async function forfeit() {
     const row = matchRef.current;
     if (!row) return;
@@ -229,12 +260,14 @@ export function OnlineMatch() {
     }
   }
 
+  useBattleMusic(Boolean(match));
+
   if (!match) {
     return (
       <main className="page centered-page">
         <section className="panel" aria-label="Duel">
           <p className="loading-line">{missing ? 'Cette partie est introuvable.' : 'Chargement du duel…'}</p>
-          <Link to="/multi" className="button back-button">
+          <Link to="/multi" className="button back-button" data-shortcut="back">
             <span>Retour au multijoueur</span>
             <span className="button-arrow" aria-hidden="true">↩</span>
           </Link>
@@ -272,6 +305,7 @@ export function OnlineMatch() {
       </header>
 
       {hasTeams && <PhaserGame />}
+      <MusicToggle />
 
       {ui === 'finished' ? (
         <section className="run-over" aria-label="Fin du duel">
@@ -286,6 +320,10 @@ export function OnlineMatch() {
                 : `${names[opponentId] ?? 'Votre adversaire'} remporte le duel.`}
           </p>
           <div className="run-over-actions">
+            <button type="button" className="button" data-key="r" disabled={rematching} onClick={rematch} autoFocus>
+              <span>{rematching ? 'Lancement…' : 'Revanche'}</span>
+              <span className="button-arrow" aria-hidden="true">↻</span>
+            </button>
             <Link to="/multi" className="button">
               <span>Nouveau duel</span>
               <span className="button-arrow" aria-hidden="true">⚔</span>
@@ -295,6 +333,8 @@ export function OnlineMatch() {
               <span className="button-arrow" aria-hidden="true">↩</span>
             </Link>
           </div>
+          <p className="run-save">Revanche : un nouveau duel dans le même salon, sans nouveau code (touche R).</p>
+          {error && <p className="form-error" role="alert">{error}</p>}
         </section>
       ) : (
         <>
@@ -325,7 +365,7 @@ export function OnlineMatch() {
                   <span>Confirmer l’abandon</span>
                   <span className="button-arrow" aria-hidden="true">⚑</span>
                 </button>
-                <button type="button" className="button" onClick={() => setConfirmingForfeit(false)}>
+                <button type="button" className="button" data-shortcut="back" onClick={() => setConfirmingForfeit(false)}>
                   <span>Continuer le duel</span>
                   <span className="button-arrow" aria-hidden="true">↩</span>
                 </button>

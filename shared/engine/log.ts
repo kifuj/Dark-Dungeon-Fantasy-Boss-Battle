@@ -21,7 +21,11 @@ export function describeEvent(event: BattleEvent, playerSeat: Seat): string[] {
     case 'heal':
       return [`${mine(event.seat) ? 'Votre monstre' : "L'ennemi"} récupère ${event.amount} PV.`];
     case 'buff':
-      return [`${mine(event.seat) ? 'Votre monstre' : "L'ennemi"} augmente sa défense !`];
+      return [`${mine(event.seat) ? 'Votre monstre' : "L'ennemi"} augmente ${event.stat === 'atk' ? 'son attaque' : 'sa défense'} !`];
+    case 'level_up':
+      return event.evolvedFrom
+        ? [`${event.evolvedFrom} évolue en ${event.name} !`, `${event.name} passe au niveau ${event.level} !`]
+        : [`${event.name} passe au niveau ${event.level} !`];
     case 'faint':
       return [`${event.name} est K.O. !`];
     case 'forfeit':
