@@ -909,6 +909,65 @@ h2,
 
 .forfeit-confirm p { margin: 0; }
 
+/* ---------- Page Crédits (US-26) ---------- */
+
+.credits-panel {
+  width: min(100%, 900px);
+  text-align: left;
+}
+
+.credits-panel > .eyebrow,
+.credits-panel > h1 { align-self: center; }
+
+.credits-panel .back-button { align-self: center; margin-top: 1.6rem; }
+
+.markdown { width: 100%; color: rgba(194, 181, 154, 0.85); line-height: 1.55; }
+
+.markdown h2 {
+  margin: 1.8rem 0 0.7rem;
+  color: var(--ember);
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.markdown a { color: var(--bone); }
+
+.markdown code {
+  padding: 0.05rem 0.3rem;
+  background: rgba(13, 13, 15, 0.55);
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.82em;
+}
+
+.markdown blockquote {
+  margin: 1rem 0;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--violet);
+  background: rgba(13, 13, 15, 0.35);
+  font-size: 0.9rem;
+}
+
+.md-table { width: 100%; overflow-x: auto; }
+
+.md-table table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
+.md-table th,
+.md-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(74, 71, 69, 0.7);
+  text-align: left;
+  vertical-align: top;
+}
+
+.md-table th {
+  color: var(--bone);
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 /* ---------- Récompenses de fin de vague (US-12) ---------- */
 
 .reward-panel {
