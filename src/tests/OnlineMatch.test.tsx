@@ -214,6 +214,30 @@ describe('US-19 — jouer un combat en ligne', () => {
     expect(screen.getByText(/Mattéo a abandonné le duel/)).toBeDefined();
   });
 
+  it('affiche l’état courant après un rafraîchissement, sans rejouer d’animation (US-21 CA1)', async () => {
+    const played: string[] = [];
+    const inits: unknown[] = [];
+    const onPlay = () => played.push('play-events');
+    const onInit = (payload: unknown) => inits.push(payload);
+    EventBus.on('play-events', onPlay);
+    EventBus.on('battle-init', onInit);
+    const { push } = await renderMatch();
+
+    // Duel déjà avancé : tour 4, version 7, avec les événements du tour 3 dans `last_events`.
+    const rng = createTurnRng(SEED, 1, 3);
+    const moves = [0, 1].map((seat) => ({ type: 'skill' as const, skillId: BASE.state.players[seat].team[0].skills[0].id }));
+    const turn = resolveTurn(BASE.state, [moves[0], moves[1]], rng);
+    await push({ ...BASE, state: turn.state, last_events: turn.events, turn: 4, version: 7 });
+
+    await waitFor(() => expect(screen.getByRole('status').textContent).toBe('À vous de jouer.'));
+    expect(screen.getByText('Tour 4')).toBeTruthy();
+    expect(played).toHaveLength(0); // aucun rejeu du tour précédent
+    expect(inits.at(-1)).toEqual({ state: turn.state, playerSeat: 0 }); // bons PV affichés directement
+    expect(hasPlayedThisTurn).toHaveBeenCalledWith('match-1', 1, 4, 'battle');
+    EventBus.off('play-events', onPlay);
+    EventBus.off('battle-init', onInit);
+  });
+
   it('affiche « En attente de l’adversaire… » après un rafraîchissement si le tour est déjà joué (US-21 CA2)', async () => {
     const { push } = await renderMatch();
     hasPlayedThisTurn.mockResolvedValue(true); // le joueur avait déjà envoyé son action avant de rafraîchir
