@@ -3,7 +3,7 @@ import type { SpeciesDef } from '../types.ts';
 import { rarityForPower, speciesPower } from './rarities.ts';
 
 /** Niveau où les starters évoluent (solo uniquement). */
-export const STARTER_EVOLUTION_LEVEL = 12;
+export const STARTER_EVOLUTION_LEVEL = 24;
 /** Niveau où les monstres communs évoluent : leurs évolutions n'apparaissent donc qu'en fin de run. */
 export const COMMON_EVOLUTION_LEVEL = 10;
 

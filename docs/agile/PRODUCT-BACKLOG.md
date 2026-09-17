@@ -474,7 +474,7 @@ Format des critères : **Étant donné** (contexte) / **Quand** (action) / **Alo
 #### US-41 — Évolutions · Could · 5 pts
 **En tant que** joueur solo, **je veux** voir mes monstres évoluer **afin de** sentir ma progression et affronter des ennemis plus forts en fin de run.
 
-- **CA1** : Les 3 starters évoluent au niveau 12 et les 7 monstres communs au niveau 10, en une espèce plus puissante du même élément (jamais boss), avec son propre sprite.
+- **CA1** : Les 3 starters évoluent au niveau 24 et les 7 monstres communs au niveau 10, en une espèce plus puissante du même élément (jamais boss), avec son propre sprite.
 - **CA2** : Le monstre qui évolue garde ses compétences, ses PP et ses PV perdus ; le journal affiche « X évolue en Y ! ».
 - **CA3** : Les évolutions ne sont jamais tirées directement : un ennemi commun de niveau suffisant arrive évolué (à partir de la vague 11).
 - **CA4** : Les évolutions ne sont pas proposées au draft du duel ; le Guide indique pour chacune l'espèce et le niveau d'origine.

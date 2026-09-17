@@ -59,7 +59,7 @@ describe('Bestiaire', () => {
       expect(evolvesFrom(into.id)).toBe(s.id);
     }
     expect(speciesAtLevel('salamander', 11)).toBe('salamander');
-    expect(speciesAtLevel('salamander', 12)).toBe('drakeid');
+    expect(speciesAtLevel('salamander', STARTER_EVOLUTION_LEVEL)).toBe('drakeid');
     expect(speciesAtLevel('drakeid', 30)).toBe('drakeid');
   });
 
