@@ -97,7 +97,7 @@
 
 **Vélocité moyenne sur les 4 sprints : 15 points** (12, 18, 18, 12), soit **60 points terminés sur 66 engagés**, plus 3 points récupérés du sprint 1 (US-02) et 5 points bonus (US-09). Hors sprint, US-18 et US-29 (8 points proposés) ont été livrées le 16/09.
 
-L'équipe livre ce qu'elle engage en développement depuis le sprint 2. Ce qui traîne depuis le sprint 1, c'est uniquement la **configuration des services externes** (US-01 : règle de réécriture du dashboard Render, protection de `main`). Ces tâches demandent des accès, pas du code, et le poste de développement ne les avait pas. Le jeu fonctionne quand même en production grâce au repli `404.html`.
+L'équipe livre ce qu'elle engage en développement depuis le sprint 2. Ce qui traîne depuis le sprint 1, c'est uniquement la **configuration des services externes** (US-01 : règle de réécriture du dashboard Render, protection de `main`). Ces tâches demandent des accès, pas du code. La protection de `main` a été activée au sprint 4 ; la règle de réécriture Render reste à faire depuis le dashboard. Le jeu fonctionne quand même en production grâce au repli `404.html`.
 
 ## 8. Risques
 
@@ -110,9 +110,11 @@ L'équipe livre ce qu'elle engage en développement depuis le sprint 2. Ce qui t
 | Projet Supabase en pause le jour J | Faible | Haut | Ouvrir le dashboard la veille et le matin |
 | ~~Sprint 4 trop court pour tout finir~~ | — | — | **Levé** : les 12 pts engagés et US-09 (bonus) sont fusionnés et vérifiés sur la production avant 10h |
 | Réseau lent pendant la démo | Moyenne | Haut | Corrigé au sprint 4 : la run solo ne se fige plus si les sprites arrivent tard (filet de 4,5 s, comme le duel) |
-| Démo qui plante en direct | Moyenne | Haut | Vidéo de secours enregistrée au sprint 4, deux navigateurs préparés |
+| Démo qui plante en direct | Moyenne | Haut | Vidéo de secours enregistrée au sprint 4 ([`presentation/demo-secours.mp4`](presentation/demo-secours.mp4)), aussi intégrée au diaporama ; base remise à zéro |
 
 ## 9. Plan de la présentation (≈ 30 min)
+
+Diaporama : [`presentation/soutenance.html`](presentation/soutenance.html) (12 slides, flèches du clavier pour avancer, `F` pour le plein écran).
 
 1. **Pitch et démo** (8 min) : partie solo, puis duel en direct sur deux PC.
 2. **Organisation Scrum** (8 min) : rôles, backlog, Planning Poker, vélocité par sprint.

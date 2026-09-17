@@ -15,6 +15,7 @@ Inspiré de *PokeRogue*.
 | Jeu en ligne (Render) | [`https://dark-dungeon-fantasy-boss-battle.onrender.com`](https://dark-dungeon-fantasy-boss-battle.onrender.com) |
 | Dépôt GitHub (public) | [`kifuj/Dark-Dungeon-Fantasy-Boss-Battle`](https://github.com/kifuj/Dark-Dungeon-Fantasy-Boss-Battle) |
 | Projet Supabase | *(privé : ne jamais publier les clés)* |
+| Présentation | [Diaporama](docs/presentation/soutenance.html) (à ouvrir dans un navigateur, vidéo intégrée) · [Vidéo de secours de la démo](docs/presentation/demo-secours.mp4) |
 
 ## 🧱 Stack
 
