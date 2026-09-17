@@ -50,7 +50,7 @@ Une user story est terminée si :
 | US-19 | Multijoueur | Jouer un combat en ligne tour par tour | Must | 8 | **8** | 3 |
 | US-23 | Multijoueur | Abandonner un duel | Should | 1 | **1** | 3 |
 | US-12 | Solo | Choisir une récompense après chaque vague | Must | 5 | | 4 |
-| US-09 | Interface combat | Animations et textes de combat | Should | 5 | | *backlog* (bonus S4) |
+| US-09 | Interface combat | Animations et textes de combat | Should | 5 | | 4 (bonus, ✅ livré pendant le sprint) |
 | US-20 | Multijoueur | Timeout de tour | Should | 3 | | 4 |
 | US-21 | Multijoueur | Reprendre une partie après un rafraîchissement | Should | 3 | | 4 |
 | US-26 | Contenu | Écran des crédits | Must | 1 | | 4 |
@@ -94,8 +94,15 @@ Les US d'un sprint sont **rejouées en Planning Poker au début de ce sprint**, 
 | US-17 Rejoindre un salon | 2 / 3 / 3 / 3 | — | **3** | La course entre deux joueurs qui entrent le code en même temps justifie 3 |
 | US-19 Combat en ligne | 8 / 13 / 8 / 8 | 8 / 8 / 8 / 8 | **8** | Owen à 13 (donc à découper) : le moteur existe depuis le sprint 1, il ne reste que le transport |
 | US-23 Abandonner | 1 / 1 / 2 / 1 | — | **1** | Une fonction courte et un bouton avec confirmation |
+| **Sprint 4** | | | | |
+| US-12 Récompenses | *votes à reporter* | | *5 proposé* | |
+| US-20 Timeout | *votes à reporter* | | *3 proposé* | |
+| US-21 Reconnexion | *votes à reporter* | | *3 proposé* | CA1 et CA2 étaient déjà tenus depuis le sprint 3 : 2 points auraient suffi |
+| US-26 Crédits | *votes à reporter* | | *1 proposé* | |
+| US-09 Animations *(bonus)* | *votes à reporter* | | *5 proposé* | |
+| US-18 Draft, US-29 Bestiaire *(livrées hors sprint)* | *votes à reporter* | | *5 et 3 proposés* | |
 
-Détail des séances : [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les US du sprint 4 seront rejouées au début de leur sprint.
+Détail des séances : [Sprint 2 — Qui a fait quoi](SPRINT-2.md#-qui-a-fait-quoi) et [Sprint 3 — Planning Poker](SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint). Les votes du sprint 4 sont à reporter dans [Sprint 4 — Planning Poker](SPRINT-4.md#planning-poker).
 
 ## 5. User stories détaillées
 

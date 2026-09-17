@@ -1,7 +1,7 @@
 # 🗡️ Dark Dungeon Fantasy Boss battle
 
 Jeu **roguelike pixel-art médiéval-fantasy au tour par tour**, jouable dans le navigateur.
-On peut jouer **en solo** contre des vagues de monstres contrôlés par l'IA, ou **en duel multijoueur en ligne** contre un ami.
+On peut jouer **en solo** contre des vagues de monstres contrôlés par l'IA, avec une récompense à choisir après chaque vague, ou **en duel multijoueur en ligne** contre un ami : draft des équipes, tours de 60 s, reprise de la partie après un rafraîchissement.
 Inspiré de *PokeRogue*.
 
 > Projet étudiant réalisé dans le cadre du TP Agile (BTS2). Aucun usage commercial.
@@ -57,21 +57,21 @@ Inspiré de *PokeRogue*.
 | Critères d'acceptation | [US détaillées](docs/agile/PRODUCT-BACKLOG.md#5-user-stories-détaillées) |
 | Definition of Ready (DoR) | [DoR](docs/agile/PRODUCT-BACKLOG.md#1-definition-of-ready-dor) |
 | Definition of Done (DoD) | [DoD](docs/agile/PRODUCT-BACKLOG.md#2-definition-of-done-dod) |
-| Estimation (Planning Poker, Fibonacci) | [Planning Poker](docs/agile/PRODUCT-BACKLOG.md#4-planning-poker) · [séance du sprint 2](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) · [séance du sprint 3](docs/agile/SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint) |
+| Estimation (Planning Poker, Fibonacci) | [Planning Poker](docs/agile/PRODUCT-BACKLOG.md#4-planning-poker) · [séance du sprint 2](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) · [séance du sprint 3](docs/agile/SPRINT-3.md#planning-poker-rejoué-en-début-de-sprint) · [séance du sprint 4](docs/agile/SPRINT-4.md#planning-poker) |
 
 ### Sprints
 
 | | [Sprint 1](docs/agile/SPRINT-1.md) — Le socle | [Sprint 2](docs/agile/SPRINT-2.md) — Premier combat jouable | [Sprint 3](docs/agile/SPRINT-3.md) — Multijoueur | [Sprint 4](docs/agile/SPRINT-4.md) — Roguelike et finitions |
 |---|---|---|---|---|
-| **État** | Terminé — 12 / 18 pts | Terminé — 18 / 18 pts | Terminé — 18 / 18 pts (+3 pts d'US-02) | À venir (jeu. matin) |
+| **État** | Terminé — 12 / 18 pts | Terminé — 18 / 18 pts | Terminé — 18 / 18 pts (+3 pts d'US-02) | Terminé — 12 / 12 pts (+5 pts bonus US-09) |
 | **Sprint Goal** | [lien](docs/agile/SPRINT-1.md#-sprint-goal) | [lien](docs/agile/SPRINT-2.md#-sprint-goal) | [lien](docs/agile/SPRINT-3.md#-sprint-goal) | [lien](docs/agile/SPRINT-4.md#-sprint-goal) |
 | **Sprint Backlog** | [lien](docs/agile/SPRINT-1.md#-sprint-backlog) | [lien](docs/agile/SPRINT-2.md#-sprint-backlog) | [lien](docs/agile/SPRINT-3.md#-sprint-backlog) | [lien](docs/agile/SPRINT-4.md#-sprint-backlog) |
 | **Qui a fait quoi** | [lien](docs/agile/SPRINT-1.md#-répartition-des-tâches) | [lien](docs/agile/SPRINT-2.md#-qui-a-fait-quoi) | [lien](docs/agile/SPRINT-3.md#-répartition-des-tâches) | [lien](docs/agile/SPRINT-4.md#-répartition-des-tâches) |
-| **Tâches terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-terminées) | [lien](docs/agile/SPRINT-3.md#-tâches-terminées) | — |
-| **Tâches non terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-3.md#-tâches-non-terminées) | — |
-| **Problèmes rencontrés** | [lien](docs/agile/SPRINT-1.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-2.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-3.md#-problèmes-rencontrés) | — |
-| **Décisions prises** | [lien](docs/agile/SPRINT-1.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-2.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-3.md#-décisions-prises-pendant-le-sprint) | — |
-| **Daily Scrums** | [lien](docs/agile/SPRINT-1.md#-daily-scrums) | [lien](docs/agile/SPRINT-2.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-3.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-4.md#-daily-scrums) |
+| **Tâches terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-terminées) | [lien](docs/agile/SPRINT-3.md#-tâches-terminées) | [lien](docs/agile/SPRINT-4.md#-tâches-terminées) |
+| **Tâches non terminées** | [lien](docs/agile/SPRINT-1.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-2.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-3.md#-tâches-non-terminées) | [lien](docs/agile/SPRINT-4.md#-tâches-non-terminées) |
+| **Problèmes rencontrés** | [lien](docs/agile/SPRINT-1.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-2.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-3.md#-problèmes-rencontrés) | [lien](docs/agile/SPRINT-4.md#-problèmes-rencontrés) |
+| **Décisions prises** | [lien](docs/agile/SPRINT-1.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-2.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-3.md#-décisions-prises-pendant-le-sprint) | [lien](docs/agile/SPRINT-4.md#-décisions-prises-pendant-le-sprint) |
+| **Daily Scrums** | [lien](docs/agile/SPRINT-1.md#-daily-scrums) | [lien](docs/agile/SPRINT-2.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-3.md#-comptes-rendus-de-daily-scrum) | [lien](docs/agile/SPRINT-4.md#-comptes-rendus-de-daily-scrum) |
 | **Sprint Review** | [lien](docs/agile/SPRINT-1.md#-sprint-review-t-15-min) | [lien](docs/agile/SPRINT-2.md#-sprint-review) | [lien](docs/agile/SPRINT-3.md#-sprint-review) | [lien](docs/agile/SPRINT-4.md#-sprint-review-t-15-min) |
 | **Rétrospective `Keep / Drop / Try`** | [lien](docs/agile/SPRINT-1.md#-rétrospective--keep--drop--try) | [lien](docs/agile/SPRINT-2.md#-rétrospective-keep-drop-try) | [lien](docs/agile/SPRINT-3.md#-rétrospective-keep-drop-try) | [lien](docs/agile/SPRINT-4.md#-rétrospective--keep--drop--try) |
 

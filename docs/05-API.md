@@ -30,7 +30,7 @@
 ## 3. Endpoints
 
 > ✅ **Déployées au sprint 3** : `rooms-create`, `rooms-join`, `match-start`, `match-action`, `match-forfeit`
-> (`npm run functions:deploy`). **Ajoutée ensuite** : `match-draft` (US-18). `match-timeout` et `match-reward` restent à faire.
+> (`npm run functions:deploy`). **Ajoutées ensuite** : `match-draft` (US-18), `match-timeout` (US-20, sprint 4). `match-reward` (BO3) n'est pas faite.
 > Toutes les fonctions livrées sont **idempotentes** : rejoindre deux fois, lancer deux fois ou abandonner
 > deux fois renvoie `200` avec le même résultat, pour qu'un double-clic ne produise jamais d'erreur visible.
 
@@ -93,13 +93,13 @@ Règles : voir l'implémentation ci-dessous. Erreurs : `WRONG_PHASE`, `STALE_TUR
 
 ---
 
-### `match-timeout` *(Should)*
+### `match-timeout` *(Should — livrée au sprint 4)*
 
 | Requête | Réponse `200` |
 |---|---|
 | `{ "matchId": "uuid" }` | `{ "status": "resolved" \| "nothing_to_do" }` |
 
-Règles : l'appelant est un joueur du match et `now > turn_deadline + 2 s`. Insère l'action par défaut pour chaque joueur absent (`is_auto = true`, conflits ignorés), puis résout le tour. Erreur : `TOO_EARLY`.
+Règles : l'appelant est un joueur du match et `now > turn_deadline + 2 s` (`isTurnExpired`). Insère l'action par défaut pour chaque joueur absent (`is_auto = true`, conflits ignorés : si le joueur envoie son action au même moment, c'est la sienne qui compte), puis résout le tour (`tryResolveBattleTurn`) ou le draft (`tryResolveDraft`). Match terminé → `200 nothing_to_do`. Erreurs : `TOO_EARLY`, `NOT_A_PLAYER`, `MATCH_NOT_FOUND`.
 
 ---
 
